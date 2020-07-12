@@ -1,0 +1,48 @@
+<apex:page showHeader="false" sidebar="false" >
+<style>
+@font-face {
+  font-family: "schoolbook";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("!URLFOR($Resource.CenturySchoolbook_Regular_woff2}") format("woff2"), url(!URLFOR($Resource.CenturySchoolbook_Regular_woff}")
+              format("woff");   
+}
+
+@font-face {
+  font-family: "gtamstandard";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("!URLFOR($Resource.GT_America_Standard_Regular_woff}") format("woff"), url("!URLFOR($Resource.GT_America_Standard_Regular_woff2}")
+              format("woff2");
+}
+
+.blueColor{
+  color: #0055AA
+}
+
+h4 {
+    font-family: gtamstandard;
+    font-size: 20px;
+    color: #130F54
+}
+
+.aclu-body {
+    font-size: 16px;
+    font-family: schoolbook;
+    line-height: 1.4;
+    word-spacing: -0.12em;
+    letter-spacing: 0.01em;
+}
+
+</style>
+    <div style="padding:8%;">
+
+  <h4>Thank you for updating Email Preferences </h4><br/><hr/><br/>
+  <apex:outputPanel layout="block"><span class="aclu-body">
+      <p>It may take up to a week to honor your opt-out request.</p>
+      <p>Stay abreast of essential issues and actions by regularly visiting our &nbsp;<apex:outputLink styleClass="blueColor" value="https://www.aclu.org/blog">Blog of Rights</apex:outputLink>, and keep in touch with our vibrant community of activists — &nbsp;<apex:outputLink styleClass="blueColor" value="https://www.facebook.com/aclu.nationwide">become a fan on Facebook </apex:outputLink>&nbsp;or&nbsp;<apex:outputLink styleClass="blueColor" value="https://twitter.com/aclu">follow the ACLU on Twitter</apex:outputLink>.</p>
+  </span></apex:outputPanel>
+  </div>
+</apex:page>

@@ -1,0 +1,14 @@
+<!-- ***************************************************************************
+ Author        :  Aashita Sharma
+ Date          :  23rd Jan 2018
+ Related Task  :  T-659055
+ Description   :  VF Page used as a related list of Proposal Detail on the Opportunity
+                  detail page. 
+**************************************************************************** -->
+<apex:page standardController="Opportunity" showHeader="false" sideBar="false" id="pg">
+    
+    <apex:outputPanel id="oppRelatedPanel">
+        <c:OppRelatedProposalComponent oppd="{!Opportunity.Id}"/>
+    </apex:outputPanel>
+  
+</apex:page>

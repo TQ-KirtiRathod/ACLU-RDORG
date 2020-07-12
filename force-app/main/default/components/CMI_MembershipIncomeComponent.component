@@ -1,0 +1,66 @@
+<apex:component controller="RevenueSharingReportsController">
+ <head>
+ </head>
+ <body>  
+  <table style="width:70%; border-collapse: collapse;">
+  <tbody>
+  <apex:variable value="{!1}" var="i"/>
+  <apex:repeat value="{!listOfRecords}" var="record">
+    <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};">
+      <th style="text-align:center;" width="10%"><span style="font-size: 8pt; ">{!record.Account__r.Affiliation__c}</span></th>
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Total_Unshared_Affiliate__c}"/></apex:outputText></span></td>
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!IF((record.BRI_Affiliate_Share__c==null || record.BRI_Affiliate_Share__c==0),0,IF(record.Eligible_for_GMI__c,record.NET_BRI__c,record.Affil_Paid__c))}"/></apex:outputText></span></td>
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Sum_Of_Unshared_and_UBRI_total__c}"/></apex:outputText></span></td>
+      <td width="3%" style="background-color:#ffffff"></td>
+      <td style="text-align:center;" width="9%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Total_Unshared_National__c}"/></apex:outputText></span></td>
+      <td style="text-align:center;" width="9%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!IF(record.Eligible_for_GMI__c,0,IF((record.BRI_Affiliate_Share__c==null || record.BRI_Affiliate_Share__c==0),0,record.Nat_l_Paid__c))}"/></apex:outputText></span></td> 
+      <td style="text-align:center;" width="9%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Sum_Of_Unshared_and_UBRI_National_Total__c}"/></apex:outputText></span></td>
+    </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr>
+      <th width="10%"></th>
+      <td colspan="3" width="35%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="3%"></td>
+      <td colspan="3" width="32%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+     <tr width="70%">
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">Total</span></td>
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedAffiliate']}"/></apex:outputText></span></td>
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!totalAffiliateBRI}"/></apex:outputText></span></td>
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedAndUBRI']}"/></apex:outputText></span></td>
+      <td width="3%"></td>
+      <td style="text-align:center;" width="9%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedNationalTotal']}"/></apex:outputText></span></td>
+      <td style="text-align:center;" width="9%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!totalNationalBRI}"/></apex:outputText></span></td>
+      <td style="text-align:center;" width="9%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalOfSumOfUnsharedAndUBRI']}"/></apex:outputText></span></td>
+    </tr>
+    <tr>
+      <th width="10%"></th>
+      <td colspan="3" width="35%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="3%"></td>
+      <td colspan="3" width="32%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+    <tfoot>
+    <table style="width:70%">
+      <tbody>
+        <tr>
+          <td width="10%"></td>
+          <td width="60%">
+            <p style="font-family: Arial Unicode MS; font-size: 7pt;text-align:left;">
+                29. Shows Total Unshared amount to be paid to affiliate.<br/>
+                30. Shows Total BRI amount to be paid to affiliate.<br/>
+                31. Shows Total combined Unshared and BRI amount to be paid to affiliate.<br/>
+                32. Shows Total Unshared amount to be paid to National.<br/>
+                33. Shows Total BRI amount to be paid to National.<br/>
+                34. Shows Total combined Unshared and BRI amount to be paid to National.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </tfoot>
+</table>
+</body>
+</apex:component>

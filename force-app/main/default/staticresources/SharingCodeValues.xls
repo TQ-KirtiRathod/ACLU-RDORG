@@ -1,0 +1,43 @@
+Name,Share_Code__c,Share_Code_Description__c 
+1,E141,Benefit
+2,E151,Solicited Earmarked
+3,C161,Unsolicited Earmarked
+4,C165,Union Recognized Foundation/Grant
+5,E181,In-Kind
+6,E131,General Incentive
+7,E191,Special Sharing
+8,C171,Memorial or Tribute
+9,B003,Recapture
+10,E013,Special Appeal
+11,A003,GoL: New Member Guardian
+12,P003,GoL: First Renewal Guardian
+13,D009,GoL: Renewal Guardian
+14,E017,GoL: Guardian Payment
+15,A001,LMG: New Life Member
+16,P001,LMG: First Renewal Life Member
+17,D011,LMG: Renewal Life Member
+18,C005,FUG: New Non-Member
+19,A002,FUG: New Member
+20,P002,First Renewal
+21,E016,Renewal Gift: Misc Direct Mail
+22,D012,Renewal Gift: Renewal
+23,E015,Unsolicited Direct Mail
+24,R151,Solicited Earmarked
+25,K161,Unsolicited Earmarked
+26,R121,Advertising
+27,K165,Recognized Foundation/Gov't Grant
+28,R131,General Incentive
+29,N111,National Direct Mail
+30,R112,Affiliate Direct Mail
+31,R113,Direct Mail
+32,K171,Memorial or Tribute
+33,R181,In-Kind Contribution
+34,R191,Special Sharing
+35,R141,Benefit
+36,N175,Workplace Giving: National
+37,R131,Workplace Giving: Affiliate
+38,T400,Endowment
+39,Q001,Bequest: Foundation
+40,Q001,Bequest: Foundation
+41,U001,Bequest: Union
+42,U001,Bequest: Union

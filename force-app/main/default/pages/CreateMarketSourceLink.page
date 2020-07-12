@@ -1,0 +1,97 @@
+<apex:page controller="CreateMarketSourceLinkController" showHeader="false" sidebar="false">
+    <apex:form id="form">
+        <apex:pageBlock title="Create Market Source Link">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{! updateURL }" reRender="msg,links" value="Create" status="status" />        
+                <apex:actionStatus id="status">
+                <apex:facet name="start">
+                    <apex:outputPanel >
+                        <img src="/img/loading32.gif" width="12" height="12" />
+                        <apex:outputLabel value="Working..."/>
+                    </apex:outputPanel>
+                </apex:facet>
+            </apex:actionStatus>
+            </apex:pageBlockButtons>
+            <apex:pageMessages id="msg" />
+            <p style="margin-bottom: 12px;">
+                Use this page to generate links with embedded market source information. Enter your link in Base URL, then select the Affiliate and insert and External Vendor Information. Enter your own market source value, or use the builder to create one based on date, topic, and audience. Then, click Create to generate your links.
+            </p>
+            <apex:pageBlockSection id="sec" collapsible="false" title="URL, Affiliate, and External Information">
+                <apex:pageBlockSectionItem > 
+                    <apex:outputLabel for="base" value="Base URL" />
+                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                        <apex:inputText value="{! link }" id="base" styleClass="requiredInput"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem > 
+                    <apex:outputLabel for="affiliate">Affiliate</apex:outputLabel>
+                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                        <apex:selectList size="1" multiselect="false" id="affiliate" value="{! affiliate }" styleClass="requiredInput">
+                            <apex:selectOptions value="{! affiliateOptions }" />
+                        </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem > 
+                    <apex:outputLabel for="external">External (Vendor Information)</apex:outputLabel>
+                    <apex:inputText value="{! external }" id="external" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection collapsible="false" title="Market Source">
+                <apex:outputPanel > 
+                    Enter your own Market Source value here, or use the Date, Audience, and Topic fields to construct one.
+                </apex:outputPanel>
+                <apex:pageBlockSectionItem >
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="mso"> 
+                    <apex:outputLabel for="other">Market Source</apex:outputLabel>
+                    <apex:inputText value="{! marketSource }" id="other" />
+                </apex:pageBlockSectionItem>
+                <script lang="javascript">
+                    function updateMS() {
+                        // Generated market source string is YYMMDD_topic_audience
+                        var y = document.getElementById('year').value;
+                        var m = document.getElementById('month').value;
+                        var d = document.getElementById('day').value;
+
+                        if (y != "" && m != "" && d != "") {
+                            var date_string = "" + ("0" + y).slice(-2) + ("0"+m).slice(-2) + ("0" + d).slice(-2);
+
+                            document.getElementById('{! $Component.mso.other }').value = date_string + "_" + document.getElementById('topic').value + "_" + document.getElementById('audience').value;
+                            document.getElementById('{! $Component.mso.other }').blur();
+                        }
+                        return null;
+                    }
+                </script>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection collapsible="false" title="Build Market Source">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="topic">Topic</apex:outputLabel>
+                    <input type="text" id="topic" onkeyup="updateMS();"  />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="audience">Audience</apex:outputLabel>
+                    <input type="audience" id="audience" onkeyup="updateMS();" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="Day">Day</apex:outputLabel>
+                    <input type="number" size="5" min="1" max="31" id="day" value="{! DAY(TODAY()) }" oninput="updateMS();"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="month">Month</apex:outputLabel>
+                    <input type="number" size="3" min="1" max="12" id="month" value="{! MONTH(TODAY()) }" oninput="updateMS();"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="Year">Year</apex:outputLabel>
+                    <input type="number" size="5" min="2017" max="2100" id="year" value="{! YEAR(TODAY()) }" oninput="updateMS();"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" collapsible="false" id="links" title="Generated Links">
+                <apex:pageBlockSectionItem > 
+                    <apex:inputTextArea rows="14" cols="80" value="{! finalLink }" readonly="true" id="finalURL" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

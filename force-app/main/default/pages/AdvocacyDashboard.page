@@ -1,0 +1,198 @@
+<apex:page controller="AdvocacyDashboardController"
+showHeader="true" applyHtmlTag="true"
+           applyBodyTag="false" docType="html-5.0" id="thePage" >
+       <apex:form id="form1">
+       		<div class="content" style="padding-top:5px;">
+            <img src="/img/s.gif" class="pageTitleIcon" title="Dashboards" alt="Dashboards" /> 
+            <h1 style="font-size:2em;"> Advocacy Dashboard</h1>
+        </div>
+        <div class="bFilterReport" style="padding-top:40px; padding-bottom:5px;font-size:120%;">
+			
+            <div class="reportParameters">
+                <div class="row">
+                <apex:PageMessages id="showmsg"></apex:PageMessages>
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                               <td>
+                                    <label>Springboard ID</label>
+                                    <apex:inputText value="{!actionData.Springboard_ID__c}" label="Specific User"
+                                     id="springBoardId"/>
+                                </td>
+                                <td>
+                                    <label>Campaign Name</label>
+                                    <apex:inputField value="{!actionData.Campaign__c}" label="Campaign Name" id="campaignId"/>
+                                   
+                                </td>
+                                <td>
+                                    <label>Campaign Group</label>
+                                    <apex:inputField value="{!actionData.Campaign_Grouping__c}" label="Campaign Group"
+                                    id="campaignGrpId"/>
+                                </td>
+                                <td>
+                                    <label></label>
+                                    <input type="submit" value="Show Report" onclick="reRenderComp();return false;" class="btn"
+                                        style="margin-left: 0px;margin-top: 12px;" />
+                                    <apex:actionFunction name="reRenderComp" action="{!showReport}" reRender="performanceByTeam, showmsg"
+                                        oncomplete="showFunnel();" status="actStatusId" 
+                                    />
+                                    <apex:actionStatus id="actStatusId">
+                                        <apex:facet name="start">
+
+                                            <img src="/img/loading.gif" />
+
+                                        </apex:facet>
+                                    </apex:actionStatus>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+       
+       <apex:outputPanel id="performanceByTeam">
+            <apex:pageBlock rendered="{!mapActionTaken != null}">
+                <apex:pageBlockSection columns="2">
+                    
+                    <c:TotalActionTakenAdvocacy wrapper="{!mapActionTaken}" summary="{!mapSummaryActionTaken}" rendered="{!mapActionTaken != null}" isRecordNotExist="{!actionTakenFlag}"/>
+					
+                    <c:NewAcquiredEmailAdvocacy wrapper="{!mapActionTaken}" summary="{!mapSummaryActionTaken}" rendered="{!mapActionTaken != null}" isRecordNotExist="{!actionTakenFlag}"  lastRunDate="{!lastEmailBatchRunDateSt}" />
+				   
+				    <!-- <c:ActionTakenEmailChart piechartData="{!lstPieData}"/> -->
+                    <!-- rendered="{!lstPieData.size!=0}" -->
+                    <apex:outputPanel rendered="{!mapActionTaken != null}" id="emailPie">
+            			<div class="bPageBlock ">
+                           <div class="pbHeader">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td class="pbTitle"><h2>Actions Taken by New vs. Existing Emails</h2></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h4>Last Batch Run Date: {!lastEmailBatchRunDateSt}</h4></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <table>
+                                <tr style="display: {!IF(actionTakenFlag, 'none','table-row')};">
+                                    <td>
+                                        <apex:chart height="300" width="500" data="{!lstPieData}">
+                        				    <apex:pieSeries dataField="data" labelField="name" tips="true">
+                        				        <apex:chartLabel display="outside" font="bold 13px Helvetica" />
+                                            </apex:pieSeries>
+                                            <apex:legend position="top"/>
+                        				</apex:chart>		   
+                                    </td>
+                                </tr>
+                                <tr style="display: {!IF(actionTakenFlag, 'table-row','none')};" >
+                                   <td style="background-color: #ececec;" colspan='2'>
+                                    <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+                                   </td>
+                                </tr>
+                            </table>
+            		      </div>			    
+					  </apex:outputPanel>
+					  
+                      <c:DonationSubsequentAdvocacy wrapper="{!mapActionTaken}" summary="{!mapSummaryActionTaken}" rendered="{!mapActionTaken != null}" isRecordNotExist="{!actionTakenFlag}"  lastRunDate="{!lastGivingBatchRunDateSt}" />
+				    
+				  
+                      <c:MarketSourceByActionTaken wrapper="{!mapSummaryActionTaken}" rendered="{!mapSummaryActionTaken != null}" isRecordNotExist="{!actionTakenFlag}"  lastRunDate="{!lastActionTakenRunDateSt}" />
+    				  
+                      <c:MarketSourceByEmail wrapper="{!mapSummaryActionTaken}" rendered="{!mapSummaryActionTaken != null}" isRecordNotExist="{!actionTakenFlag}"  lastRunDate="{!lastActionTakenRunDateSt}" />
+    				  
+                         <!-- Market Sources by Actions Taken -->
+                        <apex:outputPanel rendered="{!mapActionTaken != null}">
+                            <div class="bPageBlock">
+                               <div class="pbHeader">
+                                   <table>
+                                        <tbody>
+                                            <tr>
+                                                <td class="pbTitle">
+                                                <h2>Market Sources by Actions Taken Chart</h2>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <table>
+                                    <!-- {!mktScByActionsPieData} -->
+                                    <tr style="display: {!IF(actionTakenFlag, 'none','table-row')};">
+                                        <td> 
+                                            <apex:chart height="300" width="500" data="{!mktScByActionsPieData}">
+                                                <apex:pieSeries dataField="data" labelField="name" tips="true">
+                                                    <apex:chartLabel display="outside" font="bold 13px Helvetica"/>
+                                                </apex:pieSeries>
+                                                <apex:legend position="right" />
+                                            </apex:chart>
+                                         </td>
+                                    </tr>
+                                    <tr style="display: {!IF(actionTakenFlag, 'table-row','none')};" >
+                                       <td style="background-color: #ececec;" colspan='2'>
+                                        <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+                                       </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </apex:outputPanel>
+
+                        <!-- Market Sources by Email rendered="{!mktScByActionsPieData.size!=0}"-->
+                        <apex:outputPanel rendered="{!mapActionTaken != null}">
+                            <div class="bPageBlock">
+                               <div class="pbHeader">
+                                   <table>
+                                        <tbody>
+                                            <tr>
+                                                <td class="pbTitle">
+                                                <h2>Market Sources by Email Chart</h2>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <table>
+                                    <!-- {!mktScByEmailPieData.size} -->
+                                    <tr style="display: {!IF(actionTakenFlag, 'none','table-row')};">
+                                        <td> 
+                                            <apex:chart height="300" width="500" data="{!mktScByEmailPieData}">
+                                              <apex:pieSeries dataField="data" labelField="name" tips="true">
+                                                  <apex:chartLabel display="outside" font="bold 13px Helvetica"/>
+                                              </apex:pieSeries>
+                                              <apex:legend position="right" />
+                                            </apex:chart>
+                                       </td>
+                                    </tr>
+                                    <tr style="display: {!IF(actionTakenFlag, 'table-row','none')};">
+                                       <td style="background-color: #ececec;" colspan='2'>
+                                        <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+                                       </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </apex:outputPanel>
+
+                        
+                        <apex:outputPanel rendered="{! !actionTakenFlag}" ><!-- -->
+                            <div class="bPageBlock">
+                               <div class="pbHeader">
+                            <apex:commandButton onclick="window.open('/{!actionTakenOverTime}?pv0={!searchString}');" value="Actions Taken Over Last 30 Days" reRender="false"/>
+                            </div>
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{! !actionTakenFlag}" >
+                            <div class="bPageBlock">
+                               <div class="pbHeader">
+                            <apex:commandButton onclick="window.open('/{!actionTakenByContact}?pv0={!searchString}');" value="Number of Previous Actions Taken by Contact" reRender="false" />
+                            </div>
+                            </div>
+                        </apex:outputPanel>
+
+				  </apex:pageBlockSection>
+            </apex:pageBlock>
+        
+        </apex:outputPanel>
+        
+    </apex:form>
+
+</apex:page>

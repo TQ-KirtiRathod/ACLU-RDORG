@@ -1,0 +1,61 @@
+<apex:component controller="FCMI_Report_Controller">
+ <head>
+ </head>
+ <body>  
+  <table style="width:100%; border-collapse: collapse;">
+  <tbody>
+  <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};">
+      <th style="text-align:center;" width="12%"><span style="font-size: 8pt; ">{!record.Account__r.Affiliation__c}</span></th>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_UnSolEarmark__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_RecogGrant__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_Memorial__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_Memorial__c + record.FCMI_RecogGrant__c + record.FCMI_UnSolEarmark__c}"/></apex:outputText></span></td>
+      <!-- <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatBanked__c}"/></apex:outputText></span></td> -->
+      <td style="background-color:#ffffff" width="8%"></td>
+      <td style="background-color:#ffffff" width="8%"></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatUnSolEarmark__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatRecogGrant__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatMemorial__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatMemorial__c + record.FCMI_NatRecogGrant__c + record.FCMI_NatUnSolEarmark__c}"/></apex:outputText></span></td>
+
+      <!-- <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_AffBanked__c}"/></apex:outputText></span></td> -->
+      <td style="background-color:#ffffff" width="8%"></td>
+    </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr>
+      <th width="12%"></th>
+      <td colspan="4" width="40%" style="border-bottom:1pt solid #808080;"></td>
+      <td style="background-color:#ffffff" width="8%"></td>
+      <td style="background-color:#ffffff" width="8%"></td>
+      <td colspan="4" width="40%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+    <tr>
+      <td style="text-align:center;" width="12%"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">Total</span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalUnSolUnmarked']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMIRecogGrants']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMIMemorial']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalUnSolUnmarked'] + result['totalFCMIRecogGrants'] + result['totalFCMIMemorial'] }"/></apex:outputText></span></td>
+      <!-- <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMINatBanked']}"/></apex:outputText></span></td>    -->  
+      <td style="background-color:#ffffff" width="8%"></td>
+      <td style="background-color:#ffffff" width="8%"></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalUnSolUnmarked']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMIRecogGrants']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMIMemorial']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMINatUnsolEarmarked'] + result['totalNatRecogGrants'] + result['totalNatMemorial']}"/></apex:outputText></span></td>
+      <!-- <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMIAffBanked']}"/></apex:outputText></span></td>  -->
+      <td style="background-color:#ffffff" width="8%"></td>
+    </tr>
+    <tr>
+      <th width="12%"></th>
+      <td colspan="4" width="40%" style="border-bottom:1pt solid #808080;"></td>
+      <td style="background-color:#ffffff" width="8%"></td><td style="background-color:#ffffff" width="8%"></td>
+      <td colspan="4" width="40%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</apex:component>

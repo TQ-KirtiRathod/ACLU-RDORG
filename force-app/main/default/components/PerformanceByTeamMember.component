@@ -1,0 +1,68 @@
+<apex:component >
+    <apex:attribute name="wrapper" description="wrapper map" type="map"/>
+    <apex:attribute name="rendered" description="to show this component conditionally" type="Boolean"/>
+    <apex:attribute name="teamsRecordFlag" description="Flag to identify if map is empty or not" type="Boolean"/>
+    <div class="bPageBlock brandSecondaryBrd apexDefaultPageBlock secondaryPalette" rendered="{!rendered}">
+    
+        <div class="pbHeader">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="pbTitle"><h2>Performance By Team Member</h2>
+                        </td>
+                     </tr>
+                </tbody>
+            </table>
+            </div>
+            <table class="list" border="0" cellspacing="0" cellpadding="0"> 
+    
+   <apex:repeat value="{!wrapper}" var="wrap">
+       
+           <tr class="headerRow">
+               <td colspan="4" class="tableTitle">
+               {!wrap}</td>
+            </tr>
+                <tr class="headerRow">
+                <th scope="col">Team Member Name</th>
+                <th scope="col" class="numericalColumn">Sum of Requested Amount</th>
+                <!--th scope="col" class="numericalColumn">Sum of Open Pledged Amount</th-->
+                <th scope="col" class="numericalColumn">Sum of Closed Amount</th>
+                </tr>
+                <apex:repeat value="{!wrapper[wrap]}" var="team">
+                    <tr class="first even last">
+                    <td><span class="dashboardRowLabel">{!team.userName}</span>
+                    </td>
+                <td class="numericalColumn">
+                    <span class="dashboardRowValue">
+                        <apex:outputText value="${0,number,###,###,##0}">
+                            <apex:param value="{!team.requestedAmount}" />
+                        </apex:outputText>
+                    </span>
+                    </td><!--td class="numericalColumn">
+                    <span class="dashboardRowValue">${!team.pledgedAmount}</span>
+                    </td-->
+                    <td class="numericalColumn">
+                        <span class="dashboardRowValue">
+                        <apex:outputText value="${0,number,###,###,##0}">
+                            <apex:param value="{!team.closedAmount}" />
+                        </apex:outputText>
+                        
+                        </span></td>
+                        </tr>
+                       
+                </apex:repeat>
+                </apex:repeat>
+                  <tr style="display: {!IF(teamsRecordFlag, 'table-row','none')};" >
+               <td style="background-color: #ececec;" colspan='3'>
+                <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+               </td>
+               </tr>
+                 
+            
+               
+  </table>
+        
+     </div>
+   
+
+</apex:component>

@@ -1,0 +1,62 @@
+<apex:page controller="RevenueSharingAdminController" id="RevenueSharing" tabStyle="account" sidebar="false" showHeader="true">
+  <!-- Begin Default Content REMOVE THIS -->
+  <script id="scr">
+      function closePopup() {
+          console.log('Here in method');
+          console.log({!closeWindow});
+          console.log("{!closeWindow}");
+          if({!closeWindow}) {
+              console.log('Here1');
+              window.close();
+          }
+      }
+  </script>
+  <apex:form id="form">
+      <apex:actionFunction name="save" action="{!save}" oncomplete="closePopup();" rerender="form,scr" />
+    <apex:pageMessages rendered="{!isShowError}"></apex:pageMessages>
+      <apex:pageBlock rendered="{!!isProcessing}">
+            <apex:pageBlockSection title="Revenue Sharing" >
+                <apex:pageBlockSectionItem >
+                    <label> Report Type</label>
+                    <apex:selectList value="{!selectedReportType}" multiselect="false" size="1">
+                        <apex:selectOption itemValue="CMI" rendered="{!affiliateYearlyId == null}"/>
+                        <apex:selectOption itemValue="FCMI" rendered="{!affiliateYearlyId == null}"/>
+                        <apex:selectOption itemValue="Donor-Member Count" />
+                        <apex:actionSupport event="onchange" rerender="form" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputPanel ></apex:outputPanel>
+                <apex:inputField value="{!affiliateYearly.CMI_stage_DateStart__c}"  label="Start Date"/>
+                <apex:inputField value="{!affiliateYearly.CMI_stage_DateEnd__c}"  label="EndDate"/>
+                <apex:inputField value="{!affiliateYearly.Foundation_Cost_Factor__c}" rendered="{!selectedReportType != 'Donor-Member Count'}"/>
+                <apex:inputField value="{!affiliateYearly.Union_Cost_Factor__c}" rendered="{!selectedReportType != 'Donor-Member Count'}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons location="bottom" >
+                <!--<apex:commandButton value="Submit" title="Submit" action="{!save}" />-->
+                <apex:commandButton value="Submit" onClick="save();return false;" />
+            </apex:pageBlockButtons>
+      </apex:pageBlock>
+      <apex:outputPanel rendered="{!isProcessing}" id="displayMessage">
+          <apex:pageBlock >
+               <apex:pageBlockSection >
+                    <apex:outputText rendered="{!isError}"> Last report request currently processing. Please check back later.. </apex:outputText>
+                    <apex:outputText rendered="{!!isError}"> Your report request is being processed. You'll receive an email when it is ready to view. </apex:outputText>
+                    <br/>
+                    <apex:outputText value="Running User: {!rSSC.Last_User_Running_Report__c}"/>
+                    <apex:outputText value="Report Started Date/Time: {!rSSC.Last_Start_Run_DateTime__c}"/>
+                    <apex:outputText value="Report Details: {!rSSC.Last_Run_Details__c}"/>
+                </apex:pageBlockSection>
+          </apex:pageBlock>
+      </apex:outputPanel>
+      <apex:outputPanel rendered="{!!isProcessing}" id="displayDetails">
+          <apex:pageBlock >
+               <apex:pageBlockSection title="Last Run Details">
+                    <apex:outputText label="Last User Running Report:" value="{!rSSC.Last_User_Running_Report__c}"/>
+                    <apex:outputText label="Last Start Run DateTime:" value="{!rSSC.Last_Start_Run_DateTime__c}"/>
+                    <apex:outputText label="Report Details:" value="{!rSSC.Last_Run_Details__c}"/>
+                </apex:pageBlockSection>
+          </apex:pageBlock>
+      </apex:outputPanel>
+  </apex:form>
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

@@ -1,0 +1,60 @@
+<apex:page standardController="Batch_Log__c" extensions="createInlineOpportunityItemsCtrl" id="pg">
+    <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></apex:includeScript>
+    <style>
+        #table-scroll {
+            height:250px;
+            overflow:auto;  
+            margin-top:20px;
+            overflow-y: scroll;
+        }
+    </style>
+    <script>
+        function setStageValue(recTypeF, recCount) {
+            if(recTypeF.value == 'Donation') {
+                $('.Stage'+recCount).val('Completed');
+            } else {
+                $('.Stage'+recCount).val('Open');
+            }
+            reRenderRows();
+        }
+        
+        function restrictChargeCards(payMethod, recCount) {
+            if(payMethod.value == 'Cash/Check') {
+                restrictCC();
+            }
+        }
+    </script>
+    <apex:pageBlock id="pb">
+        <apex:form id="frm">
+            <apex:actionFunction name="addRows" action="{!addRows}" rerender="pb"/> 
+            <apex:actionFunction name="saveRows" action="{!saveRows}" rerender="pb"/> 
+            <apex:actionFunction name="deleteRow" action="{!deleteRow}" rerender="pb">
+                <apex:param name="rowIndex" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="reRenderRows" action="{!None}" rerender="pb"/>
+            <apex:actionFunction name="restrictCC" action="{!restrictCC}" rerender="pgm"/>
+            <div id="table-scroll">
+                <apex:pageMessages id="pgm"/>
+                <apex:pageBlockTable value="{!opportunityWrapperLst}" var="opptyWrapper">
+                    <apex:column >
+                        <apex:commandButton value="X" rendered="{!opptyWrapper.isNew}" onClick="deleteRow('{!opptyWrapper.recCount}');return false;"/>
+                        <apex:outputLink value="https://www.salesforce.com" id="IHOIMOLink">Add IHO/IMO</apex:outputLink>
+                    </apex:column>
+                    <apex:repeat value="{!labelFieldSet}" var="ofield" id="repeatOpptyFields">
+                        <apex:column >
+                            <apex:facet name="header">{!if(ofield.label == 'Account ID','Account Name',ofield.label)}</apex:facet>
+                            <apex:inputField styleclass="{!ofield.label}{!opptyWrapper.recCount}" value="{!opptyWrapper.objOppty[ofield]}" rendered="{!AND(opptyWrapper.isNew, ofield.label != 'Giving Record Type', ofield.label != 'Selected Payment Method')}"/>
+                            <apex:inputField styleclass="{!ofield.label}{!opptyWrapper.recCount}" onchange="restrictChargeCards(this, '{!opptyWrapper.recCount}');return false;" value="{!opptyWrapper.objOppty[ofield]}" rendered="{!AND(opptyWrapper.isNew, ofield.label == 'Selected Payment Method')}"/>
+                            <apex:selectList value="{!selectedRT}" onchange="setStageValue(this, '{!opptyWrapper.recCount}');return false;" size="1" rendered="{!AND(opptyWrapper.isNew, ofield.label == 'Giving Record Type')}">
+                                <apex:selectOptions value="{!recTypeValues}"/>
+                            </apex:selectList>
+                            <apex:outputField value="{!opptyWrapper.objOppty[ofield]}" rendered="{!!opptyWrapper.isNew}"/>
+                        </apex:column>
+                    </apex:repeat>
+                </apex:pageBlockTable>
+            </div>
+            <apex:commandButton value="Add Row" onClick="addRows();return false;"/>
+            <apex:commandButton value="Save Row" onClick="saveRows();"/>
+        </apex:form>
+    </apex:pageBlock>
+</apex:page>

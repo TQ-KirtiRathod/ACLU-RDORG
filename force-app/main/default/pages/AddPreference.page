@@ -1,0 +1,137 @@
+<apex:page standardController="rC_Bios__Preference__c" extensions="AddPreferenceController">
+    <apex:form rendered="{! NOT(canUserEdit) }">
+        <apex:pageBlock title="Preference Cannot Be Edited">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{! cancel }" value="Cancel" />
+            </apex:pageBlockButtons>
+
+            <p>
+                Only National users can edit this type of preference.
+            </p>
+        </apex:pageBlock>
+    </apex:form>
+    <apex:form rendered="{! canUserEdit }">
+        <apex:pageBlock title="Preference Details">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{! save }" value="Save" />
+                <apex:commandButton action="{! saveAndNew }" value="Save and New" />
+                <apex:commandButton action="{! cancel }" value="Cancel" />
+            </apex:pageBlockButtons>
+            <apex:pageMessages />
+            <apex:pageBlockSection >
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="selcode">Preference Code</apex:outputLabel>
+                    <apex:outputText id="selected" value="{! IF(NOT(ISBLANK(rC_Bios__Preference__c.rC_Bios__Code_Value__c)),
+                        rC_Bios__Preference__c.rC_Bios__Code_Value__c + IF(NOT(ISBLANK(pc.Description__c)), ', ', '') + pc.Description__c,
+                        'not selected') }" style="{! IF(ISBLANK(rC_Bios__Preference__c.rC_Bios__Code_Value__c), 'font-style: italic;', '') }" />
+                </apex:pageBlockSectionItem>
+                <apex:inputField value="{! rC_Bios__Preference__c.rC_Bios__Active__c }" />
+                <apex:inputField value="{! rC_Bios__Preference__c.rC_Bios__Account__c }" />
+                <apex:inputField value="{! rC_Bios__Preference__c.rC_Bios__Contact__c }" />
+                <apex:inputField value="{! rC_Bios__Preference__c.rC_Bios__Start_Date__c }" />
+                <apex:inputField value="{! rC_Bios__Preference__c.rC_Bios__End_Date__c }" />
+                <apex:inputField value="{! rC_Bios__Preference__c.rC_Bios__Status__c }" />
+                <apex:inputField value="{! rC_Bios__Preference__c.rC_Bios__Comments__c }" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock title="Select Preference Type" rendered="{! ISBLANK(rC_Bios__Preference__c.Id) }">
+            <apex:panelGrid columns="2">
+                <apex:outputPanel >
+                    <div style="width:300px;">
+                        <p>
+                            Use the filter pane to the right to locate and select a Preference Code. Enter a search string and click Filter to narrow your display to entries that contain your search in either Code Value or Description.
+                        </p>
+                        <p> 
+                            You may also narrow your search by selecting a Category of Preference Code within which to search.
+                        </p>
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel >
+                    <apex:actionFunction name="runFilter" action="{! filterPreferenceCodes }" rerender="list,nav,clear" status="filterStatus">
+                        <apex:param name="one" assignTo="{! filter }" value="" />
+                        <apex:param name="two" assignTo="{! selectedCategory }" value="" />
+                    </apex:actionFunction>
+
+                    <apex:actionFunction name="selectCode" action="{! selectPreferenceCode }" rerender="list,selected" status="filterStatus">
+                        <apex:param name="one" assignTo="{! rC_Bios__Preference__c.rC_Bios__Code_Value__c }" value="" />
+                    </apex:actionFunction>
+                    <p>
+                        <strong>Filter:&nbsp;</strong>
+                        <input type="text" id="filter" onkeydown="if (event.keyCode==13) { runFilter(document.getElementById('filter').value, document.getElementById('{! $Component.catList }').value); return false;}" />
+
+                        <a class="btn" style="text-decoration: none;" href="javascript:runFilter(document.getElementById('filter').value, document.getElementById('{! $Component.catList }').value);" >Filter</a>
+
+                        <a class="btn" style="text-decoration: none;" href="javascript:var q = document.getElementById('filter'); q.value = ''; q.blur(); runFilter(document.getElementById('filter').value, document.getElementById('{! $Component.catList }').value);">Clear</a>
+                    </p>   
+                    
+                    <p>
+                        <apex:selectList id="catList" multiselect="false" size="1" value="{! selectedCategory }" onchange="runFilter(document.getElementById('filter').value, document.getElementById('{! $Component.catList }').value);">
+                            <apex:selectOptions value="{! categorySelectOptions }" />
+                            <apex:outputLabel for="catList"><strong>Category:&nbsp;</strong></apex:outputLabel>
+                        </apex:selectList>
+
+                        <apex:actionStatus id="filterStatus">
+                            <apex:facet name="start">
+                                <apex:outputPanel >
+                                    <img src="/img/loading32.gif" width="12" height="12" />
+                                    <apex:outputLabel value="Loading..."/>
+                                </apex:outputPanel>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </p>
+
+                    <div style="overflow-y:scroll; height:400px; width:700px; margin-top:12px; margin-bottom:6px;" id="scrolldiv">
+                        <apex:pageBlockTable value="{! filteredPreferenceCodes }" var="pcode" id="list">
+                            <apex:column >
+                                <input type="radio"
+                                       onclick="q = document.getElementById('selRadio'); if (q) { q.checked = false; } selectCode('{! pcode.rC_Bios__Code_Value__c }');"
+                                       style="{! IF(pcode.rC_Bios__Code_Value__c == rC_Bios__Preference__c.rC_Bios__Code_Value__c, 'display: none;', '') }" />
+                               <input type="radio"
+                                      checked="checked"
+                                      id="{! IF(pcode.rC_Bios__Code_Value__c == rC_Bios__Preference__c.rC_Bios__Code_Value__c && !ISBLANK(rC_Bios__Preference__c.rC_Bios__Code_Value__c), 'selRadio', '') }"
+                                      style="{! IF(pcode.rC_Bios__Code_Value__c == rC_Bios__Preference__c.rC_Bios__Code_Value__c, '', 'display: none;') }" />
+                            </apex:column>
+                            <apex:column style="padding-right: 10px;">
+                                <apex:facet name="header">Code</apex:facet>
+                                <apex:outputText value="{! pcode.rC_Bios__Code_Value__c }"/>
+                            </apex:column>
+                            <apex:column style="padding-right: 10px;">
+                                <apex:facet name="header">Category</apex:facet>
+                                <apex:outputText value="{! pcode.rC_Bios__Category__c }"/>
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="header">Description</apex:facet>
+                                <apex:outputText value="{! pcode.Description__c }"/>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </div>
+                    <apex:outputPanel id="nav">
+                        Page&nbsp;<apex:outputText value="{! page }" /> of&nbsp;<apex:outputText value="{! pages }" />.&nbsp;
+                        <apex:commandLink action="{! prev }"
+                                          value="Prev"
+                                          status="pagingStatus"
+                                          rendered="{! page > 1 && pages > 0 }"
+                                          rerender="list,nav"
+                                          oncomplete="document.getElementById('scrolldiv').scrollTop = 0;" />&nbsp;
+                        <apex:commandLink action="{! next }"
+                                          value="Next"
+                                          status="pagingStatus"
+                                          rendered="{! page < pages && pages > 0 }"
+                                          rerender="list,nav"
+                                          oncomplete="document.getElementById('scrolldiv').scrollTop = 0;" />&nbsp;
+                        <apex:actionStatus id="pagingStatus">
+                            <apex:facet name="start">
+                                <apex:outputPanel >
+                                    <img src="/img/loading32.gif" width="12" height="12" />
+                                    <apex:outputLabel value="Loading..."/>
+                                </apex:outputPanel>
+                            </apex:facet>
+                        </apex:actionStatus>
+
+                        Total&nbsp;<apex:outputText value="{! count }" /> preference codes.
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:panelGrid>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

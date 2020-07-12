@@ -1,0 +1,34 @@
+<!--Modified by :: roundCorner Inc. :: 29 -Jan-2019 :: Zendesk: #55332  -->
+<apex:component controller="GivingViewsAccountLayoutController">
+    <apex:attribute name="fieldSet" description="FieldSet Component" type="String" required="required" assignTo="{!fieldSetName}"/>
+    <apex:attribute name="accId" description="Attribute on the component." type="Id" required="required" assignTo="{!accountId}"/>
+    <apex:form >
+        <apex:pageBlock title="{!sectionName}" rendered="{!IF(OpptyToDisplay.size>0,true,false)}">
+            <apex:pageBlockTable value="{!OpptyToDisplay}" var="Oppty" id="OpptyRecords" >
+                <apex:repeat value="{!labelFieldSet}" var="ofield" id="repeatOpptyFields">
+                     <apex:column id="col" headervalue="{!ofield}" rendered="{!IF(ofield == 'Name',true,false)}">
+                         <apex:outputLink target="_parent" value="/{!Oppty['Id']}">{!Oppty[ofield]}</apex:outputLink>
+                     </apex:column>
+                     <!--// Zendesk: #55332 -->
+                     <apex:column id="col2" headervalue="{!parentGivingName}"  rendered="{!IF(ofield == 'rC_Giving__Parent__c',true,false)}">
+                         <apex:outputLink target="_parent" value="/{!Oppty['rC_Giving__Parent__c']}">{!Oppty['rC_Giving__Parent__r.Name']}</apex:outputLink>
+                     </apex:column>
+                    
+                     <apex:column id="col3" headervalue="{!batchLogName}" rendered="{!IF(ofield == 'Batch_Log__c',true,false)}">
+                         <apex:outputLink target="_parent" value="/{!Oppty['Batch_Log__c']}">{!Oppty['Batch_Log__r.Name']}</apex:outputLink>
+                    </apex:column>
+                    <apex:column id="col4" headervalue="{!primaryCampaignSource}" rendered="{!IF(ofield == 'CampaignId',true,false)}">
+                         <apex:outputLink target="_parent" value="/{!Oppty['CampaignId']}">{!Oppty['Campaign.Name']}</apex:outputLink>
+                    </apex:column>
+                    <apex:column id="col5" headervalue="{!portfolio1}" rendered="{!IF(ofield == 'Portfolio__c',true,false)}">
+                         <apex:outputLink target="_parent" value="/{!Oppty['Portfolio__c']}">{!Oppty['Portfolio__r.name']}</apex:outputLink>
+                    </apex:column>
+                    <apex:column id="col1" value="{!Oppty[ofield]}" rendered="{!IF(OR(ofield = 'Portfolio__c',ofield = 'CampaignId',ofield = 'Batch_Log__c', ofield = 'rC_Giving__Parent__c',ofield = 'Batch_Log__r.Name', ofield = 'rC_Giving__Parent__r.Name'),false,true)}"/>
+                   <!-- End Zendesk: #55332 -->
+                </apex:repeat>
+            </apex:pageBlockTable> 
+            <a href="#" onclick="top.window.location.href='{!$Page.GivingRecordListWithAdjustments}?fieldSet={!fieldSetName}&accId={!accountId}';"> View More </a>
+        </apex:pageBlock>
+        <apex:PageBlock title="{!sectionName}" rendered="{!IF(OpptyToDisplay.size==0,true,false)}"><apex:OutputPanel >No Records Found</apex:OutputPanel></apex:PageBlock>
+    </apex:form>
+</apex:component>

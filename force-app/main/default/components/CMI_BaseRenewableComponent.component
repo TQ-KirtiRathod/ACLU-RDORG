@@ -1,0 +1,100 @@
+<apex:component controller="RevenueSharingReportsController">
+
+    <body>
+        <table style="width:100%;border-collapse: collapse;">
+            <tbody>
+                <apex:variable value="{!1}" var="i" />
+                <apex:repeat value="{!listOfRecords}" var="record">
+                    <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+                    <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};" width="100%">
+                        <th width="9%" style="text-align:center;"><span style="font-size: 8pt;">{!record.Account__r.Affiliation__c}</span></th>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_UBRI_RenewalDues__c}"/></apex:outputText></span></td>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_UBRI_RenewalDues_Count__c}"/></apex:outputText></span></td>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Average_Of_Renewable_Dues__c}"/></apex:outputText></span></td>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_UBRI_ExtraContribs__c}"/></apex:outputText></span></td>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;text-align:right;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_UBRI_ExtraContribs_Count__c}"/></apex:outputText></span></td>
+                        <td width="4%" style="text-align:center;"></td>
+                        <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Ration_of_Extra_Contributions__c}"/></apex:outputText></span></td>
+                        <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Total_BRI__c}"/></apex:outputText></span></td>
+                        <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.NET_BRI__c}"/></apex:outputText></span></td>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;">{!IF(record.Eligible_for_GMI__c,"GMI"," ")}</span></td>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;">{!IF(record.Eligible_for_GMI__c,"GMI",record.BRI_Affiliate_Share__c)}</span></td>
+
+                        <!--
+      <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0,number,0.0}%"><apex:param value="{!IF(record.Eligible_for_GMI__c,"GMI",record.BRI_Affiliate_Share__c)}"/></apex:outputText></span></td>
+      -->
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!IF(record.Eligible_for_GMI__c,0,IF((record.BRI_Affiliate_Share__c==null || record.BRI_Affiliate_Share__c==0),0,record.Affil_Paid__c))}"/></apex:outputText></span></td>
+                        <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!IF(record.Eligible_for_GMI__c,0,IF((record.BRI_Affiliate_Share__c==null || record.BRI_Affiliate_Share__c==0),0,record.Nat_l_Paid__c))}"/></apex:outputText></span></td> 
+                         
+                        </tr>
+                    <apex:variable value="{!i+1}" var="i" />
+                </apex:repeat>
+                <tr>
+                    <td width="9%"></td>
+                    <td colspan="14" width="42%" style="border-bottom:1pt solid #808080;"></td>
+                </tr>
+                <tr width="100%">
+                    <td width="9%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;text-align:center">Total</span></td>
+                    <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['renewableDues']}"/></apex:outputText></span></td>
+                    <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['renewableDuesCount']}"/></apex:outputText></span></td>
+                    <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['avgOfRenewableDues']}"/></apex:outputText></span></td>
+                    <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['extraContribs']}"/></apex:outputText></span></td>
+                    <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['extraContibsCount']}"/></apex:outputText></span></td>
+                    <td width="4%" style="text-align:center;"></td>
+                    <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['ratioOfExtraContribs']}"/></apex:outputText></span></td>
+                    <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['toalBRI']}"/></apex:outputText></span></td>
+                    <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['netBRI']}"/></apex:outputText></span></td>
+                    <td width="7%" style="text-align:center;"></td>
+                    <td width="7%" style="text-align:center;"></td>
+                    <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['affilPaid']}"/></apex:outputText></span></td>
+                    <td width="7%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!totalNationalBRI}"/></apex:outputText></span></td>
+                </tr>
+                <tr>
+                    <td width="9%"></td>
+                    <td colspan="14" width="42%" style="border-bottom:1pt solid #808080;"></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <p style="font-family: Arial Unicode MS; font-size: 7pt;text-align:center;font-weight:bold;text-decoration:underline;">
+                    <strong>BASE RENEWABLE INCOME</strong></p>
+                <p style="font-family: Arial Unicode MS; font-size: 7pt;">
+                    This section of the CMI lists Base Renewable Income raised and distributed. The numbers
+                    below correspond to the numeric designation of the columns on
+                    the page.
+                </p>
+                <p style="font-family: Arial Unicode MS; font-size: 7pt;padding-left:20px;">
+                    16. Repeats the affiliate postal abbreviations.
+                    <br/>17. Shows the total membership renewal DOLLARS for members
+                    renewing for at least the second time; after first joining or
+                    being recaptured, and then making a first renewal payment. It
+                    also includes all Guardian of Liberty sustaining payments.
+                    <br/>18. Shows the NUMBER of membership renewals. (Multiple Guardian
+                    of Liberty sustaining payments are not included.)
+                    <br/>19. Shows the average renewal amount. (Multiple Guardian
+                    of Liberty sustaining payments count as one per member towards
+                    the average.)
+                    <br/>20. Shows the additional Base Renewable Income DOLLARS,
+                    most of which are from special appeals.
+                    <br/>21. Shows the NUMBER of such gifts.
+                    <br/>22. Shows the average total gift per renewal.
+                    <br/>23. Shows the total gross Base Renewable Income raised,
+                    which is the total of columns 17 and 20. Note also, in the column
+                    heading, a parenthetical notation of the Cost Factor percentage
+                    that is used to calculate net BRI.
+                    <br/>24. Shows the income available for distribution after deduction
+                    of the Cost Factor.
+                    <br/>25. Indicates, where applicable, the type of special sharing
+                    that pertains to certain affiliates. GMI indicates the affiliate
+                    is entitled to a guaranteed minimum income which will exceed
+                    the funds raised in its area. Asterisks indicate that sharing
+                    for the designated affiliate is not calculated by this report.
+                    <br/>26. Shows the percentage used in calculating the portion
+                    of the net BRI due to the affiliate. Percentage varies by affiliate
+                    size.
+                    <br/>27. Shows the amount to be paid to the affiliate.
+                    <br/>28. Shows the amount to be paid to National.
+                </p>
+            </tfoot>
+        </table>
+    </body>
+</apex:component>

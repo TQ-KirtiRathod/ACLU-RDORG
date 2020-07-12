@@ -1,0 +1,9 @@
+<apex:page standardController="Batch_Log__c"
+    extensions="BatchLogDetailPageController"
+    contentType="text/csv#Export.csv;charset=utf8"
+    cache="true"
+    language="en-US">{!headers}
+    <apex:repeat value="{!opportunityWrapperLst}" var="opptyWrapper">
+        {!opptyWrapper.csvRecord}
+    </apex:repeat>
+</apex:page>

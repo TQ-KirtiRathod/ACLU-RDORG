@@ -1,0 +1,35 @@
+<!--
+ - Created by Surya pratap on 6/18/2019.
+ -->
+<aura:component >
+    <aura:attribute name="messageType" 			type="String" 	default="success"/>
+    <aura:attribute name="message" 				type="String" 	default="" 			required="true"/>
+    <aura:attribute name="timeoutMS" 			type="Integer" 	default="5000"/>
+    <aura:attribute name="closable" 			type="Boolean" 	default="true"/>
+    <aura:attribute name="autoHide" 			type="Boolean" 	default="false"/>
+    <aura:attribute name="closeParentWindow" 	type="Boolean" 	default="false"/>
+    <aura:handler name="change" value="{!v.message}" action="{!c.destory}"/>
+
+    <!--<aura:if isTrue="{!!equals(v.message,'')}">-->
+    <aura:if isTrue="{!not(empty(v.message))}">
+        <div class="toastMessage">
+            <div class="slds-notify_container slds-is-relative messageClass">
+                <div class="{! 'slds-notify slds-notify--alert ' + if(v.messageType=='success', ' slds-theme_success', if(v.messageType=='error','slds-theme_error', if(v.messageType=='warning','slds-theme_warning','slds-theme_info')))}" role="alert">
+                    <aura:if isTrue="{!v.closable}">
+                        <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse closeButtonClass" title="Close" onclick="{!c.hideToast}">
+                            <lightning:icon iconName="utility:close" size="xx-small" variant="inverse"/>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </aura:if><span class="slds-assistive-text">{!v.messageType}</span>
+                    <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex /*slds-align-top*/">
+                        <lightning:icon iconName="{!'utility:'+v.messageType}" size="medium" variant="inverse"/>
+                    </span>
+                    <div class="slds-notify__content">
+                        <h1 class="slds-text-heading_medium"> {!v.title} </h1>
+                        <h2 class="slds-text-heading_small wrapSpace pre_line" >{!v.message}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

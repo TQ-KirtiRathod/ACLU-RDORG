@@ -1,0 +1,3 @@
+<apex:page standardController="Account" showHeader="false">
+  <apex:detail subject="{!account.Id}" relatedList="true" title="false" inlineEdit="true"/>
+</apex:page>

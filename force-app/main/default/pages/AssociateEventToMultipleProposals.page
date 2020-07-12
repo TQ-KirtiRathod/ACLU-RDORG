@@ -1,0 +1,22 @@
+<apex:page controller="AssociateEventMultipleOppsController">
+    <apex:form >
+        <apex:pageMessages ></apex:pageMessages>
+        <apex:pageBlock >
+                <apex:pageBlockButtons location="top">
+                        <apex:commandButton value="Attach to Selected Proposals" action="{!save}" rendered="{!opptyWrapper.size > 0}"/>
+                        <apex:commandButton value="Cancel" action="{!Cancel}"/>
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection rendered="{!opptyWrapper.size >0}">
+                    <apex:pageBlockTable value="{!opptyWrapper}" var="wrap" >
+                        <apex:column headerValue="Select Proposal">
+                            <apex:inputCheckbox value="{!wrap.isSelect}"/>
+                        </apex:column>
+                        <apex:column headerValue="ProposalName" value="{!wrap.objOppty.Name}"/>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection rendered="{!opptyWrapper.size == 0}">
+                    <apex:outputPanel > No Proposal Records under this account Click Cancel to return to previous page</apex:outputPanel>
+                </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

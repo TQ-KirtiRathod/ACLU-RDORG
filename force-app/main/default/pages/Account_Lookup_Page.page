@@ -1,0 +1,80 @@
+<apex:page controller="AccountLookupPageController" showHeader="false" sidebar="false" tabStyle="Batch_Log__c">
+  <apex:pagemessages />
+  <apex:form id="form">
+    <div style="width:100%">
+      <apex:pageBlock id="block">
+        <Label> Select Account:&nbsp;&nbsp; </Label>
+        <apex:inputText value="{!query}" id="query" /> &nbsp;&nbsp;
+        <apex:commandButton value="Go" action="{!runQuery}" />
+        <apex:commandButton value="New" action="{!redirectPage}" />
+        <!--<apex:commandButton value="New" onClick="javascript:window.open('/setup/ui/recordtypeselect.jsp?ent=Account&retURL=%2F001%2Fo&save_new_url=%2F001%2Fe%3FretURL%3D%252F001%252Fo','mywindowtitle','width=800,height=350,top=200,left=300');return false;" />-->
+        <apex:pageBLockSection ></apex:pageBLockSection>
+        <br/>
+        <br/>
+        <apex:outputPanel rendered="{!searchWindow}">
+          <apex:pageBlockTable value="{! accountWrappers }" var="accWrapper" style="width:100%">
+            <apex:column headerValue="Name">
+              <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(accWrapper.accRec.Name)}', '{!accWrapper.accRec.id}', '{!accWrapper.accRec.Most_Recent_Date_All_Time__c}','{!accWrapper.isOpenPledges}')">{!accWrapper.accRec.Name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!accWrapper.accRec.Account_Number__c }" />
+            <apex:column value="{!accWrapper.accRec.Most_Recent_Date_All_Time__c }" />
+            <apex:column value="{!accWrapper.accRec.BillingStreet }" />
+            <apex:column value="{!accWrapper.accRec.BillingCity }" />
+            <apex:column value="{!accWrapper.accRec.BillingState }" />
+            <apex:column value="{!accWrapper.accRec.BillingCountry }" />
+            <apex:column value="{!accWrapper.accRec.BillingpostalCode }" />
+            <apex:column value="{!accWrapper.accRec.Affiliation__c }" />
+            <apex:column value="{!accWrapper.accRec.Chapter__c }" />      
+          </apex:pageBlockTable>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!!searchWindow}">
+          <apex:iframe src="/setup/ui/recordtypeselect.jsp?ent=Account&retURL=%2F001%2Fo&save_new_url=%2F001%2Fe%3FretURL%3D%252F001%252Fo" scrolling="true" id="theIframe" />
+        </apex:outputPanel>
+      </apex:pageBlock>
+    </div>
+  </apex:form>
+  <script language="javascript">
+  window.onload = new function() {
+    // bring popup window to front
+    window.focus();
+    var ele = document.getElementById('{!$Component.form.block.query}');
+    if (ele) {
+      ele.focus();
+    }
+  }
+
+  function fillIn(name, id, accTyp, hasOpenPledges) {
+    var winMain = window.opener || window.parent.opener;
+    var ele = winMain.document.getElementById('{!$CurrentPage.parameters.namefield}');
+    ele.value = name;
+    ele = winMain.document.getElementById('{!$CurrentPage.parameters.idfield}');
+    ele.value = id;
+    ele = winMain.document.getElementById('{!$CurrentPage.parameters.accType}');
+    ele.value = accTyp;
+
+    var callImoFunction = '{!$CurrentPage.parameters.imo}';
+    if (callImoFunction == 'false') {
+      var isOpenedFromSC = '{!$CurrentPage.parameters.isSc}' || false;
+      console.log('isOpenedFromSC:', isOpenedFromSC);
+      if (isOpenedFromSC == 'true') {
+        var accrow = '{!$CurrentPage.parameters.rownum}';
+        console.log("accrow>>>",accrow);
+        winMain.refreshTable(id, accrow);
+      } else {
+        winMain.openPledgesIconShowHide(hasOpenPledges);
+      }
+    }
+
+    if (callImoFunction == 'true') {
+      winMain.populateAckFields();
+    }
+
+    CloseWindow(callImoFunction);
+  }
+
+  function CloseWindow(callImoFunction) {
+    var winMain = window.opener || window.parent.opener;
+    winMain.closeAccLookupPopup(callImoFunction);
+  }
+  </script>
+</apex:page>

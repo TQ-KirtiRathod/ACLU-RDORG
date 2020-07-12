@@ -1,0 +1,170 @@
+<apex:page controller="PortfolioDashboardController">
+    <apex:form id="form1">
+        <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" />
+        <apex:includeScript value="{!$Resource.FunnelChart + '/d3.min.js'}" />
+        <apex:includeScript value="{!$Resource.FunnelChart + '/d3-funnel.min.js'}" />
+
+        <apex:outputPanel id="scriptPnl">
+            <script>
+                function showFunnel() {
+                    var data = [
+                        ['01. Identify', '{!stageIdentify}'],
+                        ['01.1 Qualify', '{!stageQualify}'],
+                        ['02. Strategy/In Progress', '{!stageInProgress}'],
+                        ['02.1 No Progress', '{!stageNoProgress}'],
+                        ['02.5 Cultivation', '{!stageCultivation}'],
+                        ['03. Solicitation', '{!stageSolicitation}'],
+                        ['04. Negotiation', '{!stageNegotiation}'],
+                        ['05. Verbal Pledge', '{!stageVerbal}'],
+                        ['05.1 Written Pledge', '{!stageWrittenPledge}'],
+                        ['06. Made Gift', '{!stageMadeGift}'],
+                        ['06.1 Stewardship', '{!stageStewardship}'],
+                        ['07. Rejected', '{!stageRejected}'],
+                        ['08. Deferred', '{!stageDeferred}'],
+                        ['09. Cancelled', '{!stageCancelled}'],
+                        ['09.1 Closed', '{!stageClosed}'],
+                        ['10. Complete', '{!stageComplete}']
+                    ];
+                    var options = {
+                        block: {
+                            dynamicHeight: true,
+                            minHeight: 30,
+
+                        },
+                        chart: {
+                            bottomPinch: 2
+                        }
+                    };
+
+                    var chart = new D3Funnel('#funnel');
+                    chart.draw(data, options);
+                }
+            
+            	$( document ).ready(function() {
+                	if('{!fakeOpportunity.Portfolio__c}') {
+                    	    showFunnel();
+                    }
+                });
+
+            </script>
+        </apex:outputPanel>
+
+        <div class="content" style="padding-top:5px;">
+            <img src="/img/s.gif" class="pageTitleIcon" title="Dashboards" alt="Dashboards" />
+            <h1 style="font-size:2em;">My Portfolio Dashboard</h1>
+
+        </div>
+        <div class="bFilterReport" style="padding-top:40px; padding-bottom:5px;font-size:120%;">
+
+            <div class="reportParameters">
+                <div class="row">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <label>Affiliate</label>
+                                    <apex:selectList value="{!selectedAffiliate}" size="1">
+                                        <apex:selectOptions value="{!PrimaryAffiliate}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <label>Specific Portfolio</label>
+                                    <apex:inputField value="{!fakeOpportunity.Portfolio__c}" label="Portfolio"
+                                    />
+                                </td>
+                                <td>
+                                    <label>Team Role</label>
+                                    <apex:selectList value="{!selectedTeamRole}" size="1">
+                                        <apex:selectOptions value="{!TeamRoles}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <label>Specific User</label>
+                                    <apex:inputField value="{!confidentialData.Completed_By__c}" label="Specific User"
+                                    />
+                                </td>
+                                <td>
+                                    <label style="margin-left:-7px !important;">Fiscal Year</label>
+                                    <apex:selectList value="{!selectedFiscalYear}" multiselect="false" size="1" style="margin-left:-7px !important;">
+                                        <apex:selectOptions value="{!YearOptions}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <label></label>
+
+                                    <input type="submit" value="Show Report" onclick="reRenderComp();return false;" class="btn"
+                                        style="margin-left: 0px;margin-top: 12px;" />
+                                    <apex:actionFunction name="reRenderComp" action="{!showReport}" reRender="performanceByTeam, scriptPnl"
+                                        oncomplete="showFunnel();" status="actStatusId"
+                                    />
+                                    <apex:actionStatus id="actStatusId">
+                                        <apex:facet name="start">
+
+                                            <img src="/img/loading.gif" />
+
+                                        </apex:facet>
+                                    </apex:actionStatus>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <apex:outputPanel id="performanceByTeam">
+            <apex:pageBlock rendered="{!mapTeamRoleWithWrapperList != null}">
+                <apex:pageBlockSection columns="2">
+                    <c:PerformanceByTeamMember wrapper="{!mapTeamRoleWithWrapperList}" rendered="{!mapTeamRoleWithWrapperList != null}" teamsRecordFlag="{!teamRolesFlag}" />
+					<!-- Progress Closed To Goal dial "-->
+                    <div class="bPageBlock brandSecondaryBrd apexDefaultPageBlock secondaryPalette">
+                        <div class="pbHeader">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tbody>
+                                    <tr>
+                                        <td class="pbTitle" style="white-space: nowrap;">
+                                            <h2 class="mainTitle">Progress Closed To Goal</h2>
+                                        </td>
+                                    </tr>
+                                    <apex:chart name="MyChart" height="300" width="400" animate="true" data="{!gaugeDataList}">
+                                        <!-- Not sure what gague data list is doing -->
+                                        <apex:axis type="Gauge" position="gauge" title="" minimum="0"
+                                            maximum="{!gageMax}" steps="1000" margin="-10"
+                                        />
+                                        <apex:gaugeSeries dataField="size" donut="50" colorSet="#78c953,#ddd" />
+                                    </apex:chart>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <c:performanceBySolicitor solicitorWrapper="{!mapSolicitorWithWrapperList}" rendered="{!mapSolicitorWithWrapperList != null}" solicitorFlag="{!solicitorFlag}"/>
+
+                    <c:overallPortfolioPerformance portfolioPerformanceWrapper="{!mapTypeOfAmountWithTotalAmount}" />
+                    
+                    <!-- Proposal By Pipeline Stage -->
+                    <div class="bPageBlock brandSecondaryBrd apexDefaultPageBlock secondaryPalette">
+                        <div class="pbHeader">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tbody>
+                                    <tr>
+                                        <td class="pbTitle">
+                                            <h2 class="mainTitle">Proposal By Pipeline Stage</h2>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="funnel" style="width: 500px; height: 500px; margin: 0 auto" />
+                    </div>
+
+                    <c:donorsInPortfolio donorsInPortfolio="{!mapAccountNameWithStageAndAmount}" donorsFlag="{!donorsflag}" totalClosedAmount="{!totalPortClosedAmount}" totalRequestedAmount="{!totalPortRequestedAmount}"/>
+
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            <!--This is needed otherwise the portfolio lookup will not function correctly due to field filter-->
+            <apex:inputField style="display:none" value="{!fakeOpportunity.RecordTypeId}" label="Portfolio"/>
+        </apex:outputPanel>
+
+    </apex:form>
+
+</apex:page>

@@ -1,0 +1,50 @@
+<apex:component controller="FCMI_Report_Controller">
+ <body>
+  <table style="width:100%;border-collapse:collapse;">
+  <tbody>
+   <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};" width="100%">
+      <th width="8%" style="text-align:center;"><span style="font-size: 8pt;">{!record.Account__r.Affiliation__c}</span></th>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatDirectMailLess2500__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatDirectMailLess2500_Count__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatDirectMailLess2500_AvgGift__c}"/></apex:outputText></span></td>
+      <td width="9%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatDirectMailLess2500_NetAmount__c}"/></apex:outputText></span></td>
+      <td width="3%" style="text-align:right;"></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatWorkplace__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_TotalBRI__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NetBRI__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{!IF(record.Eligible_for_GMI__c,'GMI','')}"/></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0,number,0.0}%"><apex:param value="{!record.FCMI_AFFInterim__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_AFFIL_PAID__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NATL_PAID__c}"/></apex:outputText></span></td>
+     </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr>
+      <td width="8%"></td>
+      <td colspan="12" width="92%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+     <tr width="100%">
+      <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;text-align:center">Total</span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalNatDirectMail']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['totalNatCount']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totlNatAvgGift']}"/></apex:outputText></span></td>
+      <td width="9%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalNatNetamount']}"/></apex:outputText></span></td>
+      <td width="3%" style="text-align:right;"></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['totalNatWorkPlace']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{! result['totalTotalBRI']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalNetBRI']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"></td>
+      <td width="8%" style="text-align:right;"></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalaffilPaid']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalNatlPaid']}"/></apex:outputText></span></td> </tr>
+    <tr>
+      <td width="8%"></td>
+      <td colspan="12" width="92%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</apex:component>

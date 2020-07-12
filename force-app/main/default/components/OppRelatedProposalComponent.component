@@ -1,0 +1,56 @@
+<!-- ***************************************************************************
+ Author        :  Aashita Sharma
+ Date          :  23rd Jan 2018
+ Related Task  :  T-659055
+ Description   :  VF component used as a related list of Prospects on the 
+                  Opportunity detail page. Inline editing feature is added for 
+                  the related list.
+**************************************************************************** -->
+<apex:component controller="OppRelatedProposalComponentController" allowDML="true" Id="comp"> 
+    <apex:attribute name="oppd" description="Id of the opportunity"
+                  type="String" required="required" assignTo="{!oppId}">                      
+    </apex:attribute>   
+    <apex:form Id="compfrm">        
+         <!--To make the look and feel same as standard salesforce related list -->
+        <apex:outputPanel Id="comppanel1" rendered="{!proposalList.size == 0}">
+            <table  class="list" border="0" cellspacing="0" cellpadding="0" style="background-color:#F8F8F8;border: 0;">
+                <tbody>
+                    <tr>
+                        <th style="font-size: 1em;font-weight: normal;" scope="col">No records to display</th>
+                    </tr>
+                </tbody> 
+            </table>
+        </apex:outputPanel>
+      
+        <apex:outputPanel Id="comppanel2" rendered="{!proposalList.size > 0}">
+            <!--To make the look and feel same as standard salesforce related list -->
+            <table id="tableProspects" class="list tablesorter" border="0" cellspacing="1" cellpadding="0" width="100%"  >
+                <thead class="rich-table-thead">
+                    <tr class="headerRow" style="background-color:#E8E8E8;">
+                    <th scope="col" class="" width="15%"> </th> 
+                        <apex:repeat value="{!$ObjectType.Proposal_Detail__c.FieldSets.ProposalDetails}" var="f" id="repeatFields" >
+                            <th scope="col" class="" width="20%">{!f.Label}</th> 
+                        </apex:repeat>
+                    </tr>
+                </thead>
+            
+                <tbody>
+                    <apex:repeat value="{!proposalList}" var="pros">
+                        <tr class="dataRow even first" onmouseout="if (window.hiOff){hiOff(this);}" onmouseover="if (window.hiOn){hiOn(this);}" >
+                            <td class="dataCell">
+                                <apex:outputLink target="_parent" value="/{!pros.id}/e?retURL={!oppId}" style="color:blue" >Edit</apex:outputLink>&nbsp;|&nbsp;
+                                <apex:outputLink target="_parent" value="/{!pros.id}" style="color:blue" >View</apex:outputLink>
+                            </td>
+                            <apex:repeat value="{!$ObjectType.Proposal_Detail__c.FieldSets.ProposalDetails}" var="f" id="repeatField" >
+                                <th>
+                                    <apex:outputText rendered="{!IF( $ObjectType.Proposal_Detail__c.Fields[f].Type == 'currency',false,true)}">{!pros[f]}</apex:outputText> 
+                                    <c:customCurrency rendered="{!IF( $ObjectType.Proposal_Detail__c.Fields[f].Type == 'currency',true,false)}" curr="{! IF(pros[f] != '',pros[f],0)}" />
+                                </th>
+                            </apex:repeat>
+                        </tr>
+                    </apex:repeat>
+              </tbody>
+            </table>
+        </apex:outputPanel>          
+    </apex:form>  
+</apex:component>

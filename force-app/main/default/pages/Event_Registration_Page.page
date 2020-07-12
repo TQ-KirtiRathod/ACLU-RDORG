@@ -1,0 +1,371 @@
+<apex:page Controller="eventRegistratingController" Id="pg" tabStyle="campaignMember" sidebar="false">
+    <style>
+        .custPopup{
+            z-index: 9999; 
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            /* These are the 3 css properties you will need to change so the popup 
+            displays in the center of the screen. First set the width. Then set 
+            margin-left to negative half of what the width is. You can add 
+            the height property for a fixed size pop up if you want.*/
+            width: 700px;
+            margin-left: -250px;
+            top:100px;
+        }
+        .popupBackground{
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+        .colHeaderPadding{
+            padding-Right: 5% !important;
+        }
+        .colBorder{
+            Border:2% ;
+        }
+        .alignVertical{
+            vertical-align: top !important;
+        }
+        .textFieldWidth{
+            width:100%;
+        }
+    </style>
+    <script src="//code.jquery.com/jquery-1.4.4.js"/>
+    <script>
+        $jQ = jQuery.noConflict();
+        $jQ(document).ready(function() {
+           setFixedHeader('PbT');
+        });
+        function vfElement(visualforceId) {
+            return jQuery("[id $=':" + visualforceId + "']")
+        }
+
+        function vfId(visualforceId) {
+          return vfElement(visualforceId).attr('id')
+        }
+        function savemembers(recCount){
+            updateCmpMembers(recCount);
+        }
+               
+        function openCmpPage(cmpMemId){
+            var url="/"+cmpMemId;
+            window.open(url,'Popup','height=600,width=800,left=200,top=200');
+        }
+        
+        function AddCampMem(oppId,row){
+            console.log('row',row);
+            console.log('oppId',oppId);
+            addnewCampMember(oppId,row);
+        }
+        function createNewcm(){
+            //console.log('frst',frst);
+            //console.log('lst',lst);
+            var frst = vfId('firstNameBox');
+            var lst = vfId('lastNameBox');
+            fName = document.getElementById(frst).value;
+            lName = document.getElementById(lst).value;
+            console.log('fName',fName);
+            console.log('lName',lName);
+            createCm(fName,lName);
+        }
+        function nex(){
+            nextPage();
+        }
+        function prev(){
+            previousPage();
+        }
+        function remove(cmpmemberId){
+            rmvcmpMember(cmpmemberId);
+        }
+        /*function sortFunction(colName){
+            sortColumn(colName);
+        }*/
+        
+        function setFixedHeader(sfTableId)  {
+        var wrperDiv = 'wrapper_' + sfTableId;
+        var fxdDiv = 'fixed_' + sfTableId;  
+        var tblDiv = 'table_' + sfTableId;  
+        var desiredHeight = 500; 
+        var desiredWidth = screen.width-150;
+        var dTable = $jQ('table[id$="'+sfTableId+'"]');
+        var wrapperHeight = 500 + $jQ(dTable).find('thead').height();
+        
+        if(!($jQ(dTable).closest('#'+wrperDiv).length)) {
+            $jQ(dTable).wrap( "<div id='"+wrperDiv+"'></div>" );
+            $jQ('#'+wrperDiv).prepend( "<div id='"+fxdDiv+"'></div>" );
+            $jQ(dTable).wrap( "<div id='"+tblDiv+"'></div>" );
+            $jQ('#'+wrperDiv).width(desiredWidth).height(wrapperHeight);
+            $jQ('#'+fxdDiv).width(desiredWidth + 20).height(0).css('overflow','hidden');
+            $jQ('#'+tblDiv).width('107%').height(desiredHeight).css('overflow','auto');
+        }
+        
+         $jQ('#'+fxdDiv).html('');
+            /*var table = $jQ('<table></table>').addClass('list resultTable').attr('border','0').attr('cellpadding','0').attr('cellspacing','0');
+            var tableHead = $jQ('<thead></thead>');
+            var row = $jQ('<tr></tr>').addClass('headerRow'); 
+            $jQ(dTable).find('thead tr th').each(function(){
+                debugger;
+                var rowCol = $jQ('<th></th>').addClass('headerRow').html($jQ(this).html()).css('width',$jQ(this).css('width')).attr('scope','col').attr('colspan','1');
+                $jQ(rowCol).find('div').css('width',$jQ(this).find('div').css('width'));
+                $jQ(this).find('div').css('width',$jQ(rowCol).find('div').css('width'));
+                row.append(rowCol);
+                $jQ(this).find('div').html('');
+                debugger;
+            });
+            tableHead.append(row);
+            table.append(tableHead);
+            $jQ('#'+fxdDiv).append(table);*/
+            $jQ('#'+tblDiv).scroll(function () {
+              $jQ('#'+fxdDiv).scrollLeft($jQ(this).scrollLeft());
+            });
+
+    }
+    </script>
+    <apex:form Id="frm">
+            <apex:actionstatus id="counterStatus">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb; height:100%;opacity:0.65;width:100%;">
+                    <div class="waitingHolder" style="top: 100px; width: 91px;">
+                    <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                    <span class="waitingDescription">Loading...</span>
+                    </div>
+                </div>
+                </apex:facet>
+            </apex:actionstatus>
+            <apex:pageMessages id="pgm"/>
+            <!--<apex:actionFunction name="sortColumn" action="{!sortName}" rerender="freeze,innerPb,pb,addSec" >
+                <apex:param name="sortColName" value=""/>
+            </apex:actionFunction>-->
+            <apex:actionFunction name="rmvcmpMember" action="{!deleteCmMember}" rerender="freeze,innerPb,pb,addSec" oncomplete="setFixedHeader('PbT')">
+                <apex:param name="cmpMeId" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="previousPage" action="{!previous}" rerender="freeze,innerPb,pb,addSec" status="counterStatus" oncomplete="setFixedHeader('PbT')"></apex:actionFunction>
+            <apex:actionFunction name="nextPage" action="{!next}" rerender="freeze,innerPb,pb,addSec" status="counterStatus" oncomplete="setFixedHeader('PbT')"></apex:actionFunction>
+            <apex:actionFunction name="updateCmpMembers" action="{!saveCampaignMembers}" rerender="freeze,innerPb,Pb" status="counterStatus" oncomplete="setFixedHeader('PbT')">
+                <apex:param name="selRec" value="" />
+            </apex:actionFunction>
+            <apex:actionFunction name="addnewCampMember" action="{!addCampaingMemeber}" rerender="addSec">
+                <apex:param name="selOppId" assignTo="{!oppId}" value=""/>
+                <apex:param name="selOppRow" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="createCm" action="{!savenewCampaignMember}" rerender="addSec,freeze,Pb" oncomplete="setFixedHeader('PbT')" >
+                <apex:param name="firName" value="" />
+                <apex:param name="lstName" value="" />
+            </apex:actionFunction>
+            <apex:outputPanel id="dummy"></apex:outputPanel>
+            <apex:sectionHeader title="Campaign Name" subtitle="{!campaignName}"/>
+            <apex:pageBlock Id="Pb" >
+                <apex:pageBlockButtons location="top" Id="Pbb">
+                    <apex:commandButton value="Add New Pledge" action="{!newPledge}"/>
+                    <apex:commandButton value="Manage Campaign" action="{!manageSeat}"/>
+                    <apex:commandButton value="Manage Campaign Groups" action="{!campaignAttributes}"/>
+                </apex:pageBlockButtons> 
+                <!--Opportunity Table-->
+                <div  Id="freeze" > <!-- style= "height:400px;overflow:auto" -->
+                    <apex:pageBlockTable value="{!registrations}" var="reg" Id="PbT" title="{!campaignName}">
+                        
+                        <!--<apex:column headerValue="Action" style="width:15%;">
+                            <apex:commandLink Id="showChildBtn"  value="Show Details" action="{!campaignMembersList}" styleClass="btn" style="text-decoration:none">
+                                <apex:param name="selRec" value="{!reg.RecCount}" assignTo="{!selRow}" />
+                            </apex:commandLink>
+                        </apex:column>-->
+                        <apex:column styleClass="alignVertical" headerValue="Account Name">
+                            <apex:outputLink value="/{!reg.objOppty.account.Id}" >{!reg.objOppty.account.name}</apex:outputLink>
+                        </apex:column>
+                        <!--<apex:column value="{!reg.recCount}"></apex:column>-->
+                        <apex:column styleClass="alignVertical">
+                            <apex:facet name="header">
+                                <apex:commandLink action="{!sortName}" value="Giving Name{!IF(sortColName == 'Name',IF(SortingOrder=='ASC','▲','▼'),'' )}" id="nameSort">
+                                    <apex:param name="sortNameField" value="Name" assignTo="{!sortColName}"/>
+                                </apex:commandLink> 
+                            </apex:facet>
+                            <apex:outputLink value="/{!reg.objOppty.Id}" >{!reg.objOppty.name}</apex:outputLink>
+                        </apex:column>
+                        <!--<apex:column styleClass="alignVertical" value="{!reg.objOppty.name}"/>-->
+                        <apex:column styleClass="alignVertical" value="{!reg.objOppty.closeDate}">
+                            <apex:facet name="header">
+                                <apex:commandLink action="{!sortName}" value="CloseDate {!IF(sortColName == 'closeDate',IF(SortingOrder=='ASC','▲','▼'),'' )}" id="closeDtSort">
+                                    <apex:param name="sortCloseDateField" value="closeDate" assignTo="{!sortColName}"/>
+                                </apex:commandLink> 
+                            </apex:facet>
+                        </apex:column>
+                        <apex:column styleClass="alignVertical" value="{!reg.objOppty.rC_Giving__Giving_Amount__c}">
+                            <apex:facet name="header">
+                                <apex:commandLink action="{!sortName}" value="Giving Amount {!IF(sortColName == 'rC_Giving__Giving_Amount__c',IF(SortingOrder=='ASC','▲','▼'),'' )}" id="givingAmtSort">
+                                    <apex:param name="sortGivingAmtField" value="rC_Giving__Giving_Amount__c" assignTo="{!sortColName}"/>
+                                </apex:commandLink> 
+                            </apex:facet>
+                        </apex:column>
+                        <apex:column styleClass="alignVertical" value="{!reg.objOppty.rC_Giving__Closed_Amount__c}">
+                            <apex:facet name="header">
+                                <apex:commandLink action="{!sortName}" value="Closed Amount {!IF(sortColName == 'rC_Giving__Closed_Amount__c',IF(SortingOrder=='ASC','▲','▼'),'' )}" id="closedAmtSort">
+                                    <apex:param name="sortClosedAmtField" value="rC_Giving__Closed_Amount__c" assignTo="{!sortColName}"/>
+                                </apex:commandLink> 
+                            </apex:facet>
+                        </apex:column>
+                        <apex:column styleClass="alignVertical" value="{!reg.objOppty.StageName}">
+                             <apex:facet name="header">
+                                <apex:commandLink action="{!sortName}" value="Stage {!IF(sortColName == 'StageName',IF(SortingOrder=='ASC','▲','▼'),'' )}" id="stageSort">
+                                    <apex:param name="stageField" value="StageName" assignTo="{!sortColName}"/>
+                                </apex:commandLink> 
+                            </apex:facet>
+                        </apex:column>
+                        <apex:column styleClass="alignVertical" value="{!reg.tickets}" headerValue="# Tickets"/>
+                        <apex:column styleClass="alignVertical" value="{!reg.ads}" headerValue="# Ads"/>
+                        <apex:column styleClass="alignVertical" value="{!reg.package_TicketPrice}" headerValue="Package/Ticket Price"/>
+                        <apex:column styleClass="alignVertical" value="{!reg.discountAmount}" headerValue="Discount Amount"></apex:column> 
+                        <!--<apex:column headerValue="Add Campaign Member"><apex:commandButton value="Add" onclick="AddCampMem('{!reg.objOppty.Id}','{!reg.recCount}')"  rerender="dummy"></apex:commandButton></apex:column>-->
+                        <apex:column headerValue="Campaign Members">
+                            <apex:commandButton value="Add" onclick="AddCampMem('{!reg.objOppty.Id}','{!reg.recCount}')"  rerender="dummy"></apex:commandButton>
+                            <apex:commandButton Id="Save"  value="Save"  onClick="savemembers('{!reg.RecCount}')" rerender="freeze,innerPb" rendered="{!IF(reg.cmpMembers.size>0,true,false)}"/>
+                            <apex:outputPanel rendered="{!IF(reg.cmpMembers.size>0,true,false)}" id="colSec">
+                                <apex:pageBlockSection columns="1">
+                               <!-- <apex:pageBlockSectionItem >
+                                    <apex:commandButton value="Add" action="{!addCampaingMemeber}"/>
+                                </apex:pageBlockSectionItem>-->
+                                <apex:pageBlockSectionItem > <!--onclick="resetInlineEdit()"action="{!saveCampaignMembers}" rerender="freeze" status="counter" -->
+                                    <!--<apex:commandButton Id="Save"  value="Save"  onClick="savemembers('{!reg.RecCount}')" rerender="freeze,innerPb">-->
+                                        <!--<apex:param name="selRow" value="{!reg.RecCount}" assignTo="{!selRow}"/>-->
+                                    <!--</apex:commandButton>-->
+                                    
+                                    <!--<apex:commandButton value="Cancel" action="{!closeSec}"/>-->
+                                </apex:pageBlockSectionItem>
+                                <!--<apex:pageBlockSectionItem >
+                                    
+                                </apex:pageBlockSectionItem>-->
+                                </apex:pageBlockSection>
+                                <apex:pageBlockTable value="{!reg.cmpMembers}" var="cm" id="innerPb">
+                                    <!--<apex:column headerValue="Action" ><apex:commandButton onclick="remove('{!cm.campaignmember.Id}')" rerender="dummy" value="Delete" rendered="{!NOT(ISBLANK(cm.campaignmember.leadId))}"/></apex:column>-->
+                                    <apex:column headerValue="#" headerClass="colHeaderPadding" styleClass="colHeaderPadding,colBorder">{!cm.Count}</apex:column>
+                                    <!--<apex:column headerValue="View"><apex:commandLink rerender="dummy" onclick="openCmpPage('{!cm.cmp.Id}');" >{!cm.cmp.name}</apex:commandLink></apex:column>-->
+                                    <!--first Name and Last Name are editable only if the Campaign Member is related to Lead-->
+                                    <apex:column headerValue="First Name" >
+                                        <apex:outputPanel rendered="{!NOT(ISBLANK(cm.campaignmember.leadId))}" style="width:95% !Important">
+                                            <apex:commandLink rerender="dummy" ondblclick="openCmpPage('{!cm.campaignmember.Id}');" >
+                                                <apex:inputText value="{!cm.campaignmember.firstName}" style="width:100% !Important" ></apex:inputText>
+                                            </apex:commandLink>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!ISBLANK(cm.campaignmember.leadId)}" >
+                                            <apex:commandLink rerender="dummy" onclick="openCmpPage('{!cm.campaignmember.Id}');" >
+                                                <apex:outputField value="{!cm.campaignmember.firstName}"></apex:outputField>
+                                            </apex:commandLink>
+                                        </apex:outputPanel>
+                                    </apex:column>
+                                    <apex:column headerValue="Last Name" >
+                                        <apex:outputPanel rendered="{!NOT(ISBLANK(cm.campaignmember.leadId))}" style="width:95% !Important">
+                                            <apex:commandLink rerender="dummy" ondblclick="openCmpPage('{!cm.campaignmember.Id}');" >
+                                                <apex:inputText value="{!cm.campaignmember.LastName}" style="width:100% !Important"></apex:inputText>
+                                            </apex:commandLink>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!ISBLANK(cm.campaignmember.leadId)}" >
+                                            <apex:commandLink rerender="dummy" onclick="openCmpPage('{!cm.campaignmember.Id}');" >
+                                                <apex:outputField value="{!cm.campaignmember.LastName}"></apex:outputField>
+                                            </apex:commandLink>
+                                        </apex:outputPanel>
+                                    </apex:column>
+                                    <apex:column headerValue="Meal Preferences" >
+                                        <apex:inputField value="{!cm.campaignmember.Meal_Preference__c}" styleClass="textFieldWidth">
+                                            <!--<apex:inlineEditSupport event="ondblclick" changedStyleClass="myBoldClass" resetFunction="resetInlineEdit"/>-->
+                                        </apex:inputField>
+                                    </apex:column>
+                                    <apex:column headerValue="VIP"><apex:inputField value="{!cm.campaignmember.Vip__c}"></apex:inputField></apex:column>
+                                    <apex:column headerValue="Speaker"><apex:inputField value="{!cm.campaignmember.Speaker__c}"></apex:inputField></apex:column>
+                                    <!--<apex:column headerValue="ContactId"><apex:inputField value="{!cm.contactId}" ></apex:inputField></apex:column>-->
+                                    <apex:column headerValue="Registered Seat"><apex:outputField value="{!cm.campaignmember.rC_Event__Registered_Venue_Seats__c}"></apex:outputField></apex:column>
+                                    <apex:column headerValue="Registered Table Name"><apex:outputField value="{!cm.campaignmember.rC_Event__Registered_Table_Name__c}"></apex:outputField></apex:column>
+                                </apex:pageBlockTable>
+                            </apex:outputPanel>
+                            
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </div> 
+                <!--Opportunity Table Ends-->
+                <apex:pageBlockButtons location="bottom">
+                    <apex:commandButton value="Previous" action="{!previous}"  disabled="{!!hasPrevious}"/> 
+                    <apex:commandButton value="Next" action="{!next}" disabled="{!!hasNext}" /> 
+                </apex:pageBlockButtons>
+                <!--<apex:pageBlockSection columns="3" Id="PbS"> 
+                    <apex:pageBlockSectionItem Id="PbS1"></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem Id="PbS2">
+                        <apex:commandButton value="Previous" action="{!previous}" disabled="{!!hasPrevious}"/>
+                        <apex:commandButton value="Next" action="{!next}" disabled="{!!hasNext}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem Id="PbS3"></apex:pageBlockSectionItem>
+                </apex:pageBlockSection>-->
+            </apex:pageBlock>
+            
+            <apex:outputPanel id="addSec">
+                <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!showChild}"/>
+                <apex:outputPanel styleClass="custPopup" layout="block" rendered="{!showChild}">
+                    <apex:pageBlock id="CmpMem" rendered="{!showChild}" >
+                        <apex:pageMessages id="pgm1"/>
+                        <apex:pageBlockButtons id="Pouppbb"> 
+                            <!--<apex:commandButton value="Add" action="{!addCampaingMemeber}"/>--> 
+                            <apex:commandButton value="Save"  onClick="createNewcm()" rerender="dummy" /><!-- action="{!savenewCampaignMember}"  rerender="freeze,addsec,innerPb"-->
+                            <apex:commandButton value="Cancel" action="{!closeSec}" rerender="addSec"/><!--rerender="freeze,addSec"-->
+                        </apex:pageBlockButtons>
+                        <apex:pageBlockSection title="Create New Campaign Member" id="popuppb">
+                            
+                            <!--<div  Id="freeze">--> <!--style= "height:200px;overflow:auto"-->
+                                
+                                <apex:pageBlockSectionItem >
+                                    <label>Contact</label>
+                                    <apex:inputField value="{!newCM.contactId}"  />
+                                </apex:pageBlockSectionItem>
+                                <!--<apex:pageBlockSectionItem >
+                                    <label>Lead</label>
+                                    <apex:inputField value="{!newCM.LeadId}" />
+                                </apex:pageBlockSectionItem>-->
+                                <apex:pageBlockSectionItem >
+                                    <label>Related Transaction </label>
+                                    <apex:outputField value="{!newCM.Opportunity__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <!--<apex:pageBlockTable value="{!cmpMembers}" var="cm">
+                                    <apex:column headerValue="View"><apex:outputLink value="/{!cm.Id}" >{!cm.name}</apex:outputLink></apex:column>
+                                    <apex:column headerValue="First Name"><apex:inputText value="{!cm.firstName}"></apex:inputText></apex:column>
+                                    <apex:column headerValue="Last Name"><apex:inputText value="{!cm.LastName}"></apex:inputText></apex:column>
+                                    <apex:column headerValue="Meal Preferences"><apex:inputField value="{!cm.Meal_Preference__c}"></apex:inputField></apex:column>
+                                    <apex:column headerValue="ContactId"><apex:inputField value="{!cm.contactId}" ></apex:inputField></apex:column>
+                                    <apex:column headerValue="Registered Seat"><apex:inputField value="{!cm.rC_Event__Registered_Venue_Seats__c}"></apex:inputField></apex:column>
+                                    <apex:column headerValue="Registered Table Name"><apex:inputField value="{!cm.rC_Event__Registered_Table_Name__c}"></apex:inputField></apex:column>
+                                </apex:pageBlockTable>-->
+                            <!--</div>-->
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection title="Campaign Member new Lead">
+                                <apex:pageBlockSectionItem >
+                                    <label>First Name</label>
+                                    <apex:inputText id="firstNameBox" value="{!firstName}" />
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <label>Last Name</label>
+                                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                        <apex:inputText id="lastNameBox" value="{!lastName}"/>
+                                    </apex:outputPanel>
+                                </apex:pageBlockSectionItem>
+                                <!--<apex:pageBlockSectionItem >
+                                    <label>Company </label>
+                                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                        <apex:inputText value="{!newLead.Company}"/>
+                                    </apex:outputPanel>
+                                </apex:pageBlockSectionItem>-->
+                                <apex:pageBlockSectionItem >
+                                    <label>Meal Preferences </label>
+                                    <apex:inputField value="{!newCM.Meal_Preference__c}"/>
+                                </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+       
+    </apex:form>
+</apex:page>

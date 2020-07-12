@@ -1,0 +1,56 @@
+/**
+ * Created by Surya pratap on 6/18/2019.
+ */
+.THIS .success {
+    color:green;
+    background-color: #e9ffe6;
+    
+}
+
+.THIS .error {
+    color:red;
+    background-color: #fdedea;
+}
+
+.THIS .slds-notify {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+}
+
+.THIS .slds-notify__close {
+    top: 17% !important;
+    right: .4rem !important;
+}
+
+.THIS {
+    position: fixed;
+    top: 3% !important;
+    left: 0% !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    background-color: rgba(182, 187, 182, 0.01) !important;
+}
+
+.THIS .force_ToastManager {
+    white-space : pre-wrap;
+}
+
+.THIS .message_Class {
+    width : fit-content !important;
+    margin : auto;
+}
+
+.THIS .closeButtonClass {
+    width: 18px;
+}
+
+.THIS .toast_Message {
+    height: 4rem !important;
+}
+
+.THIS .wrap_Space {
+    white-space : pre-wrap;
+}
+
+.THIS .pre_line {
+    white-space: pre-line;
+}

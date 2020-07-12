@@ -1,0 +1,89 @@
+<!--*Name  :  PaymentMethodLookupPage
+*Author:  Ana Ferreira
+*Date  :  Dec 02, 2019
+* BGE-84
+*Purpose : Custom controller for PaymentMethod page. Used in BGE and opened when lookup icon.-->
+<apex:page controller="PaymentMethodLookupPageController" showHeader="false" sidebar="false" tabStyle="Batch_Log__c">
+
+  <apex:pagemessages />
+  <apex:form id="form">
+    <div style="width:100%">
+      <apex:pageBlock id="block">
+        <Label> Select Payment Method:&nbsp;&nbsp; </Label>
+        <apex:inputText value="{!query}" id="query" /> &nbsp;&nbsp;
+        <apex:commandButton value="Go" action="{!runQuery}" />
+<!--        <apex:commandLink value="New" action="{!redirectPage}"  id="newPay1" target='newPaymentMethodContent'/>|-->
+          <apex:commandButton value="New" action="{!newPaymentWindow}"/>
+        <apex:pageBLockSection ></apex:pageBLockSection>
+        <br/>
+        <br/>
+        <apex:outputPanel rendered="{!searchWindow}">
+            <apex:tabPanel switchType="client" selectedTab="name1" id="tabbedPanel">
+                <apex:tab label="Search" name="tab1" id="tabOne">
+                    <apex:pageBlockTable value="{! paymentWrappers }" var="paymentWrapper" style="width:100%">
+                        <apex:column headerValue="Name">
+                          <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(paymentWrapper.payment.RecordType.Name)}', '{!paymentWrapper.payment.id}')">{!paymentWrapper.payment.Name}</apex:outputLink>
+                        </apex:column>
+
+                        <apex:column value="{!paymentWrapper.payment.Reference_Number__c }" />
+                        <apex:column value="{!paymentWrapper.payment.rC_Giving__Account__c }" />
+                        <apex:column value="{!paymentWrapper.payment.rC_Giving__Card_Expiration_Month__c }" />
+                        <apex:column value="{!paymentWrapper.payment.rC_Connect__Merchant_Name__c }" />
+                        <apex:column value="{!paymentWrapper.payment.rC_Connect__Payment_Processor__c }" />
+                        <apex:column value="{!paymentWrapper.payment.rC_Giving__Is_Active__c }" />
+                        <apex:column value="{!paymentWrapper.payment.rC_Giving__Is_Default__c }" />
+                    </apex:pageBlockTable>
+                </apex:tab>
+            </apex:tabPanel>
+        </apex:outputPanel>
+
+      </apex:pageBlock>
+    </div>
+      <apex:outputPanel id="tabNew" rendered="{!newPayment}">
+          <apex:pageBlock >
+          <apex:pageBlockSection title="New Payment Method">
+              <apex:outputField value="{!paymentMethodNew.rC_Giving__Account__c}"/><br/>
+              <apex:selectList value="{!paymentMethodNew.RecordTypeId}" multiselect="false" size="1">
+                  <apex:selectOptions value="{! PaymentMethodsRecordType  }"/>
+              </apex:selectList><br/>
+
+              <apex:commandButton value="Save" action="{! saveNewPaymentMethod  }" />
+          </apex:pageBlockSection>
+          </apex:pageBlock>
+      </apex:outputPanel>
+
+  </apex:form>
+
+  <script language="javascript">
+      function fillIn(name, id, pay) {
+        var winMain = window.opener || window.parent.opener;
+        var fieldId =  '{!$CurrentPage.parameters.namefield}'+'_lkid';
+        var nameId =  '{!$CurrentPage.parameters.namefield}'+'_lkold';
+        var paymentMethod = '{!$CurrentPage.parameters.paymentMethod}';
+        
+          // &lt;!&ndash;var fieldId =  '{!$CurrentPage.parameters.namefield}';&ndash;&gt;
+          // &lt;!&ndash; var nameId =  '{!$CurrentPage.parameters.namefield}';&ndash;&gt;
+
+        var ele = winMain.document.getElementById(fieldId);
+        ele.value = id;
+
+        ele = winMain.document.getElementById('{!$CurrentPage.parameters.idfield}');
+        ele.value = id;
+
+        ele = winMain.document.getElementById(nameId);
+        ele.value = name;
+
+        ele = winMain.document.getElementById('{!$CurrentPage.parameters.namefield}');
+        ele.value = name;
+
+        console.log('ele: '+ '{!$CurrentPage.parameters.idfield}');
+        winMain.document.getElementById(paymentMethod).value=name;
+        CloseWindow();
+      }
+
+      function CloseWindow() {
+        var winMain = window.opener || window.parent.opener;
+        winMain.closeAccLookupPopup();
+      }
+  </script>
+</apex:page>

@@ -1,0 +1,34 @@
+<apex:component >
+  <apex:attribute name="portfolioPerformanceWrapper" description="wrapper to show total amount" type="map"/>
+  <div class="bPageBlock brandSecondaryBrd apexDefaultPageBlock secondaryPalette">
+        <div class="pbHeader">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="pbTitle"><h2>Overall Portfolio Performance</h2>
+                        </td>
+                     </tr>
+                </tbody>
+            </table>
+            </div>
+  <!--apex:pageBlock rendered="{!portfolioPerformanceWrapper != null}" title="Overall Portfolio Performance"--><!--/apex:pageBlock-->
+    <apex:repeat value="{!portfolioPerformanceWrapper}" var="performance">
+      <table class="list" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <apex:repeat value="{!portfolioPerformanceWrapper[performance]}" var="overall">
+            <td>
+               {!performance}
+                <span style="float:right;">
+                  <apex:outputText value="${0,number,###,###,##0}">
+                            <apex:param value="{!overall}" />
+                        </apex:outputText>
+                </span>
+             </td>
+          </apex:repeat>
+        </tr>
+      </table>
+    </apex:repeat>
+      
+    </div>
+  
+</apex:component>

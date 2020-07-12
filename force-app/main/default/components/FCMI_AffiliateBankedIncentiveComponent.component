@@ -1,0 +1,43 @@
+<apex:component controller="FCMI_Report_Controller">
+ <body>  
+  <table style="width:64%;border-collapse:collapse;">
+  <tbody>
+   <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};" width="64%">
+      <th width="8%" style="text-align:center;"><span style="font-size: 8pt;">{!record.Account__r.Affiliation__c}</span></th>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_DirectMailGreater2500__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_Advertising__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_GenIncentive__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_Benefit__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_SolEarmark__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_InKind__c}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}">
+        <apex:param value="{!record.FCMI_DirectMailGreater2500__c + record.FCMI_Advertising__c + record.FCMI_GenIncentive__c + record.FCMI_Benefit__c + record.FCMI_SolEarmark__c + record.FCMI_InKind__c }"/></apex:outputText></span></td>
+     </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr width="64%">
+      <td width="8%"></td>
+      <td colspan="7" width="56%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+     <tr width="64%">
+      <td width="8%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;text-align:center">Total</span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalDirectMailGreater']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalAdvertising']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalGenIncentive']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalBenifit']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalSolEarmarked']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalInKind']}"/></apex:outputText></span></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}">
+        <apex:param value="{!result['totalDirectMailGreater'] + result['totalAdvertising'] + result['totalGenIncentive'] + result['totalBenifit'] + result['totalSolEarmarked'] + result['totalInKind'] }"/></apex:outputText></span></td>
+    </tr>
+    <tr width="64%">
+      <td width="8%"></td>
+      <td colspan="7" width="56%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</apex:component>

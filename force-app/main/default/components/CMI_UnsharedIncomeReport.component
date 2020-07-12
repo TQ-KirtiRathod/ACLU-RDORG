@@ -1,0 +1,86 @@
+<apex:component controller="RevenueSharingReportsController">
+<head>
+  <script>
+  </script>
+</head>
+ <body>  
+  <table style="width:100%; border-collapse: collapse;">
+  <tbody>  
+   <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};">
+      <th style="text-align:center;" width="10%"><span style="font-size: 8pt;">{!record.Account__r.Affiliation__c}</span></th>
+      <td style="text-align:right; " width=" 8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_New__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_New_Count__c}"/></apex:outputText></span></td>
+      <td style="text-align:right; " width=" 8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_Recap__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_Recap_Count__c}"/></apex:outputText></span></td>
+      <td style="text-align:right; " width=" 8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_FirstRenew__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_FirstRenew_Count__c}"/></apex:outputText></span></td>
+      <td style="text-align:right; " width=" 6%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Total_Unshared_Affiliate__c}"/></apex:outputText></span></td>
+      <td style="text-align:right; background-color:#ffffff" width=" 6%"></td>
+      <td style="text-align:right;" width=" 8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_New_Nat__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_New_Nat_Count__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_Recap_Nat__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_Recap_Nat_Count__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_FirstRenew_Nat__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Unshared_FirstRenew_Nat_Count__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width=" 6%"><span style="font-family: Arial Unicode MS; font-size: 8pt; text-align:right;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Unshared_NationalTotal__c}"/></apex:outputText></span></td>
+    </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr>
+      <td colspan="8" width="52%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="6%"></td>
+      <td colspan="7" width="42%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+     <tr style="border-bottom:1pt solid black;">
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt;">Total</span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedNew']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedCount']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedRecap']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedRecapCount']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedFirstRenew']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['renewCount']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="6%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedAffiliate']}"/></apex:outputText></span></td>
+      <td width="6%"></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedNewNat']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedNewNatcount']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedRecapNat']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['unsharedRecapNatCount']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="8%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['firstRenewNat']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="4%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['firstRenewNatCount']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="6%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalUnsharedNational']}"/></apex:outputText></span></td>
+    </tr>
+    <tr>
+      <td colspan="8" width="52%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="6%"></td>
+      <td colspan="7" width="42%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+    <tfoot>
+    <p style="font-family: Arial Unicode MS; font-size: 7pt;text-align:center;font-weight:bold;text-decoration:underline;">
+     <strong>UNSHARED INCOME</strong>
+    </p>
+    <p style="font-family: Arial Unicode MS; font-size: 7pt;">
+       Here is a brief explanation of our unshared income report. The numbers below correspond to the numbers heading each column.
+    </p>
+    <p style="font-family: Arial Unicode MS; font-size: 7pt;padding-left:20px;">
+            1.    This column contains the Affiliate Abbreviation. For donations with an ‘NAA’ chapter credit, the chapter applied to a donation will be used to determine the affiliate.
+       <br/>2.    This is the total DOLLARS in new member income recruited and reported by Affiliates to National.
+       <br/>3.    This is the NUMBER of new members the affiliate recruited and reported.
+       <br/>4.    This is the total DOLLARS in "recaptures" recruited and reported by Affiliates to National. Recaptures are former members/donors who have not contributed
+                  any money during the previous 24 months or more; that is, he/she becomes a recapture in the 25th or subsequent month.
+                  This money has always been unshared.
+       <br/>5.    This is the NUMBER of recaptures.
+       <br/>6.    This is the DOLLARS received from members who joined or were recaptured last year and are renewing their membership for the first time since.
+                  Affiliates keep not only 100% of new and recapture member income; they also keep 100% of the renewal income of those who renew for the first time.
+                  Note that NO cost factor is deducted for first-time renewals.
+       <br/>7.    This is the number of first time renewals.
+       <br/>8.    This is the total unshared dollar amount for all three categories.
+       <br/>9-15. These columns give the exact same dollar and donor count information for the National Office as described above for the affiliates.
+    </p>
+  </tfoot>
+</table>
+</body>
+</apex:component>

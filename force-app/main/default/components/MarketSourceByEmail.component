@@ -1,0 +1,154 @@
+<apex:component >
+    <apex:attribute name="wrapper" description="wrapper map" type="map" />
+    <apex:attribute name="rendered" description="to show this component conditionally" type="Boolean" />
+    <apex:attribute name="lastRunDate" description="Flag to identify if map is empty or not" type="String" />
+    <apex:attribute name="isRecordNotExist" description="Flag to identify if map is empty or not" type="Boolean" />
+    <table>
+        <apex:pageBlock >
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="pbTitle">
+                            <h2>Market Sources by Email</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h4>Last Batch Run Date: {!lastRunDate}</h4>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="list" border="0" cellspacing="0" cellpadding="0">
+                <tr class="headerRow">
+                    <th scope="col">Market Source List</th>
+                    <th scope="col" class="numericalColumn">Count</th>
+                    <th scope="col" class="numericalColumn">% of Total</th>
+                </tr>
+                <apex:repeat value="{!wrapper}" var="wrap">
+                    <apex:repeat value="{!wrapper[wrap]}" var="team">
+                        <tr class="first even last">
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">Email Acquisition by Email</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">{!team.emailMSByEmail}</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.emailMSByEmail>0,((team.emailMSByEmail/(team.emailMSByEmail + team.emailMSByFB + team.emailMSByTW + 
+                            team.emailMSByWeb + team.emailMSByBanner + team.emailMSByGAdd + team.emailMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                            </td>
+                        </tr>
+                        <tr class="first even last">
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">Email Acquisition by Facebook</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">{!team.emailMSByFB}</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.emailMSByFB>0,((team.emailMSByFB/(team.emailMSByEmail + team.emailMSByFB + team.emailMSByTW + 
+                            team.emailMSByWeb + team.emailMSByBanner + team.emailMSByGAdd + team.emailMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                            </td>
+                        </tr>
+                        <tr class="first even last">
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">Email Acquisition by Twitter</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">{!team.emailMSByTW}</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.emailMSByTW>0,((team.emailMSByTW/(team.emailMSByEmail + team.emailMSByFB + team.emailMSByTW + 
+                            team.emailMSByWeb + team.emailMSByBanner + team.emailMSByGAdd + team.emailMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                            </td>
+                        </tr>
+                        <tr class="first even last">
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">Email Acquisition by Web</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">{!team.emailMSByWeb}</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.emailMSByWeb>0,((team.emailMSByWeb/(team.emailMSByEmail + team.emailMSByFB + team.emailMSByTW + 
+                            team.emailMSByWeb + team.emailMSByBanner + team.emailMSByGAdd + team.emailMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                            </td>
+                        </tr>
+                        <tr class="first even last">
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">Email Acquisition by Banner</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">{!team.emailMSByBanner}</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.emailMSByBanner>0,((team.emailMSByBanner/(team.emailMSByEmail + team.emailMSByFB + team.emailMSByTW + 
+                            team.emailMSByWeb + team.emailMSByBanner + team.emailMSByGAdd + team.emailMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                            </td>
+                        </tr>
+                        <tr class="first even last">
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">Email Acquisition by Google Ads</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">{!team.emailMSByGAdd}</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.emailMSByGAdd>0,((team.emailMSByGAdd/(team.emailMSByEmail + team.emailMSByFB + team.emailMSByTW + 
+                            team.emailMSByWeb + team.emailMSByBanner + team.emailMSByGAdd + team.emailMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                            </td>
+                        </tr>
+                        <tr class="first even last">
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">Email Acquisition By Other</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">{!team.emailMSByOth}</span>
+                            </td>
+                            <td class="numericalColumn">
+                                <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.emailMSByOth>0,((team.emailMSByOth/(team.emailMSByEmail + team.emailMSByFB + team.emailMSByTW + 
+                            team.emailMSByWeb + team.emailMSByBanner + team.emailMSByGAdd + team.emailMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                </apex:repeat>
+                
+                <!-- No Data -->
+                <tr style="display: {!IF(isRecordNotExist, 'table-row','none')};">
+                    <td style="background-color: #ececec;" colspan='3'>
+                        <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+                    </td>
+                </tr>
+            </table>
+        </apex:pageBlock>
+    </table>
+</apex:component>

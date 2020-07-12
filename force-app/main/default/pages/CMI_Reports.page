@@ -1,0 +1,356 @@
+<apex:page showHeader="false" renderAs="PDF" applyHtmlTag="false" applyBodyTag="false" controller="RevenueSharingReportsController">
+ <html>
+  <head>
+   <style type="text/css">
+    @page{
+      margin-top: 4cm;
+     @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: sans-serif;
+      font-size: 70%;
+     }
+     @top-center
+     {
+      content: element(headerCenter);
+      font-family: sans-serif;
+      font-size: 70%;
+     }
+     size: A4 landscape;           
+ 
+    }
+    .break { page-break-before: always; }
+            div.headerCenter
+            {
+              position: running(headerCenter);
+              
+            }
+   </style>
+  </head>
+  <body>
+    <div>
+   <div align="center" class="headerCenter">
+  <table style="width:100%">
+   <thead>
+    <tr>
+      <th width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+                                                <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
+                                                <br/>&nbsp;</th>
+      <th colspan="14" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - UNSHARED INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
+                                    <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
+                                    <br/>&nbsp;</th>
+    </tr>
+    <tr>
+      <th colspan="8" style="border-bottom:1pt solid #808080; width:52%;" align="center">
+        UNSHARED AFFILIATE INCOME
+      </th>
+      <th style="width:6%;"></th>
+      <th colspan="7"  style="border-bottom:1pt solid #808080; width:42%;" align="center">
+        UNSHARED NATIONAL INCOME
+      </th>
+    </tr>
+    <tr>
+      <th style="border-bottom:1pt solid #808080;width:10%;"></th>
+      <th colspan="2" style="border-bottom:1pt solid #808080; font-size:9pt;width:12%;">NEW</th>
+      <th colspan="2" style="border-bottom:1pt solid #808080; font-size: 9pt; font-weight: bold;width:12%;">RECAP</th>
+      <th colspan="2" style="border-bottom:1pt solid #808080; font-size: 9pt; font-weight: bold;width:12%;">FIRST RENEW</th>
+      <th  style="border-bottom:1pt solid #808080; font-size: 9pt;width:6%;">TOTAL</th>
+      <th style="width:6%;"></th>
+      <th colspan="2" style="border-bottom:1pt solid #808080; font-size: 9pt;width:12%;">NEW</th>
+      <th colspan="2" style="border-bottom:1pt solid #808080; font-size: 9pt;width:12%;">RECAP</th>
+      <th colspan="2" style="border-bottom:1pt solid #808080; font-size: 9pt;width:12%;">FIRST RENEW</th>
+      <th style="border-bottom:1pt solid #808080; font-size: 9pt;width:6%;">TOTAL</th>
+    </tr>
+    <tr>
+      <th style="font-size: 9pt ; text-align:center; width:10%;">AFF</th>
+      <th style="font-size: 9pt ; text-align:right; width:8%; ">$</th>
+      <th style="font-size: 9pt ; text-align:right; width:4%;">#</th>
+      <th style="font-size: 9pt ; text-align:right; width:8%; ">$</th>
+      <th style="font-size: 9pt ; text-align:right; width:4%;">#</th>
+      <th style="font-size: 9pt ; text-align:right; width:8%;  ">$</th>
+      <th style="font-size: 9pt ; text-align:right; width:4%;">#</th>
+      <th style="font-size: 9pt ; text-align:right; width:6%;  ">$</th>
+      <th style="width:6%"></th>
+      <th style="font-size: 9pt ;text-align:right; width:8%">$</th>
+      <th style="font-size: 9pt ;text-align:right; width:4%">#</th>
+      <th style="font-size: 9pt ;text-align:right; width:8%">$</th>
+      <th style="font-size: 9pt ;text-align:right; width:4%">#</th>
+      <th style="font-size: 9pt ;text-align:right; width:8%">$</th>
+      <th style="font-size: 9pt ;;text-align:right; width:4%">#</th>
+      <th style="font-size: 9pt ;text-align:right; width:6%">$</th>
+    </tr>
+    <tr>
+      <th style="font-size: 9pt ;  text-align:center; color:#808080;width:10%;">1</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:8%;">2</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:4%;">3</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:8%;">4</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:4%;">5</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:8%;">6</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:4%;">7</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:6%;">8</th>
+      <th style="width:6%"></th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:8%;">9</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:4%;">10</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:8%;">11</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:4%;">12</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:8%;">13</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:4%;">14</th>
+      <th  style="font-size: 9pt ;  text-align:right; color:#808080;width:6%;">15</th>
+    </tr>
+    <tr>
+      <td colspan="8" width="52%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="6%"></td>
+      <td colspan="7" width="42%" style="border-bottom:1pt solid #808080;"></td>
+     </tr>
+  </thead>
+ </table>
+  </div>
+   <div>
+   <c:CMI_UnsharedIncomeReport />
+   </div>
+</div>
+   <div class="break">
+   <div class="headerCenter">
+   <table style="width:100%">
+   <thead>
+    <tr>
+      <th cospan="2" width="9%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+                                                <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
+                                                <br/>&nbsp;</th>
+      <th colspan="12" width="79%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - BASE RENEWABLE INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
+                                    <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
+                                    <br/>&nbsp;</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th colspan="3"  style="border-bottom:1pt solid #808080;  font-size: 9pt; font-weight: bold;text-align:center;">RENEWABLE DUES</th>
+      <th colspan="2" style="border-bottom:1pt solid #808080;  font-size: 9pt; font-weight: bold;text-align:center;">EXTRA CONTRIBS</th>
+      <th ></th>
+      <th style=" font-size: 9pt; font-weight: bold;text-align:center;">TOTAL</th>
+      <th  style=" font-size: 9pt; font-weight: bold;text-align:center;">TOTAL BRI</th>
+      <th  style=" font-size: 9pt; font-weight: bold;text-align:center;">NET BRI</th>
+      <th  style=" font-size: 9pt; font-weight: bold;text-align:center;">AFF</th>
+      <th  style=" font-size: 9pt; font-weight: bold;text-align:center;">AFF</th>
+      <th  style=" font-size: 9pt; font-weight: bold;text-align:center;">AFFIL</th>
+      <th  style=" font-size: 9pt; font-weight: bold;text-align:center;">NATL</th>
+    </tr>
+    <tr>
+      <th width="9%" style=" font-size: 9pt; font-weight: bold;text-align:center;">AFF</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">$</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">#</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">AVG GIFT</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">$</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">#</th>
+      <th  width="4%" style=" font-size: 9pt; font-weight: bold;text-align:center;"></th>
+      <th  width="8%" style=" font-size: 9pt; font-weight: bold;text-align:center;">AVG GIFT</th>
+      <th  width="8%" style=" font-size: 9pt; font-weight: bold;text-align:center;"></th>
+      <th  width="8%" style=" font-size: 9pt; font-weight: bold;text-align:center;">(CF={!listOfRecords[0].Union_Cost_Factor__c}%)</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">TYPE</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">PRCNT</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">PAID</th>
+      <th  width="7%" style=" font-size: 9pt; font-weight: bold;text-align:center;">PAID</th>
+    </tr>
+    <tr>
+      <th  style=" font-size: 9pt;text-align:center;color:#808080">16</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">17</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">18</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">19</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">20</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">21</th>
+      <th></th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">22</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">23</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">24</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">25</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">26</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">27</th>
+      <th  style="  font-size: 9pt;text-align:center;color:#808080">28</th>
+    </tr>
+    <tr>
+      <td width="9%"></td>
+      <td colspan="14" width="42%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </thead>
+  </table>
+     </div>
+    <div><c:CMI_BaseRenewableComponent /></div>
+   </div>
+   
+   <div class="break">
+   <div class="headerCenter">
+   <table style="width:100%">
+   <thead>
+    <tr>
+      <th cospan="2" width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+                                                <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
+                                                <br/>&nbsp;</th>
+      <th colspan="7" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - MEMBERSHIP INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
+                                    <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
+                                    <br/>&nbsp;</th>
+    </tr>
+    <tr>
+      <th width="10%"></th>
+      <th colspan="3" width="35%" style="font-size: 9pt;border-bottom:1pt solid #808080;" align="center">AFFILIATE</th>
+      <td width="3%"></td>
+      <th colspan="3" width="32%" style="font-size: 9pt;border-bottom:1pt solid #808080;" align="center">NATIONAL</th>
+      <th width="30%"></th>
+    </tr>
+    <tr>
+      <th width="10%" style="font-size: 9pt; font-weight: bold;text-align:center;">AFF</th>
+      <th width="10%" style="font-size: 9pt; font-weight: bold; text-align:center;">UNSHARED&nbsp;&nbsp;+</th>
+      <th width="10%" style="font-size: 9pt; font-weight: bold; text-align:center;">BRI&nbsp;&nbsp;=</th>
+      <th width="10%" style="font-size: 9pt; font-weight: bold;text-align:center; ;">TOTAL</th>
+      <td width="3%"></td>
+      <th width="9%" style="font-size: 9pt; font-weight: bold;text-align:center;">UNSHARED&nbsp;&nbsp;+</th>
+      <th width="9%" style="font-size: 9pt; font-weight: bold;text-align:center;">BRI&nbsp;&nbsp;=</th>
+      <th width="9%" style="font-size: 9pt; font-weight: bold;text-align:center;">TOTAL</th>
+      <th width="30%"></th>
+    </tr>
+    <tr>
+      <th width="10%"></th>
+      <th width="10%" style="font-family: Arial Unicode MS; font-size: 9pt;color:#808080;text-align:center;">29</th>
+      <th width="10%" style=" font-family: Arial Unicode MS; font-size: 9pt;color:#808080;text-align:center;">30</th>
+      <th width="10%" style=" font-family: Arial Unicode MS; font-size: 9pt;color:#808080;text-align:center;">31</th>
+      <td width="3%"></td>
+      <th width="9%" style=" font-family: Arial Unicode MS; font-size: 9pt;color:#808080;text-align:center;">32</th>
+      <th width="9%" style=" font-family: Arial Unicode MS; font-size: 9pt;color:#808080;text-align:center;">33</th>
+      <th width="9%" style=" font-family: Arial Unicode MS; font-size: 9pt;color:#808080;text-align:center;">34</th>
+      <th width="30%"></th>
+    </tr>
+    <tr>
+      <th width="10%"></th>
+      <td colspan="3" width="35%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="3%"></td>
+      <td colspan="3" width="32%" style="border-bottom:1pt solid #808080;"></td>
+      <th width="30%"></th>
+    </tr>
+    </thead>
+    </table>
+   </div>
+   <div>
+    <c:CMI_MembershipIncomeComponent />
+    </div>
+   </div>
+   
+   <div class="break">
+    <div class="headerCenter">
+       <table style="width:100%">
+       <thead>
+    <tr>
+      <th width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+                                                <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
+                                                <br/>&nbsp;</th>
+      <th colspan="8" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - NON-MEMBERSHIP UNSHARED INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
+                                    <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
+                                    <br/>&nbsp;</th>
+    </tr>
+    <tr>
+      <th width="12%"></th>
+      <th colspan="4" width="40%" style="font-size: 9pt;border-bottom:1pt solid #808080;" align="center">AFFILIATE</th>
+      <td width="4%"></td>
+      <th colspan="4" width="44%" style="font-size: 9pt;border-bottom:1pt solid #808080;" align="center">NATIONAL</th>
+    </tr>
+    <tr>
+      <th width="12%" style="text-align:center; font-size: 9pt; ">AFF</th>
+      <th width="10%" style="text-align:right; font-size: 9pt;  ">UNSOLICITED<br/>EARMARKED</th>
+      <th width="10%" style="text-align:right; font-size: 9pt;  ">REGOC<br/>GRANTS</th>
+      <th width="10%" style="text-align:right; font-size: 9pt;  ">MEMORIAL</th>
+      <th width="10%" style="text-align:right; font-size: 9pt; ">TOTAL</th>
+      <td width="4%"></td>
+      <th width="11%" style="text-align:right; font-size: 9pt; ">UNSOLICITED<br/>EARMARKED</th>
+      <th width="11%" style="text-align:right; font-size: 9pt; ">REGOC<br/>GRANTS</th>
+      <th width="11%" style="text-align:right; font-size: 9pt; ">MEMORIAL</th>
+      <th width="11%" style="text-align:right; font-size: 9pt; ">TOTAL</th>
+    </tr>
+    <tr>
+      <th width="12%"></th>
+      <th width="10%" style="text-align:right; font-size: 9pt; color:#808080">35</th>
+      <th width="10%" style="text-align:right; font-size: 9pt; color:#808080">36</th>
+      <th width="10%" style="text-align:right; font-size: 9pt; color:#808080">37</th>
+      <th width="10%" style="text-align:right; font-size: 9pt; color:#808080">38</th>
+      <td width="4%"></td>
+      <th width="11%" style="text-align:right; font-size: 9pt; color:#808080">35</th>
+      <th width="11%" style="text-align:right; font-size: 9pt; color:#808080">36</th>
+      <th width="11%" style="text-align:right; font-size: 9pt; color:#808080">37</th>
+      <th width="11%" style="text-align:right; font-size: 9pt;color:#808080">38</th>
+    </tr>
+    <tr>
+      <th width="12%"></th>
+      <td colspan="4" width="40%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td colspan="4" width="44%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+       </thead>
+       </table>  
+    </div>
+    <div>
+      <c:CMI_NonMembershipUnsharedIncomeComponent />
+    </div>
+   </div>
+   
+   <div class="break">
+   <div class="headerCenter">
+   <table style="width:100%">
+   <thead>
+    <tr>
+      <th width="10%"  align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+                                                <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
+                                                <br/>&nbsp;</th>
+      <th colspan="10" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - INCENTIVE INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
+                                    <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
+                                    <br/>&nbsp;</th>
+    </tr>
+    <tr>
+      <th width="10%"></th>
+      <th colspan="5" width="45%" style="border-bottom:1pt solid #808080;font-size: 9pt;" align="center">AFFILIATE</th>
+      <td width="4%"></td>
+      <th colspan="5" width="41%" style="border-bottom:1pt solid #808080;font-size: 9pt;" align="center">NATIONAL</th>
+    </tr>
+    <tr>
+      <th width="10%" style=" text-align:center;font-size: 9pt; ">AFF</th>
+      <th width="9%" style=" text-align:right;font-size: 9pt;  ">Advertising</th>
+      <th width="9%" style=" text-align:right;font-size: 9pt;  ">General<br/>Incentive</th>
+      <th width="9%" style=" text-align:right;font-size: 9pt;  ">Solicited<br/>Earmarked</th>
+      <th width="9%" style="  text-align:right;font-size: 9pt; ">Benefit</th>
+      <th width="9%" style=" text-align:right;font-size: 9pt; ">Total</th>
+      <td width="4%"></td>
+      <th width="8%" style=" text-align:right;font-size: 9pt; ">Advertising</th>
+      <th width="8%" style=" text-align:right;font-size: 9pt; ">General<br/>Incentive</th>
+      <th width="8%" style=" text-align:right;font-size: 9pt; ">Solicited<br/>Earmarked</th>
+      <th width="8%" style=" text-align:right;font-size: 9pt; ">Benefit</th>
+      <th width="9%" style=" text-align:right;font-size: 9pt; ">Total</th>
+    </tr>
+    <tr>
+      <th width="10%"></th>
+      <th width="9%" style="  text-align:right; font-size: 9pt; color:#808080">39</th>
+      <th width="9%" style="  text-align:right; font-size: 9pt; color:#808080">40</th>
+      <th width="9%" style="  text-align:right;font-size: 9pt; color:#808080">41</th>
+      <th width="9%" style="  text-align:right;font-size: 9pt; color:#808080">42</th>
+      <th width="9%" style="  text-align:right;font-size: 9pt; color:#808080">43</th>
+      <td width="4%"></td>
+      <th width="8%" style="  text-align:right;font-size: 9pt; color:#808080">44</th>
+      <th width="8%" style="  text-align:right;font-size: 9pt; color:#808080">45</th>
+      <th width="8%" style="  text-align:right;font-size: 9pt; color:#808080">46</th>
+      <th width="8%" style="  text-align:right;font-size: 9pt; color:#808080">47</th>
+      <th width="9%" style="  text-align:right;font-size: 9pt; color:#808080">48</th>
+    </tr>
+    <tr>
+      <td width="10%"></td>
+      <td colspan="5" width="45%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td colspan="5" width="41%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </thead>
+  </table>
+   </div>
+   <div>
+     <c:CMI_IncentiveIncomeReportsComponent />   
+   </div>
+   </div>
+  </body>
+ </html>
+</apex:page>

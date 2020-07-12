@@ -1,0 +1,58 @@
+<apex:page controller="Cash_Receipt_ReportsController" contentType="application/vnd.ms-excel#{!fileName}.xls" 
+           cache="true" readOnly="True">
+      <html>
+          <table border="0" >
+            <tr>
+                <th>Deposit Site</th>
+                <th>DD batch #</th>
+                <th>Effective Date</th>
+                <th>Bank Date</th>
+                <th>Account Id</th>
+                <th>Account name</th>
+                <th>Amount</th>
+                <th>Type</th>           
+                <th>Fund Code</th>
+                <th>GL Code</th>
+                <th>Focus Area Code</th>
+                <th>Res Center Code</th> 
+                <th style = "display:{!IF(StockGift,'inline','none')}">High Amount</th>
+                <th style = "display:{!IF(StockGift,'inline','none')}">Low Amount</th>
+                <th style = "display:{!IF(StockGift,'inline','none')}">Tax Value</th>
+                <th style = "display:{!IF(StockGift,'inline','none')}">Realized Gain/Loss</th>
+                <th style = "display:{!IF(StockGift,'inline','none')}">Tax Date</th>
+                <th style = "display:{!IF(StockGift,'inline','none')}">Stock Ticker</th>
+            </tr>
+    
+            <apex:repeat var="row" value="{!lstWrapperClass}">
+            <tr>
+                <td>{!row.deposit_Site}</td>
+                <td>{!row.dD_Batch}</td>
+                <td>
+                    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}" >
+                        <apex:param value="{!row.effective_Date}"/>
+                    </apex:outputText>
+                </td>
+                <td>
+                    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}" >
+                        <apex:param value="{!row.bank_Date}"/>
+                    </apex:outputText>
+                </td>
+                <td>{!row.accountId} </td>
+                <td>{!row.accountName}</td>
+                <td>{!row.giving_Amount}</td>
+                <td>{!row.gift_Type}</td>
+                <td>{!row.fund_Code}</td>
+                <td>{!row.gL_Code}</td>
+                <td>{!row.focus_Area_Code}</td>
+                <td>{!row.res_Center_Code}</td>
+                <td style = "display:{!IF(StockGift,'inline','none')}">{!row.high_amount}</td>
+                <td style = "display:{!IF(StockGift,'inline','none')}">{!row.low_amount}</td>
+                <td style = "display:{!IF(StockGift,'inline','none')}">{!row.tax_value}</td>
+                <td style = "display:{!IF(StockGift,'inline','none')}">{!row.realized_Gain_Loss}</td>
+                <td style = "display:{!IF(StockGift,'inline','none')}">{!row.tax_Date}</td>
+                <td style = "display:{!IF(StockGift,'inline','none')}">{!row.stock_ticker}</td>
+            </tr>
+            </apex:repeat> 
+        </table>
+    </html>
+</apex:page>

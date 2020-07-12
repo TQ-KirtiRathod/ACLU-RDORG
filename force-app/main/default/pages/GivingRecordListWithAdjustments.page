@@ -1,0 +1,27 @@
+<apex:page controller="GivingRecordsSectionController" tabStyle="Opportunity" sidebar="true" showHeader="true" >
+	<apex:sectionHeader title="Giving" subtitle="{!accountName}"/>
+	<apex:outputLink styleClass="ptBreadcrumb" value="/{!accountId}" id="theLink">Account: {!accountName}</apex:outputLink> <br/><br/>
+	<apex:pageBlock title="{!sectionName+' List'}">
+		<apex:form >
+			<apex:pageBlockSection rendered="{!!isProposal}">
+			        <apex:inputCheckbox value="{!hideAdjustments}">
+					<apex:outputLabel >Hide Adjustments</apex:outputLabel>
+					<apex:actionSupport event="onchange" reRender="OpptyRecords" action="{!hideAdjustments}"/>
+				</apex:inputCheckbox>
+			</apex:pageBlockSection>
+		
+			<apex:pageBlockTable value="{!OpptyToDisplay}" var="Oppty" id="OpptyRecords" title="{!sectionName}">
+				<apex:repeat value="{!labelFieldSet}" var="ofield" id="repeatOpptyFields">
+					 <apex:column id="col" headervalue="{!ofield}" rendered="{!IF(ofield == 'Name',true,false)}">
+		                 <apex:outputLink target="_parent" value="/{!Oppty['Id']}">{!Oppty[ofield]}</apex:outputLink>
+		             </apex:column>
+					 <apex:column id="col1" value="{!Oppty[ofield]}">
+					 	<!--  <apex:outputField  label="{!ofield}" />-->
+					 </apex:column>
+				</apex:repeat>
+			</apex:pageBlockTable> 
+			<apex:commandButton action="{!previous}" disabled="{!!hasPrevious}" Value="Previous"> </apex:commandButton> 
+			<apex:commandButton action="{!next}" disabled="{!!hasNext}" Value="Next"> </apex:commandButton>
+		</apex:form>
+	</apex:pageBlock>
+</apex:page>

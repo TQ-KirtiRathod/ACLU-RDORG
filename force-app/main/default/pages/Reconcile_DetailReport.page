@@ -1,0 +1,61 @@
+<apex:page controller="Reconcile_DetailReportController" contentType="application/vnd.ms-excel#{!affiliate}-{!startDate}-{!endDate}.xls" 
+cache="true" readOnly="True" applyHtmlTag="false" applyBodyTag="false" showHeader="false" sidebar="false">
+<!-- Modifield the changes by SFDO #66998 3/05/2019 -->
+<!-- Keep this comment  renderAs="html" -->
+  <html>
+    <table border="1">
+        <tr>
+            <th>Account #</th>
+            <th>Account Name</th>
+            <th>Chapter</th>
+            <th>Auto Giving#</th>
+            <th>Donation Batch Date</th>
+            <th>Donation Amount</th>
+            <th>CP based on PKG</th>
+            <th>Donation Batch Number</th>
+            <th>Donation Source Code</th>
+            <!-- <th>Campaign: Source Code</th>  --><!-- Mail Code Description -->
+            <th>Sharing Category</th>
+            <th>Deposit Site</th>
+            <th>Sharing Code</th>
+            <th>Sharing Code Description</th>
+            <th>Donation Sharing Entity</th>
+            <th>Restriction</th>
+            <th>Fund</th>
+            <!-- not used <th>Donation Deposit Location</th> -->
+            <th>Donation Chapter</th>
+            <th>Donation Program Type</th>
+            <th>Donation Item Description</th>
+        </tr>
+        <apex:repeat value="{!wrapperClassList}" var="row" id="row">
+            <tr>
+                <td>{!row.objOpp.account.Account_Number__c}</td>
+                <td>{!row.objOpp.account.name}</td>
+                <td>{!row.objOpp.account.Chapter__c}</td>
+                <td>{!row.objOpp.Auto_Giving_Number__c}</td>
+                <td>
+                    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                        <apex:param value="{!row.objOpp.Batch_Date__c}" />
+                    </apex:outputText>
+                </td>
+                <td>{!row.objOpp.amount}</td>
+                <td>{!row.cp}</td>
+                <td>{!row.objOpp.Batch_Log__r.Name}</td> <!--ZenDesk - #66998 Assigned Batch_Log__r.Name field instead of Batch__c -->
+                <td>{!row.objOpp.rC_Giving__Source_Code__c}</td>
+                <!-- <td>{!row.objOpp.rC_Giving__Campaign_Source_Code__c}</td> -->
+                <td>{!row.Sharing_Category}</td>
+                <td>{!row.objOpp.Deposit_Site__c}</td>
+                <td>{!row.objOpp.Sharing_Code__c}</td>
+                <td>{!row.objOpp.Sharing_Code_Description__c}</td>
+                <td>{!row.objOpp.Sharing_Entity__c}</td>
+                <td>{!row.objOpp.Restriction__c}</td>
+                <td>{!row.objOpp.Fund__c}</td>
+                <!-- not used <td>{!row.objOpp.Deposit_Site__c}</td> -->
+                <td>{!row.objOpp.account.Chapter__c}</td>
+                <td>{!row.objOpp.Program_Type__c}</td>
+                <td>{!row.recordTypeName}</td>
+            </tr>
+        </apex:repeat>
+    </table>
+  </html>
+</apex:page>

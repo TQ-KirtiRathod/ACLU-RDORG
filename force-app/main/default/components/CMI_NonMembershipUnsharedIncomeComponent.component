@@ -1,0 +1,51 @@
+<apex:component controller="RevenueSharingReportsController">
+ <head>
+ </head>
+ <body>  
+  <table style="width:100%; border-collapse: collapse;">
+  <tbody>
+  <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};">
+      <th style="text-align:center;" width="12%"><span style="font-size: 8pt; ">{!record.Account__r.Affiliation__c}</span></th>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_UnsolicitedEarmarked__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_RecogGrants__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Memorial__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Non_Membership_Unshared_Income_Total__c}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff" width="4%"></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Nat_UnsolicitedEarmarked__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Nat_RecogGrants__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.CMI_stage_Nat_Memorial__c}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.Non_Membership_Nat_Unshared_Income_Total__c}"/></apex:outputText></span></td>
+    </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr>
+      <th width="12%"></th>
+      <td colspan="4" width="40%" style="border-bottom:1pt solid #808080;"></td>
+      <td style="background-color:#ffffff" width="4%"></td>
+      <td colspan="4" width="44%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+    <tr>
+      <td style="text-align:center;" width="12%"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">Total</span></td>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['unsolicitedEarmarked']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['recogGrants']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['memorial']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['nonMembUnshIncTotal']}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff" width="4%"></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['natUnsolicitedEarmarked']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['natRecoGrants']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['natMemorial']}"/></apex:outputText></span></td>
+      <td style="text-align:right;" width="11%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['nonMemNatUnsharedIncomeTotal']}"/></apex:outputText></span></td>
+    </tr>
+    <tr>
+      <th width="12%"></th>
+      <td colspan="4" width="40%" style="border-bottom:1pt solid #808080;"></td>
+      <td style="background-color:#ffffff" width="4%"></td>
+      <td colspan="4" width="44%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</apex:component>

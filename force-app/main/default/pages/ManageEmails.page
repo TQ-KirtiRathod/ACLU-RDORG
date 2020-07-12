@@ -1,0 +1,185 @@
+<apex:page controller="ManageEmailsController" id="pg" showHeader="false">
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    
+    <apex:includeScript value="{!URLFOR($Resource.ManageEmailResource, '/jQuery3_1_0.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.ManageEmailResource, '/Bootstrap3_3_7.Js')}"/>
+    
+    <apex:stylesheet value="{!URLFOR($Resource.ManageEmailResource, 'Bootstrap3_3_7.css')}"/>
+    
+    <style>
+        @font-face {
+          font-family: "schoolbook";
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+          src: url("!URLFOR($Resource.CenturySchoolbook_Regular_woff2}") format("woff2"), url(!URLFOR($Resource.CenturySchoolbook_Regular_woff}")
+              format("woff");
+        }
+        
+        @font-face {
+          font-family: "gtamstandard";
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+          src: url("!URLFOR($Resource.GT_America_Standard_Regular_woff}") format("woff"), url("!URLFOR($Resource.GT_America_Standard_Regular_woff2}")
+              format("woff2");
+        }
+        .center_div{
+            margin-top: 25px;
+            font-size: 16px;
+            font-family: schoolbook;
+            line-height: 1.4;
+            word-spacing: -0.12em;
+            letter-spacing: 0.01em;
+            width:54% /* value of your choice which suits your alignment */
+        } 
+        h4 {
+            font-family: gtamstandard;
+            font-size: 20px;
+            color: #130F54;
+        }
+        .btn-md {
+            background: #0055AA;
+            color: #FFF;
+            font-family: gtamstandard;
+            border-radius: 3px;
+            border: 0;
+            padding: 10px 30px;
+            line-height: 21px;
+            font-size: 15px;
+        }
+    </style> 
+    <script>
+        $( document ).ready(function() {
+            $('.chckbox').attr('checked','checked');
+            if('{!isOptedOut}' == 'true') {
+                resetPanel1();
+            } else {
+                $('.optradioYes').attr('checked', 'checked');
+            }
+            $('.optYes').attr('checked', 'checked');
+        });
+    
+        function resetPanel1() {
+            $('#UpdateMyEmailButton1').addClass('disabled');
+            $('.optradioYes').attr('disabled', true);
+            $('.optradioNo').attr('disabled', true);
+            $('.optradioNo').attr('checked', 'checked');
+        }
+        
+        function resetPanel2() {
+            $('.chckbox').attr('checked','checked');
+        }
+    
+        function UpdateMyEmailSub1() {
+            if($("input[name='optradio']:checked").val() == 'No') {
+                UpdateMyEmailSubButton1();
+            }
+            else {
+                thankyoupage();
+            }
+        }
+        
+        function UpdateMyEmailSub2() {
+            var arr = [];
+            $('.chckbox:checkbox').each(function () {
+               if(!this.checked) {
+                   arr.push($(this).val());
+                   UpdateMyEmailSubButton2(JSON.stringify(arr));
+               }
+               else {
+                thankyoupage();
+               }
+          });
+          
+        }
+    
+        function UpdateMyEmailSub3() {
+            if($("input[name='optRadioFull']:checked").val() == 'No') {
+                UpdateMyEmailSubButton3();
+            }
+            else {
+                thankyoupage();
+            }
+        }
+    </script>
+    <div class="container center_div">
+        <apex:form id="frm" style="width: 89%">
+            <apex:actionFunction name="UpdateMyEmailSubButton1" action="{!UpdateMyEmailSub1}" onComplete="resetPanel1();resetPanel2();" rerender="panel1,panel2">
+                <apex:param name="referralCode" value="{!referral}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="UpdateMyEmailSubButton2" action="{!UpdateMyEmailSub2}" rerender="panel2" onComplete="resetPanel2();">
+                <apex:param name="ePrefLabels" value=""/>
+                <apex:param name="isFullOptOut" value="false"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="UpdateMyEmailSubButton3" action="{!UpdateMyEmailSub2}" onComplete="resetPanel1();" rerender="panel3,panel2,panel1,panel4">
+                <apex:param name="isFullOptOut" value="true"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="thankyoupage" action="{!redirectThankYouPage}" onComplete="resetPanel1();" rerender="panel3,panel2,panel1,panel4">
+            </apex:actionFunction>
+      
+            <apex:outputPanel id="panel1" styleClass="panel1Class" rendered="{!isShowFirstPanel}">
+                <div class="panel panel-default" style="background-color: #f5f5f5;">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <h4>{!topSectionText} Emails</h4><br></br><br></br>
+                            <p> Would you like to continue to receive {!topSectionText} Emails? </p>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" class="optradioYes" value="Yes"/>Yes, please continue sending me {!topSectionText} emails to {!maskEmailAddress}</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" class="optradioNo" value="No"/>No, please do not send {!topSectionText} emails to {!maskEmailAddress}</label>
+                            </div>
+                            <button type="button" class="btn-md" onClick="UpdateMyEmailSub1();" id="UpdateMyEmailButton1">Update My Email Subscriptions</button>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel id="panel2" styleClass="panel2Class" rendered="{!isShowSecondPanel}">
+                <div class="panel panel-default" style="background-color: #f5f5f5;">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <h4>Email Subscriptions</h4><br></br><br></br>
+                            <p> I would like to remain subscribed to the following email lists: </p>
+                            <apex:repeat value="{!prefLabelsCodeMap}" var="label" id="theRepeat">
+                                <div class="checkbox">
+                                    <label><input type="checkbox" value="{!label}" class="chckbox"/>{!label}</label>
+                                </div>
+                            </apex:repeat>
+                            <button type="button" class="btn-md" id="UpdateMyEmailButton2" onClick="UpdateMyEmailSub2();">Update My Email Subscriptions</button>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel id="panel3" styleClass="panel3Class" rendered="{!!isOptedOut}">
+                <div class="panel panel-default" style="background-color: #f5f5f5;">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <p> Would you like to continue receiving emails from ACLU? </p>
+                            <div class="radio">
+                                <label><input type="radio" name="optRadioFull" class="optYes" value="Yes"/>Yes, please keep {!maskEmailAddress} on ACLU email lists</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="optRadioFull" class="optNo" value="No"/>No, please completely remove {!maskEmailAddress} from your email list and send no further emails</label>
+                            </div>
+                            <button type="button" class="btn-md" id="UpdateMyEmailButton3" onClick="UpdateMyEmailSub3();">Update My Email Subscriptions</button>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            
+            <apex:outputPanel id="panel4" styleClass="panel4Class" rendered="{!isOptedOut}">
+                <div class="panel panel-default" style="background-color: #f5f5f5;">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <p> You are currently unsubscribed. </p>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </apex:form>
+    </div>
+</apex:page>

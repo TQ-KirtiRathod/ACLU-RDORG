@@ -1,0 +1,98 @@
+<apex:page controller="RunDrawloopPackagesController">
+    <apex:pageMessages id="errorPanel" />
+    <apex:outputPanel id="op">
+    <script>
+        function runDDPJS() {
+            runDDP();
+        }
+        function processReq_JS() {
+            //alert({!errors});
+            //if(!{!errors}) {
+                sendRequests();
+            //}
+        }
+        function alertMsg() {
+            if('{!mergeNumber}' != '') {
+                alert('Merge Job Number: {!mergeNumber}\nSource Records: {!countOfSourceRecords}\nMerged Documents: {!countOfMergeRequests}');
+                window.location.href = '/{!$Label.DrawloopListView}';
+            } else if(!{!errors}) {
+                window.location.href = '/{!$Label.DrawloopListView}';
+            }
+        }
+    </script>
+    </apex:outputPanel>
+    <apex:form id="frm">
+        <apex:outputPanel id="statuses" >
+        <apex:actionstatus id="Status1">
+        <apex:facet name="start">
+            <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb; height:100%;opacity:0.65;width:100%;">
+            <div class="waitingHolder" style="top: 100px; width: 91px;">
+            <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+            <span class="waitingDescription">...Loading...</span>
+            </div>
+        </div>
+        </apex:facet>
+    </apex:actionstatus>
+    <apex:actionstatus id="Status2" rendered="{!!errors}">
+        <apex:facet name="start">
+            <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb; height:100%;opacity:0.65;width:100%;">
+            <div class="waitingHolder" style="top: 100px; width: 91px;">
+            <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+            <span class="waitingDescription">...Sending Requests...</span>
+            </div>
+        </div>
+        </apex:facet>
+    </apex:actionstatus>
+    </apex:outputPanel>
+        
+        <apex:actionFunction name="runDDP" action="{!runDDP}" rerender="errorPanel,statuses,op" status="Status1" onComplete="sendRequests();"/>
+        <apex:actionFunction name="sendRequests" action="{!sendRequests}" rerender="statuses,op" status="Status2" onComplete="alertMsg();"/>
+        
+        <apex:pageblock title="Choose Salutation Preferences">
+            
+            <apex:pageBlockSection >
+                <apex:selectList label="1st Choice Inside Salutation:" value="{!firstInside}" size="1">
+                    <apex:selectOptions value="{!salutationFormalTypeList}"></apex:selectOptions>
+                </apex:selectList>
+                <apex:selectList label="1st Choice Outside Salutation:" value="{!firstOutside}" size="1">
+                    <apex:selectOptions value="{!salutationFormalTypeList}"></apex:selectOptions>
+                </apex:selectList>
+
+                <apex:selectList label="2nd Choice Inside Salutation:" value="{!secondInside}" size="1">
+                    <apex:selectOptions value="{!salutationFormalTypeList}"></apex:selectOptions>
+                </apex:selectList>
+                <apex:selectList label="2nd Choice Outside Salutation:" value="{!secondOutside}" size="1">
+                    <apex:selectOptions value="{!salutationFormalTypeList}"></apex:selectOptions>
+                </apex:selectList>
+
+                <apex:selectList label="3rd Choice Inside Salutation: " value="{!thirdInside}" size="1">
+                    <apex:selectOptions value="{!salutationFormalTypeList}"></apex:selectOptions>
+                </apex:selectList>
+                <apex:selectList label="3rd Choice Outside Salutation: " value="{!thirdOutside}" size="1">
+                    <apex:selectOptions value="{!salutationFormalTypeList}"></apex:selectOptions>
+                </apex:selectList>
+
+            </apex:pageBlockSection>
+            <br />
+            <!--<apex:inputCheckbox value="{!bypassSalutation}" selected="true"/>
+            <b>Bypass the Salutation Preferences (Account Formal and Informal Salutations are available for use)</b>
+            <br /> -->
+        </apex:pageblock>
+        <apex:pageblock title="Select Document Packages to Run">
+            <apex:pageBlockSection >
+                <c:MultiselectPicklist leftLabel="Available Processes"
+                leftOptions1="{!sOptions}"
+                rightLabel="Selected Processes"
+                rightOptions1="{!selectedDDPs}"
+                size="14"
+                width="250px"/>
+            </apex:pageBlockSection>
+            <apex:inputCheckbox value="{!excludeRecords}" />
+            <b>Mark Excluded Giving Records (by Affiliate) Acknowledgment Status to B - Manually Bypassed From Acknowledgements</b>
+            <br /> <br />
+            
+            <apex:commandButton onClick="runDDPJS();return false;" value="Run" id="theButton"/>
+            <br /><br /><a href="/apex/MergeManagement" >Undo Acknowledgement Updates Management Page</a>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,62 @@
+<apex:component controller="FCMI_Report_Controller">
+ <body>  
+  <table style="width:82%;border-collapse:collapse;">
+  <tbody>
+   <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};" width="82%">
+      <th width="10%" style="text-align:center;"><span style="font-size: 8pt;">{!record.Account__r.Affiliation__c}</span></th>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_SpecialSharing__c}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_EarlySharing__c}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatSpecialSharing__c}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatEarlySharing__c}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}">
+             <apex:param value="{!record.FCMI_SpecialSharing__c + record.FCMI_EarlySharing__c + record.FCMI_NatSpecialSharing__c + record.FCMI_NatEarlySharing__c }"/>
+            </apex:outputText></span></td> 
+   </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr width="82%">
+      <td width="10%"></td>
+      <td width="12%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td width="12%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td width="12%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td colspan="3" width="24%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+     <tr width="82%">
+      <td width="10%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;text-align:center">Total</span></td>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMISpecialSharing']}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMIEarlySharing']}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMINatSpecialSharing']}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="12%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMINatEarlySharing']}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="4%"></td>
+      <td width="8%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;">
+        <apex:outputText value="${0, number, ###,###,###,##0}">
+          <apex:param value="{!result['totalFCMISpecialSharing'] + result['totalFCMIEarlySharing'] + result['totalFCMINatSpecialSharing'] + result['totalFCMINatEarlySharing'] }"/>
+        </apex:outputText></span></td>   
+    </tr>
+    <tr width="82%">
+      <td width="10%"></td>
+      <td width="12%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td width="12%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td width="12%" style="border-bottom:1pt solid #808080;"></td>
+      <td width="4%"></td>
+      <td colspan="3" width="24%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</apex:component>

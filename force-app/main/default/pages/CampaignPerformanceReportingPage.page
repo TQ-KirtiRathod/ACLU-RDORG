@@ -1,0 +1,62 @@
+<apex:page controller="CampaignPerformanceReportingController" action="{!displayReport}" readOnly="true" showHeader="false"> 
+    <apex:form >
+    <apex:pageMessages />
+    <apex:pageBlock title="Report Criteria">
+        <apex:pageBlockSection >
+            <apex:outputLabel value="Affiliation = {!$CurrentPage.parameters.pv1}" />
+            <apex:outputLabel value="Sub Affiliation = {!$CurrentPage.parameters.pv2}" />
+            <apex:outputLabel value="Campaign Type = {!$CurrentPage.parameters.pv3}" />
+            <apex:outputLabel value="Appeal Segment = {!$CurrentPage.parameters.pv4}" />
+            <apex:outputLabel value="Solicitation = {!$CurrentPage.parameters.pv5}" />
+            <apex:outputLabel value="Channel = {!$CurrentPage.parameters.pv6}" />
+            <apex:outputLabel value="Effort = {!$CurrentPage.parameters.pv7}" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+        
+    <apex:pageBlock title="Campaign Performance Rating">
+   <apex:pageBlockTable value="{!repWrapper}" var="record">
+      <apex:column >
+          <apex:facet name="header">Close Date</apex:facet>
+          <apex:outputText value="{0,date,MM/dd/yy}"> 
+            <apex:param value="{!record.closeDate}" /> 
+          </apex:outputText>
+      </apex:column>
+      <apex:column value="{!record.count}">
+          <apex:facet name="header">Giving Count</apex:facet>
+      </apex:column>
+      <apex:column >
+          <apex:facet name="header">Giving Amount</apex:facet>
+          <apex:outputText value="{0, number,########0.00}">
+              <apex:param value="{!record.amount}" />
+          </apex:outputText>
+      </apex:column>
+      <apex:column value="{!record.cumulativeCount}">
+          <apex:facet name="header">Cumulative Count</apex:facet>
+      </apex:column>
+      <apex:column >
+          <apex:facet name="header">Cumulative Amount</apex:facet>
+          <apex:outputText value="{0, number,########0.00}">
+              <apex:param value="{!record.cumulativeAmt}" />
+          </apex:outputText>
+      </apex:column>
+   </apex:pageBlockTable>
+</apex:pageBlock>
+<apex:commandButton action="{!displayExcel}" value="Export To Excel" rendered="{!showButton}"/>
+
+<apex:pageBlock >
+    <apex:pageBlockSection >
+    <apex:chart id="myChartInner" height="400" width="800" data="{!cWrapper}">
+          <apex:axis type="Numeric" position="left" fields="amountField" 
+            title="Cumulative Giving Amount" grid="true"/>
+          <apex:axis type="Category" position="bottom" fields="dateField" 
+            title="CloseDate">
+        </apex:axis>
+        <apex:lineSeries axis="left" fill="true" xField="dateField" yField="amountField"
+          markerType="cross" markerSize="4" markerFill="#FF0000"/>
+          <!--<apex:lineSeries axis="left" xField="dateField" yField="countfield"
+          markerType="circle" markerSize="4" markerFill="#8E35EF"/>-->
+   </apex:chart>
+    </apex:pageBlockSection>
+</apex:pageBlock>
+</apex:form>
+</apex:page>

@@ -1,0 +1,3 @@
+<apex:page controller="ReconciliationReportController"  action="{!redirectReconciliationReportFoundationGMI}">
+You are being redirect to the respective report
+</apex:page>

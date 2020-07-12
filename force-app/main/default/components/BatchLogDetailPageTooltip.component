@@ -1,0 +1,52 @@
+<apex:component selfClosing="true">
+    <apex:attribute name="helpText" description="Help Text." type="String" required="true"/>
+    <style>
+        a:hover {
+            background:#FFFFFF;
+            text-decoration:none;
+        } /*BG color is a must for IE6*/
+        
+        a.tooltip span {
+            display:none;
+            padding:2px 1px;
+            margin-left:8px;
+            width:100px;
+            z-index:201;
+            font-size:100%;
+            white-space:normal;
+            font-family:arial;
+            text-decoration:none;
+            /*word-wrap:break-word;*/
+        }
+        
+        a.tooltip:hover span{
+            display:inline;
+            position:absolute;
+            background:#FEFDB9;
+            text-align: left;
+            border:1px solid orange;
+            color:#000000;
+            font-weight: normal;
+        }
+        
+        a.tooltip img{
+		    background-image: url(/img/help/helpOrbs.gif);
+		    background-position: 0 0;
+		    width:  15px;
+		    height: 15px;
+	    }
+		  
+		a.tooltip:hover img{
+		    background-image: url(/img/alohaSkin/help_orange.png);
+		    background-position: 0 0;
+		    width: 15px;
+		    height: 15px;
+		    color:red;
+		}
+
+    </style>
+    <a class="tooltip" href="#" style="text-decoration: none;">
+        <img src="/img/s.gif" />
+        <span>{!helpText}</span>
+    </a>
+</apex:component>

@@ -1,0 +1,22 @@
+<apex:page controller="CampaignPerformanceReportingController" action="{!displayReport}" contentType="application/vnd.ms-excel#CampaignPerformanceReport.xls" cache="true">
+   <html>
+       <table border="0" >
+           <tr>
+               <th>Close Date</th>
+               <th>Giving Count</th>
+               <th>Giving Amount</th>
+               <th>Cumulative Count</th>
+               <th>Cumulative Amount</th>
+           </tr>
+           <apex:repeat var="record" value="{!repWrapper}">
+               <tr>
+                   <td>{!record.cDate}</td> 
+                   <td>{!record.count}</td>
+                   <td>{!record.amount}</td>
+                   <td>{!record.cumulativeCount}</td>
+                   <td>{!record.cumulativeAmt}</td>
+               </tr>
+           </apex:repeat>
+       </table>
+    </html>
+</apex:page>

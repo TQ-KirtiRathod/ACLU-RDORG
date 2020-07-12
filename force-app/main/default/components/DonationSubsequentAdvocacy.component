@@ -1,0 +1,74 @@
+<apex:component >
+    <apex:attribute name="wrapper" description="wrapper map" type="map" />
+    <apex:attribute name="summary" description="summary map" type="map" />
+    <apex:attribute name="rendered" description="to show this component conditionally" type="Boolean" />
+    <apex:attribute name="lastRunDate" description="Flag to identify if map is empty or not" type="String" />
+    <apex:attribute name="isRecordNotExist" description="Flag to identify if map is empty or not" type="Boolean" />
+    <div class="bPageBlock brandSecondaryBrd apexDefaultPageBlock secondaryPalette" rendered="{!rendered}">
+        <div class="pbHeader">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="pbTitle">
+                            <h2>Donations Subsequent to Taking an Action</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h4>Last Batch Run Date: {!lastRunDate}</h4>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <table class="list" border="0" cellspacing="0" cellpadding="0">
+            <tr class="headerRow">
+                <th scope="col">Action Name</th>
+                <th scope="col" class="numericalColumn">Secondary Advocacy Donation Count</th>
+                <th scope="col" class="numericalColumn">Secondary Advocacy Donation Sum</th>
+            </tr>
+            <apex:repeat value="{!wrapper}" var="wrap">
+                <apex:repeat value="{!wrapper[wrap]}" var="team">
+                    <tr class="first even last">
+                        <td><span class="dashboardRowLabel">{!team.actionName}</span>
+                        </td>
+                        <td class="numericalColumn">
+                            <span class="dashboardRowValue">
+                               {!team.secondaryAdvocacyDonCount}
+                            </span>
+                        </td>
+                        <td class="numericalColumn">
+                            <span class="dashboardRowValue">
+                    <apex:outputText value="${0, number, ###,###,##0}">
+                        <apex:param value="{!team.secondaryAdvocacyDonSum}"/>
+                    </apex:outputText>
+                    </span>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </apex:repeat>
+            <apex:repeat value="{!summary}" var="sum">
+                <apex:repeat value="{!summary[sum]}" var="s">
+                    <tr class="headerRow">
+                        <th>Summary</th>
+                        <th class="numericalColumn">
+                            <span class="dashboardRowValue">
+                               {!s.secondaryAdvocacyDonCount}
+                            </span>
+                        </th>
+                        <th class="numericalColumn">
+                            <apex:outputText value="${0, number, ###,###,##0}">
+                                <apex:param value="{!s.secondaryAdvocacyDonSum}" />
+                            </apex:outputText>
+                        </th>
+                    </tr>
+                </apex:repeat>
+            </apex:repeat>
+            <tr style="display: {!IF(isRecordNotExist, 'table-row','none')};">
+                <td style="background-color: #ececec;" colspan='3'>
+                    <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+                </td>
+            </tr>
+        </table>
+    </div>
+</apex:component>

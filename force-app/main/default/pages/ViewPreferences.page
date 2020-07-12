@@ -1,0 +1,65 @@
+<apex:page standardController="Account" extensions="ViewPreferencesController" showHeader="false">
+    <apex:form >
+        <apex:pageBlock title="Preferences">
+            <apex:pageBlockButtons >
+                <apex:outputLink value="/a0O?rlid=00N36000008gj62&id={!$CurrentPage.parameters.Id}" id="PreferencesFullList" target="_blank">View All Preferences</apex:outputLink>&nbsp;&nbsp;
+                <apex:commandButton oncomplete="window.top.location = '{! URLFOR($Action.rC_Bios__Preference__c.New, null, 
+                [CF00N36000008gj62=Account.Name, CF00N36000008gj62_lkid=Account.Id, cancelURL=URLFOR($Action.Account.View, Account.Id), retURL=URLFOR($Action.Account.View, Account.Id)]) }'" value="New" />
+            </apex:pageBlockButtons>
+            <div style="height:150px; overflow-y: scroll;">
+                <apex:pageBlockTable value="{! preferences }" var="pc" id="table">
+                    <apex:column >
+                        <apex:outputLink target="_top" value="{! URLFOR($Action.rC_Bios__Preference__c.View, pc.preference.id) }">View</apex:outputLink>
+                        <apex:outputText rendered="{! pc.userCanDelete || pc.userCanEdit }"> |&nbsp;</apex:outputText>
+                        <apex:outputLink target="_top" value="{! URLFOR($Page.AddPreference, null,
+                                                                        [cancelURL=URLFOR($Action.Account.View, Account.Id),
+                                                                        retURL=URLFOR($Action.Account.View, Account.Id), Id=pc.preference.id]) }"
+                                         rendered="{! pc.userCanEdit }">Edit
+                        </apex:outputLink>
+                         <apex:outputText rendered="{! pc.userCanDelete && pc.userCanEdit }"> |&nbsp;</apex:outputText>
+                        <apex:outputLink value="{! URLFOR($Action.rC_Bios__Preference__c.Delete, pc.preference.id,
+                                                [retURL=URLFOR($Page.ViewPreferences, null, [Id=Account.Id])]) }"
+                                         rendered="{! pc.userCanDelete }">Del
+                        </apex:outputLink>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Contact</apex:facet>
+                        <apex:outputText value="{! pc.preference.rC_Bios__Contact__r.Name }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Code</apex:facet>
+                        <apex:outputText value="{! pc.preference.rC_Bios__Code_Value__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Category</apex:facet>
+                        <apex:outputText value="{! pc.preference.rC_Bios__Category__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Description</apex:facet>
+                        <apex:outputText value="{! pc.description }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Start Date</apex:facet>
+                        <apex:outputField value="{! pc.preference.rC_Bios__Start_Date__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">End Date</apex:facet>
+                        <apex:outputField value="{! pc.preference.rC_Bios__End_Date__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Active</apex:facet>
+                        <apex:outputField value="{! pc.preference.rC_Bios__Active__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Status</apex:facet>
+                        <apex:outputField value="{! pc.preference.rC_Bios__Status__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Comments</apex:facet>
+                        <apex:outputField value="{! pc.preference.rC_Bios__Comments__c }"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </div>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

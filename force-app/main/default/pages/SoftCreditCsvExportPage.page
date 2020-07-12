@@ -1,0 +1,10 @@
+<apex:page standardController="Batch_Log__c"
+    extensions="SoftCreditPageController"
+    contentType="text/csv#Export.csv;charset=utf8"
+    cache="true"
+    language="en-US">{!softCreditHeaders}
+
+    <apex:repeat value="{!childOppWrapperLst}" var="opptyWrapper">
+        {!opptyWrapper.csvRecord}
+    </apex:repeat>
+</apex:page>

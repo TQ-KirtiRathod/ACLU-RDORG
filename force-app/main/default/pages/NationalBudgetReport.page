@@ -1,0 +1,53 @@
+<apex:page controller="NationalBudgetReportController" docType="html-5.0" id="mypage">
+    <apex:form >
+        <!-- 	<div class="content" style="padding-top:5px;">
+            <img src="/img/s.gif" class="pageTitleIcon" title="Dashboards" alt="Dashboards" /> 
+            <h1 style="font-size:2em;">National Budget Report</h1>
+        </div> -->
+        <br />
+        <apex:PageBlock title="National Budget Report">
+            <apex:PageMessages id="showmsg"></apex:PageMessages>
+            <apex:PageBlockSection >
+                <!-- if date picker needs changed convert code to this line
+					<apex:inputfield value="{!nb.Start_Date__c}" label="Current YTD Start Date" /> -->
+                <apex:input type="date" value="{!current_YTD_StartDate}" label="Current YTD Start Date" />
+                <apex:input type="date" value="{!current_YTD_EndDate}" label="Current YTD End Date" />
+                <apex:input type="date" value="{!prior_YTD_StartDate}" label="Prior YTD Start Date" />
+                <apex:input type="date" value="{!prior_YTD_EndDate}" label="Prior YTD End Date" />
+                <apex:selectList value="{!DefaultPrior_Fiscal_Year}" id="PriorFiscalYearOptions" multiselect="false" size="1" label="Prior Fiscal Year" onChange="sePrevFiscalYear(this.value);">
+                    <apex:selectOptions value="{!PriorFiscalYearOptions}" />
+                </apex:selectList>
+                <apex:selectList value="{!DefaultBudget_Fiscal_Year}" id="BudgetFiscalYearOptions" multiselect="false" size="1" label="Budget Fiscal Year" onChange="setBudgetFiscalYear(this.value);">
+                    <apex:selectOptions value="{!BudgetFiscalYearOptions}" />
+                </apex:selectList>
+            </apex:PageBlockSection>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Show Report" action="{!showReport}" title="Submit" id="showmsg" />
+            </apex:pageBlockButtons>
+        </apex:PageBlock>
+
+				<div style="display: {!IF(isRecordExist, 'block','none')};">
+          <apex:pageBlock >
+              <h3>National Budget Report Status</h3>
+              <BR/>
+              <apex:PageBlockSection >
+								The report is being generated.  <BR/>An email will be sent when report has completed and is available for viewing.
+              </apex:PageBlockSection>
+          </apex:pageBlock>
+        </div>
+        
+<!--         <div style="display: {!IF(isRecordExist, 'block','none')};">
+            <apex:pageBlock>
+                <h3>Nation Budget Report Section</h3>
+                <BR/>
+                <apex:PageBlockSection>
+                    <apex:commandButton onclick="window.open('/{!c3NationBudgetReport}');" value="C3 National Budget Report" reRender="true" />
+                    <apex:commandButton onclick="window.open('/{!c4NationBudgetReport}');" value="C4 National Budget Report" reRender="true" />
+                    <apex:commandButton onclick="window.open('/{!nationBudgetSummaryReport}');" value="National Budget Summary Report" reRender="true" />
+                    <apex:commandButton onclick="window.open('/{!nationBudgetUnbudgetGiftReport}');" value="National Budget Unbudgeted Gifts Report" reRender="true" />
+                </apex:PageBlockSection>
+            </apex:pageBlock>
+        </div> -->
+
+    </apex:form>
+</apex:page>

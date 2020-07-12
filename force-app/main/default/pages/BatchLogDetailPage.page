@@ -1,0 +1,2047 @@
+<apex:page standardController="Batch_Log__c" extensions="BatchLogDetailPageController" id="pg" action="{! checkRecordType}" sidebar="false" deferLastCommandUntilReady="true">
+  <apex:stylesheet value="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" />
+  <apex:stylesheet value="{! URLFOR($Resource.BatchLogDetailPage, 'jqGrid/5.2.1/css/ui.jqgrid.css')}" />
+  <apex:stylesheet value="{! URLFOR($Resource.BatchLogDetailPage, 'css/BatchLog.css')}" />
+  <script>
+    
+    function openReport(url){
+    
+     window.open(url, '_blank');
+    
+    } 
+    
+  </script> 
+  <apex:form id="frm" onkeyup="submitListener(event)">
+    <apex:actionstatus id="counterStatus">
+      <apex:facet name="start">
+        <div class="popupBackground" id="el_loading">
+          <div class="loadingPopup custPopup">
+            <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+            <span class="waitingDescription">Loading...</span>
+          </div>
+        </div>
+      </apex:facet>
+    </apex:actionstatus>
+    <apex:pageMessages id="pgm" />
+    <!-- Action Block START-->
+      <apex:actionFunction name="populateAckFields" action="{! populateAckFields}" rerender="section9" status="counterStatus"/> <!--Sai:7/6: Change-->
+      <apex:actionFunction name="refreshTble" action="{! None}" rerender="OpptyWrapperList" status="counterStatus" oncomplete="_bge.focusOnGivingAmount();" />
+      <apex:actionFunction name="setOpenPledgeIcon" action="{! setOpenPledgeIcon}" rerender="apexVariables" status="counterStatus"/>
+      <apex:actionFunction name="setproductIds" action="{! setCampaignProductIds}" rerender="pageMsgsBLE" status="counterStatus">
+        <apex:param name="cmpProdIds" value="" />
+        <apex:param name="cmpRow" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="addRowApex" action="{! addRows}" rerender="pageMsgsBLE,apexVariables" oncomplete="_bge.afterAddRow();" status="counterStatus"/>
+      <apex:actionFunction name="cancelRowChange" action="{! cancelRowChange}" rerender="pageMsgsBLE,apexVariables" oncomplete="_bge.reloadGrid(false);" status="counterStatus"/>
+      <apex:actionFunction name="refreshOpptyList" action="{! refreshOppt}" rerender="pageMsgsBLE,apexVariables,batchLogDetails" oncomplete="_bge.afterRefreshList();" status="counterStatus"/>
+      <apex:actionFunction name="saveOneRow" action="{! saveOneRow}" rerender="batchLogDetails,apexVariables,OpptyWrapperList" status="counterStatus" oncomplete="_bge.afterSaveRow();" />
+      <apex:actionFunction name="createOpptyProducts" action="{! createOpptyProducts}" rerender="batchLogDetails,apexVariables,OpptyWrapperList" status="counterStatus" oncomplete="_bge.afterCreateOpptyProd();"/>
+      <apex:actionFunction name="renderTable" action="{! populatePledgeBoolean}" rerender="pgm,apexVariables,OpptyWrapperList" status="counterStatus" oncomplete="_bge.focusOnSourceCode();">
+        <apex:param name="selAccId" value="" />
+        <apex:param name="selRow" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="populateFundFields" action="{! populateFund}" rerender="pgm,OpptyWrapperList" status="counterStatus">
+        <apex:param name="campRow" value="" />
+      </apex:actionFunction>
+      
+      <apex:actionFunction name="populateRecordTypeaction" action="{! populateRecordType}" rerender="pgm,OpptyWrapperList" status="counterStatus">
+        <apex:param name="recCount1" value="" />
+        <apex:param name="value" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="refreshAjax" rerender="pgm" status="counterStatus" oncomplete="_bge.reloadGrid();" />
+      <!--change-->
+      <apex:actionFunction name="deleteOppRow" action="{! deleteRow}" rerender="pgm,apexVariables,batchLogDetails,OpptyWrapperList" status="counterStatus" oncomplete="_bge.reloadGrid(false);">
+        <apex:param name="rowIndex" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="updateURL" action="{! updatePaymentURL}" oncomplete="window.open('{!destUrlToCreatePaymentMthd}');">
+        <apex:param name="accountId" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="reRenderRows" action="{! None}" rerender="pb,pgm" status="counterStatus"/>
+      <!-- <apex:actionFunction name="restrictCC" action="{! restrictCC}" rerender="pageMsgsBLE" status="counterStatus"/> -->
+      <!--<apex:actionFunction name="setImoIhoOpportunity" action="{! setImoIhoOpportunity}" immediate="true" onComplete="openIHOPopup();" reRender="ihoaccLookup,ihoImoPopup" status="counterStatus">
+        onComplete="openIHOPopup();" 
+        <apex:param name="selectdOpptyForImo" value="" />
+        <apex:param name="relation" value="" />
+        change
+        <apex:param name="oppId" value="" />
+      </apex:actionFunction>-->
+      <!-- BGE-84 ASL-46 customize payment methdo popup -->
+      <apex:actionFunction name="adjustGivingProperties" action="{! adjustGivingProperties}" onComplete="openAdjustGivingPopup(); hideDefaultLookup();" reRender="adjustGivingPopup" status="counterStatusAdjustGiving">
+        <apex:param name="selectedOpptyForAdjustment" value="" />
+      </apex:actionFunction>
+    <apex:actionFunction name="saveAdjustmentOppty" action="{! saveAdjustmentOppty}" onComplete="checkErrorInSaveAdjustment();" rerender="errorInBatchRowPanel" status="counterStatusAdjustGiving">
+      </apex:actionFunction>
+      <apex:actionFunction name="checkErrorInSaveAdjustment" action="{!checkErrorInSaveAdjustment}" onComplete="closeAdjustGivingPopup(); refreshListonError();" rerender="errorInBatchRowPanel,batchLogDetails,apexVariables,OpptyWrapperList" status="counterStatusAdjustGiving">
+      </apex:actionFunction>
+
+      <apex:actionFunction name="cancelAdjustment" action="{!cancelAdjustment}" oncomplete="closeAdjustGivingPopup(); _bge.reloadGrid(false);" reRender="batchLogDetails,apexVariables,OpptyWrapperList" status="counterStatusAdjustGiving">
+          <apex:param name="delRowIndex" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="togglePaymentMethodModal" action="{! togglePaymentMethod}" rerender="tstpopup,pgm" status="counterStatus">
+        <apex:param name="oppRow" value="" />
+        <apex:param name="payType" value="" />
+        <apex:param name="accId" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="modifyrow" action="{! updateParent}" rerender="apexVariables,OpptyWrapperList,batchLogDetails" status="counterStatus" oncomplete="_bge.reloadGrid();" >
+        <apex:param name="row" value="" />
+        <apex:param name="OpportId" value="" />
+        <apex:param name="isPledgePayment" value="" />
+        <apex:param name="isOpenfromSft" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="addSplitRow" action="{! addSplitRow}" rerender="pgm,apexVariables" oncomplete="_bge.afterSplitRow();" status="counterStatus">
+        <apex:param name="splitRowIndex" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="matchOpportunity" action="{! matchOpportunity}" reRender="pgm,apexVariables,OpptyWrapperList,batchLogDetails" status="counterStatus" onComplete="_bge.reloadGrid();">
+        <apex:param name="matchOpptyIndex" value="" />
+      </apex:actionFunction>
+      <apex:actionFunction name="exportBatchItems" action="{! exportBatchItems}" status="counterStatus" />
+      <apex:actionFunction name="confirmSaveBatchLog" action="{!saveBatchLog}" reRender="batchLogDetails,pgm,apexVariables"  oncomplete="_bge.reloadGrid(false);" status="counterStatus" />
+      <apex:actionFunction name="saveBatchLog" action="{! checkBatchLogWarning}" reRender="batchLogDetails,pgm,apexVariables" oncomplete="warning('{!warningsBatchLogString}','{!batchLogInvalid}');" status="counterStatus" />
+<!--      <apex:actionFunction name="saveBatchLog" action="{! saveBatchLog}" reRender="batchLogDetails,pgm,apexVariables" oncomplete="_bge.reloadGrid(false);" status="counterStatus" />-->
+      <apex:actionFunction name="editBatchLog" action="{! editBatchLog}" reRender="batchLogDetails,pgm,apexVariables,BatchListButtons" oncomplete="_bge.reloadGrid(false);" status="counterStatus" />
+      <apex:actionFunction name="releaseBatchLog" action="{! releaseBatchLog}" reRender="BatchListButtons,pgm,apexVariables" oncomplete="updateErrorDetailToFlagged();" status="counterStatus" />
+      <apex:actionFunction name="cancelBatchLog" action="{! cancelBatchLog}" status="counterStatus" />
+      <apex:actionFunction name="updateErrorDetailToFlagged" action="{! updateErrorDetailToFlagged}" oncomplete="_bge.reloadGrid(false);" reRender="batchLogDetails,BatchListButtons,pgm,apexVariables" status="counterStatus"/>
+      <!--<apex:actionFunction name="export" action="{! dummy}" rerender="dummy" />-->
+    <!-- Action Block End-->
+
+    <!-- Batch Log Details START-->
+      <apex:pageBlock id="batchLogDetails" title="Batch Log Details" mode="{! if(OR(isEdit,batchLog.Id == null), 'edit', 'readOnly')}">
+        <apex:pageBlockButtons >
+          <apex:commandButton value="Save" onclick="_bge.saveBatch(); return false;" rendered="{! OR(batchLog.Id == null, isEdit)}" />
+          <apex:commandButton value="Edit" onclick="_bge.editBatch(); return false;" rendered="{! AND(batchLog.Id != null, !isEdit)}" disabled="{! isReleased}" />
+          <apex:commandButton value="Cancel" onclick="_bge.cancelBatch(); return false;" />
+          <apex:commandButton value="Release" onclick="_bge.releaseBatch();"  rerender="batchLogDetails" rendered="{! AND(batchLog.Id != null, !isEdit)}" disabled="{! isReleased}" />
+          <apex:commandButton value="Accept As Is & Release" action="{! resetExternalId}" reRender="batchLogDetails,BatchListButtons,pgm,apexVariables" rendered="{! !affiliateUser && batchLog.Batch_Log_Status__c == 'Membership and Revenue Sharing Resets Needed'}" status="counterStatus"/>
+          <apex:commandButton value="Reset Membership/Sharing & Release" onclick="window.alert('Resetting Membership and sharing will take a few minutes. You will receive an email alert once the process completes and the batch is balanced and released.');"
+                                action="{! callApexBatchResetMembership}" reRender="batchLogDetails,BatchListButtons,pgm,apexVariables" rendered="{! batchLog.Batch_Log_Status__c == 'Membership and Revenue Sharing Resets Needed' && isUserNotAffiliate}" status="counterStatus"/>
+          <!-- sai-7/28:Change -->
+          <apex:commandButton value="Delete" action="{!deleteBatchLog}" reRender="batchLogDetails,BatchListButtons,pgm,apexVariables"
+          rendered="{!AND(OR(
+                         AND(
+                             NOT(affiliateUser), 
+                             hasBatchLogItems
+                             ),
+                         AND(affiliateUser, hasBatchLogItems, 
+                             batchLog.Affiliation__c == userAffiliation)
+                         ), !newOrEditing)}" />
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection columns="2" title="Batch Summary" >
+          <apex:outputField value="{! batchLog.Name}" />
+
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel > 
+                <apex:outputLabel value="Batch Type" />
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Batch_Type}" rendered="{! isNew}" />
+            </apex:outputPanel>
+            <apex:outputPanel >
+              <apex:selectList value="{! batchType}" size="1" rendered="{! isNew}" >
+                <apex:selectOptions value="{! batchTypeLst}" />
+              </apex:selectList>
+              <apex:outputField value="{! batchLog.Batch_Type__c}" rendered="{! !isNew}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          <apex:outputField value="{! batchLog.Batch_Log_Status__c}" rendered="{!!((batchLog.Error_Details__c == 'Processing' || batchLog.Error_Details__c == 'Processing status, please refresh the page.') && batchLog.Batch_Log_Status__c == 'Balanced')}"/>
+          <apex:outputText label="Batch Log Status" value="Processing" rendered="{!batchLog.Error_Details__c == 'Processing' && batchLog.Batch_Log_Status__c == 'Balanced'}"/>
+          <apex:outputText label="Batch Log Status" value="Processing, please refresh the page." rendered="{!batchLog.Error_Details__c == 'Processing status, please refresh the page.' && batchLog.Batch_Log_Status__c == 'Balanced' }"/>
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel value="Program Type" />
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Program_Type}" rendered="{! isNew}" />
+            </apex:outputPanel>
+           <apex:outputPanel styleClass="requiredInput">
+              <apex:outputPanel layout="block" rendered="{! isNew}" styleClass="requiredBlock" />
+              <apex:selectList value="{! batchProgramType}" size="1" rendered="{! isNew}" >
+                <apex:selectOptions value="{! programOptions}" />
+              </apex:selectList>
+              <apex:outputText value="{! batchProgramType}" rendered="{! !isNew}" />
+              <!-- render inputField on error so that error message automatically rendered, but hide input itself -->
+              <apex:inputField value="{! batchLog.Program_Type__c}" styleClass="hidden" rendered="{! batchLogInvalid}"/>
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+
+          <apex:outputField value="{! batchLog.Batch_Log_Type__c}" />
+
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel value="Affiliation Code" />
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Affiliate_Code}" rendered="{! isNew}" />
+            </apex:outputPanel>
+            <apex:outputPanel >
+              <apex:selectList value="{! affiliateCode}" size="1" rendered="{! isNew}" >
+                <apex:selectOptions value="{! affiliateCodes}" />
+              </apex:selectList>
+              <apex:outputText value="{! affiliateCode}" rendered="{! !isNew}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+
+          <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Tax Date" />
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Tax_Date}" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              
+              <apex:inputField value="{! batchLog.Tax_Date__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Tax_Date__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          
+          <apex:outputField value="{! batchLog.Days_Open__c}" rendered="{! !isNew}"/>
+          <apex:pageBlockSectionItem rendered="{!isNew}" />
+          <apex:pageBlockSectionItem rendered="{!showTPABypass}">
+            <apex:outputPanel >
+                <apex:outputLabel value="TPA Bypass" />
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_TPA_Bypass}" rendered="{! newOrEditing}"/>
+            </apex:outputPanel>
+            <apex:outputPanel >              
+              <apex:inputField value="{! batchLog.TPA_Bypass__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.TPA_Bypass__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection columns="2" title="Deposit Summary">
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel >{!$Label.Deposit_Site}</apex:outputLabel>
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Deposit_Site}" rendered="{! newOrEditing}"/>
+            </apex:outputPanel>
+            <apex:outputPanel >
+              <apex:outputPanel layout="block" styleClass="requiredInput" rendered="{! newOrEditing}">
+                <apex:outputPanel layout="block" styleClass="requiredBlock" />
+                <apex:selectList value="{! batchLog.Deposit_Site__c}" rendered="{! hasPrimaryAffiliation}"
+                  size="1" required="true">
+                  <apex:selectOptions value="{! affiliateDepositSites}" />
+                </apex:selectList>
+                <apex:inputField value="{! batchLog.Deposit_Site__c}"  rendered="{! !hasPrimaryAffiliation}"/>
+              </apex:outputPanel>
+              <apex:outputField value="{! batchLog.Deposit_Site__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+
+          <apex:outputText />
+          
+
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel >Batch Date</apex:outputLabel>
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Batch_Date}" rendered="{! newOrEditing}" />
+            </apex:outputPanel>
+            <apex:outputPanel >
+                  
+              <apex:inputField value="{! batchLog.Batch_Date__c}" required="true"  rendered="{! newOrEditing}"/>
+              <apex:outputField value="{! batchLog.Batch_Date__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel >Bank Date</apex:outputLabel>
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Bank_Date}" rendered="{! newOrEditing}"/>
+            </apex:outputPanel>
+            <apex:outputPanel >
+              <apex:inputField value="{! batchLog.Bank_Date__c}"  rendered="{! newOrEditing}"/>
+              <apex:outputField value="{! batchLog.Bank_Date__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel >{!$Label.Expected_Count}</apex:outputLabel>
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Expected_Count}" rendered="{! newOrEditing}"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="block" styleClass="requiredInput">
+              <apex:outputPanel rendered="{! newOrEditing}">
+                <apex:outputPanel layout="block" styleClass="requiredBlock" />                
+                <apex:inputField value="{! batchLog.Expected_Count__c}" />
+              </apex:outputPanel>
+              <apex:outputField value="{! batchLog.Expected_Count__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+
+          <apex:outputField value="{! batchLog.Actual_Count__c}" />
+
+          <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel >{!$Label.Expected_Amount}</apex:outputLabel>
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Expected_Amount}" rendered="{! newOrEditing}"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="block" styleClass="requiredInput">
+              <apex:outputPanel rendered="{! newOrEditing}">
+                <apex:outputPanel layout="block" styleClass="requiredBlock" />                
+                <apex:inputField value="{! batchLog.Expected_Amount__c}" />
+              </apex:outputPanel>
+              <apex:outputField value="{! batchLog.Expected_Amount__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          <apex:pageBlockSectionItem >
+          <apex:outputLabel value="Actual Amount" />
+          <apex:outputField value="{! batchLog.Actual_Amount__c}"/></apex:pageBlockSectionItem>
+          
+          <apex:outputText />
+          
+          <apex:inputField value="{! batchLog.Total_Net_Amount__c}"  rendered="{! newOrEditing && !batchLog.BatchLog_Has_Fees__c }"/>
+          <apex:outputField value="{! batchLog.Total_Net_Amount__c}"  rendered="{! newOrEditing && batchLog.BatchLog_Has_Fees__c }"/>
+          <apex:outputField value="{! batchLog.Total_Net_Amount__c}" rendered="{! !newOrEditing}" />
+          <!-- BGE-61,New comment field -->
+            <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Comments" />
+                <c:BatchLogDetailPageTooltip helpText="Please provide comments" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              <apex:inputField value="{! batchLog.Comments__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Comments__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          <!-- BGE-61 END -->
+          
+          <apex:inputField value="{! batchLog.Total_Fees__c}"  rendered="{! newOrEditing && !batchLog.BatchLog_Has_Fees__c }"/>
+          <apex:outputField value="{! batchLog.Total_Fees__c}"  rendered="{! newOrEditing && batchLog.BatchLog_Has_Fees__c }"/>
+          <apex:outputField value="{! batchLog.Total_Fees__c}" rendered="{! !newOrEditing}" />
+          
+        </apex:pageBlockSection>
+        
+             <!-- Traction(Mounica V) BGE-61 New Defaults -->    
+          <apex:pageBlockSection columns="2" title="Batch Defaults">
+           <!--Custom Lookup-->
+          <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <Label StyleClass="labelCol vfLabelColTextWrap last" style="color:#4a4a56;font-size:11px;font-weight:bold;">Default Campaign</Label>
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Default_Campaign}" rendered="{! newOrEditing}" />
+            </apex:outputpanel>
+            <!--&nbsp;&nbsp;&nbsp;&nbsp;-->
+            <apex:outputPanel >
+              
+              <apex:inputHidden value="{! batchLog.Default_Campaign__c}" id="targetId" />
+              <apex:inputHidden value="{! sourceCde}" id="sorcCde" />
+              <apex:inputHidden value="{! progtype}" id="ProgType" />
+              <apex:outputPanel rendered="{! newOrEditing}" >                
+                <apex:inputText size="15" value="{! batchLogCampaignName}" id="targetName" disabled="false" /> <!--Sai-7/9: LabelChange-->
+                <a href="Javascript:openLookupPopup('{!$Component.targetName}', '{!$Component.targetId}', 'Campaign', 'AccID', 'oppID','','{!$Component.sorcCde}','{!$Component.ProgType}');"><img src="/img/s.gif" class="lookupIcon"></img>   
+                </a>
+              </apex:outputPanel>
+              <apex:outputField value="{! batchLog.Default_Campaign__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          <!--Custom Lookup Ends-->    
+         
+           <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Default Payment Method" />
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Default_Payment_Method}" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              
+              <apex:inputField value="{! batchLog.Default_Payment__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Default_Payment__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          
+            <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Default Check #" />
+                <c:BatchLogDetailPageTooltip helpText="Please provide a check number to be defaulted" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              <apex:inputField value="{! batchLog.Default_Check__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Default_Check__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          
+           <apex:pageBlockSectionItem >
+            <apex:outputPanel >
+                <apex:outputLabel value="Payment Subtype" />
+                <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Payment_Subtype}" rendered="{! newOrEditing}"/>
+            </apex:outputPanel>
+            <apex:outputPanel >              
+              <apex:inputField value="{! batchLog.Payment_Subtype__c}" required="true" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Payment_Subtype__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          
+          <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Default Check Date" />
+                <c:BatchLogDetailPageTooltip helpText="Please provide a check date to be defaulted" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              <apex:inputField value="{! batchLog.Default_Check_Date__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Default_Check_Date__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          
+           <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Default Fund" />
+                <c:BatchLogDetailPageTooltip helpText="Please provide a check date to be defaulted" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              <apex:inputField value="{! batchLog.Default_Fund__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Default_Fund__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          
+          <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Default Gift Amount" />
+                <c:BatchLogDetailPageTooltip helpText="Please provide an amount to be defaulted" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              <apex:inputField value="{! batchLog.Default_Gift_Amount__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Default_Gift_Amount__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+          
+            <apex:pageBlockSectionItem >
+            <apex:outputpanel >
+                <apex:outputLabel value="Default Account Code" />
+                <c:BatchLogDetailPageTooltip helpText="Please provide an Account Code to be defaulted" rendered="{! newOrEditing}"/>
+            </apex:outputpanel>
+            <apex:outputPanel >
+              <apex:inputField value="{! batchLog.Default_Account_Code__c}" rendered="{! newOrEditing}" />
+              <apex:outputField value="{! batchLog.Default_Account_Code__c}" rendered="{! !newOrEditing}" />
+            </apex:outputPanel>
+          </apex:pageBlockSectionItem>
+<!--BGE-75-->
+              <apex:pageBlockSectionItem >
+                  <apex:outputpanel >
+                      <apex:outputLabel value="Default Payment Issuer" />
+                      <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Default_Payment_Method}" rendered="{! newOrEditing}"/>
+                  </apex:outputpanel>
+                  <apex:outputPanel >
+
+                      <apex:inputField value="{! batchLog.Default_Payment_Issuer__c}" rendered="{! newOrEditing}" />
+                      <apex:outputField value="{! batchLog.Default_Payment_Issuer__c}" rendered="{! !newOrEditing}" />
+                  </apex:outputPanel>
+              </apex:pageBlockSectionItem>
+<!--BGE-75 END-->
+        </apex:pageBlockSection> <!--- BGE-61 END -->
+        
+        <apex:pageBlockSection columns="2" title="System Information" rendered="{! !newOrEditing}">
+          <apex:outputField value="{! batchLog.OwnerId}" />
+          <apex:outputText value="" />
+          <apex:outputField value="{! batchLog.CreatedById}" />
+          <apex:outputField value="{! batchLog.LastModifiedById}" />
+          <apex:outputField value="{! batchLog.CreatedDate}" />
+          <apex:outputField value="{! batchLog.LastModifiedDate}" />
+        </apex:pageBlockSection>
+      </apex:pageBlock>
+
+    <!-- Enter Key error Message  -->
+      <apex:outputPanel id="enterKeyRestrictMsgPopup" styleClass="hidePanel">
+        <!--  -->
+        <apex:outputPanel styleClass="popupBackground" layout="block" />
+        <apex:outputPanel styleClass="custPopup restrictEnterKeyPopup" layout="block">
+          <apex:PageBlock >
+            <apex:image id="warning" value="/img/msg_icons/warning24.png" />&nbsp;&nbsp;
+            <apex:outputText >{!$Label.Restrict_Enter_Key}</apex:outputText>
+            <apex:PageblockButtons location="top">
+              <apex:commandButton value="Close" onClick="closePoup()" rerender="enterKeyRestrictMsgPopup" />
+            </apex:PageblockButtons>
+          </apex:PageBlock>
+        </apex:outputPanel>
+      </apex:outputPanel>
+    <!-- Enter Key error Message  Ends-->
+    <!--  Payment Method Block -->
+      <apex:outputPanel id="tstpopup">
+        <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{! displayPopUp}" />
+        <apex:outputPanel styleClass="custPopup paymentMethodPopup" layout="block" rendered="{! displayPopUp}">
+            <!-- To show loading symbol for popup -->
+            <apex:actionstatus id="counterStatusIMO">
+              <apex:facet name="start">
+                <div class="popupBackground" id="el_loading">
+                  <div class="loadingPopup custPopup">
+                    <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                    <span class="waitingDescription">Loading...</span>
+                  </div>
+                </div>
+              </apex:facet>
+              </apex:actionStatus>
+          <apex:pageBlock title="New Payment Method" >
+            <apex:pageMessages id="pageMsg" />
+            <apex:pageBlockSection title="Charge Card Information" rendered="{! IF(paymentMType == 'EFT',false,true)}" columns="1">
+              <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputlabel value="No Charge" rendered="{! !affiliateUser}"> </apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_No_Charge}" rendered="{! !affiliateUser}"/>                                
+                  </apex:outputPanel>
+                  <apex:inputField value="{! paymentMethodRec.No_Charge__c}"  rendered="{! !affiliateUser}"/>
+              </apex:pageBlockSectionItem>
+              
+              <apex:pageBlockSectionItem >
+                  <apex:outputPanel style="width:100%">
+                    <apex:outputlabel value="Card Holder Name" styleClass="labelCol vfLabelColTextWrap" > </apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Card_Holder_Name}"/>                  
+                  </apex:outputPanel>
+                  <apex:inputField value="{! paymentMethodRec.rC_Giving__Card_Holder_Name__c}" />
+              </apex:pageBlockSectionItem> 
+              
+              <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputlabel value="Card Issuer"> </apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Card_Issuer}"/>                   
+                  </apex:outputPanel>
+                  <apex:inputField value="{! paymentMethodRec.rC_Giving__Card_Issuer__c}" />
+              </apex:pageBlockSectionItem>
+              
+              <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputlabel value="Card Number" rendered="{! !affiliateUser}"> </apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Card_Number}" rendered="{! !affiliateUser}"/>                 
+                  </apex:outputPanel> 
+                  <apex:inputField value="{! paymentMethodRec.rC_Giving__Card_Number__c}" rendered="{! !affiliateUser}"/>
+              </apex:pageBlockSectionItem>
+              
+              <!--<apex:inputField value="{! paymentMethodRec.rC_Giving__Card_Expiration__c}"/>-->
+              <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputlabel style="margin-left: 12px;" styleClass="labelCol vfLabelColTextWrap" rendered="{! !affiliateUser}"> Expiration Month</apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Expiration_Month}" rendered="{! !affiliateUser}"/>
+                    <apex:inputField value="{! paymentMethodRec.rC_Giving__Card_Expiration_Month__c}" style="margin-left: 10px;" rendered="{! !affiliateUser}"/>
+                    <apex:outputlabel style="margin-left: 14px;" styleClass="labelCol vfLabelColTextWrap" rendered="{! !affiliateUser}"> Expiration Year</apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Expiration_Year}" rendered="{! !affiliateUser}"/>
+                    <apex:inputField value="{! paymentMethodRec.rC_Giving__Card_Expiration_Year__c}" style="margin-left: 10px;" rendered="{! !affiliateUser}"/>
+                  </apex:outputPanel>
+              </apex:pageBlockSectionItem>
+              <!--<apex:inputField value="{! paymentMethodRec.Charge_Credit_Card_EFT__c}" Label="Charge Payment" rendered="{! IF(paymentMType == 'EFT',false,true)}"/>-->
+              
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Electronic Funds Transfer Information" rendered="{! IF(paymentMType == 'EFT',true,false)}">
+              <!-- <apex:inputField value="{! paymentMethodRec.rC_Giving__Bank_Name__c}"/>
+              <apex:inputField value="{! paymentMethodRec.rC_Giving__Card_Number_Last_4__c}"/>-->
+              <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputlabel > Routing Number</apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Routing_Number}" />
+                </apex:outputPanel>
+                <apex:inputField value="{! paymentMethodRec.rC_Giving__Routing_Number__c}" required="{! required}" styleClass="required" />
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputlabel > Account Number</apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Payment_Account_Number}" />
+                </apex:outputPanel>
+                <apex:inputField value="{! paymentMethodRec.rC_Giving__Account_Number__c}" required="{! required}" styleClass="required" />
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputlabel style="margin-left: 12px;" styleClass="labelCol vfLabelColTextWrap" > Account Type</apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Account_Type}" />
+                </apex:outputPanel>
+                <apex:inputField value="{! paymentMethodRec.rC_Giving__Account_Type__c}" />
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputlabel style="margin-left: 12px;" styleClass="labelCol vfLabelColTextWrap" > No Charge</apex:outputlabel>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_No_Charge}" />
+                </apex:outputPanel>
+                <apex:inputField value="{! paymentMethodRec.No_Charge__c}" Label="No Charge" />
+              </apex:pageBlockSectionItem>
+              
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons location="bottom">
+                  <apex:commandButton value="Save" id="saveChargeCard_EFT" action="{! createPayment}" rerender="tstpopup,OpptyWrapperList" status="counterStatusIMO"/>
+              <apex:commandButton value="Cancel" action="{! closePopup}" rerender="tstpopup,OpptyWrapperList" status="counterStatusIMO"/>
+            </apex:pageBlockButtons>
+          </apex:pageBlock>
+        </apex:outputPanel>
+      </apex:outputPanel>
+    <!--  Payment Method Block Ends -->
+
+    <!--BGE-84 Add ability to update account and payment method on adjust giving
+        Name  :  PaymentMethodLookupPageController
+        Author:  Ana Ferreira
+        Date  :  Dec 02, 2019-->
+    <!--Adjust Giving Block -->
+      <div id="table-scroll2">
+        <apex:outputpanel id="errorInBatchRowPanel" >
+              <apex:inputHidden id="errorInBatchRow" value="{!errorInBatchRow}" />
+        </apex:outputpanel>
+        <apex:outputPanel id="adjustGivingPopup" styleClass="adjustGivingPopup hidePanel" >
+          <apex:outputPanel styleClass="popupBackground" layout="block" />
+          <apex:outputPanel styleClass="custPopup adjustGivingPopup" layout="block">
+              <!-- To show loading symbol for popup -->
+            <apex:actionstatus id="counterStatusAdjustGiving">
+              <apex:facet name="start">
+                <div class="popupBackground" id="el_loading">
+                  <div class="loadingPopup custPopup">
+                    <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                    <span class="waitingDescription">Loading...</span>
+                  </div>
+                </div>
+              </apex:facet>
+              </apex:actionStatus>
+            <apex:pageMessages id="pageMsgs" />
+            <apex:pageBlock title="Adjust Giving" id="tableScrollTest">
+
+              <apex:pageBlockTable value="{! adjustmentOpptyLst}" var="opp">
+
+                <apex:repeat value="{! adjustmentFieldSet}" var="afield" id="repeatAdjutFields">
+
+                    <!--AND(opp.Adjustment_Code__c != 'D', NOT(AND(opp.Adjustment_Code__c == 'B',afield == 'Amount'))), -->
+
+                  <apex:column headerValue="{!IF(afield.label == 'Campaign ID','Campaign Name',
+                                              IF(afield.label == 'Account ID', 'Account Name', afield.label))}"
+                                 rendered="{! AND(OR(isReleased, opp.rC_Giving__Parent__c == adjustTransParentId, adjustTransParentId != NULL,
+                        afield.label == 'Adjustment Code', isAdjustementsCreated), opp.Adjustment_Code__c != 'D')}">
+
+                        <apex:outputField value="{! opp[afield]}"  rendered="{! AND ( afield.label == 'Account ID')}" id="originalAccId"/>
+                        <apex:outputField value="{! opp[afield]}"  rendered="{! AND ( afield.label!= 'Account ID')}" />
+                    </apex:column>
+
+                      <apex:column headerValue="{!IF(afield.label == 'Campaign ID','Campaign Name',
+                                              IF(afield.label == 'Account ID', 'Account Name', afield.label))}"
+                                   rendered="{! AND(OR(isReleased, opp.rC_Giving__Parent__c == adjustTransParentId, adjustTransParentId != NULL,
+                                               afield.label == 'Adjustment Code', isAdjustementsCreated),
+                                                opp.Adjustment_Code__c == 'D',
+                                                originalDTransaction!=null,
+                                                originalTransaction!=null,
+                                                originalDTransaction.AccountId==opp.AccountId,
+                                                originalTransaction.AccountId!=opp.AccountId)}">
+
+
+                          <apex:outputField value="{! opp[afield]}"   />
+                      </apex:column>
+
+
+<!--Last line to adjustment-->
+                      <apex:outputField value="{! opp[afield]}"   />
+                    <apex:column headerValue="{!IF(afield.label == 'Campaign ID','Campaign Name',
+                                        IF(afield.label == 'Account ID', 'Account Name', afield.label))}"
+                                 rendered="{! AND(or(originalTransaction==null, originalTransaction.AccountId==opp.AccountId),
+                                            opp.rC_Giving__Parent__c != NULL ,
+                                            opp.Adjustment_Code__c == 'D', !isReleased)}">
+                        <apex:outputField id="adjustmentCode"  value="{! opp[afield]}" rendered="{! OR(afield.label == 'Adjustment Code',afield.label == 'Transaction Type')}"/>
+
+<!--accountId-->
+                        <!--BGE-84 hiding-->
+                 <apex:inputField value="{! opp[afield]}" rendered="{! AND(afield.label =='Account ID', !showAdj_Save_btn)}" id="accountIdOutput" onChange="validateErrorMsg();"/>
+                 <apex:outputField value="{! opp[afield]}" rendered="{! AND(afield.label =='Account ID', showAdj_Save_btn)}" />
+<!--                        <apex:outputField value="{! opp[afield]}" rendered="{! AND(afield.label =='Account ID')}"/>-->
+
+<!--requiredFields-->
+                 <apex:inputField value="{! opp[afield]}" rendered="{! AND(afield.label != 'Adjustment Reason Type',
+                                                                            afield.label != 'Adjustment Notes',
+                                                                            afield.label != 'Selected Payment Method',
+                                                                            afield.label !='Account ID',
+                                                                            afield.label !='Transaction Type',
+                                                                            afield.label !='Adjustment Code', 
+                                        afield.label !='Payment Method')}"/>
+                <div class = "requiredInput">
+                    <div class = "requiredBlock"> </div>
+                        <apex:inputField id="reason"  value="{! opp[afield]}" rendered="{! AND(afield.label == 'Adjustment Reason Type')}"/>
+                        <apex:inputField id="reasonNote"  value="{! opp[afield]}" rendered="{! AND(afield.label == 'Adjustment Notes')}"/>
+
+                </div>
+                <!--payment method-->
+                <apex:inputField value="{! opp[afield]}" id="paymentMethod" rendered="{! AND(afield.label =='Payment Method')}" />
+<!--customLookup-->
+<!--                        <apex:inputField value="{! opp[afield]}" rendered="{! AND(afield.label == 'Selected Payment Method')}"/>-->
+                        <!--BGE-84 hiding-->
+                  <div class="customPaymentMethodLookup requiredInput">
+                          <div class = "requiredBlock"> </div>
+                          <apex:inputHidden value="{! opp.rC_Giving__Payment_Method_Selected__c}" id="givingMethodId" rendered="{! AND(afield.label == 'Selected Payment Method')}"/>
+                          <apex:inputField value="{! opp.rC_Giving__Payment_Method_Selected__c}" id="givingMethodName" rendered="{! AND(afield.label == 'Selected Payment Method')}" style="width:75%"/>
+
+                      <a  href='#' onclick="openCustomLookup('{! opp.rC_Giving__Payment_Method_Selected__c}')"
+                                style="display:{! IF(afield.label == 'Selected Payment Method', 'initial','none')}">
+                              <img src="/img/s.gif" class="lookupIcon"></img>
+                          </a>
+                      </div>
+
+              </apex:column>
+
+                </apex:repeat>
+
+              </apex:pageBlockTable>
+              <apex:pageBlockButtons location="bottom">
+
+                <apex:commandButton value="Close" onClick="closeAdjustGivingPopup();return false;" rendered="{! showAdj_close_btn}"/>
+                <apex:commandButton Value="Cancel Adjustment" onclick="ConfirmcancelAdjustment();return false;" rendered="{! showAdj_CancelAdjust_btn}"/>
+<!--                                          <apex:commandButton value="Save & Commit" onClick="ConfirmsaveAdjustmentOppty('{!activeOpportunity.hasSoftCredits}');return false;" rendered="{! showAdj_Save_Commit_btn}"/>-->
+                        <!--                <apex:commandButton value="Save & Commit" onClick="validateRequiredFields();" rendered="{! showAdj_Save_Commit_btn}"/>-->
+                                          <!--BGE-84 hiding-->
+                <input type="button" value="Save & Commit" onClick="validateRequiredFields();" class="btn" style="display:{!IF(showAdj_Save_Commit_btn, '','none')};"/>
+                                          <!--BGE-84 hiding-->
+                <apex:commandButton value="Save" onClick="alertUseronSoftCredits('{!activeOpportunity.hasSoftCredits}');return false;" rendered="{! showAdj_Save_btn}"/>
+              </apex:pageBlockButtons>
+            </apex:pageBlock>
+          </apex:outputPanel>
+            <script type='text/javascript'>
+                function validateErrorMsg() {
+                    originalAccId = vfId('originalAccId');
+                    originalAccValue = document.getElementById(originalAccId).firstElementChild.text;
+                    console.log('init');
+                    inputid = vfId('accountIdOutput');
+                    inputValue = document.getElementById(inputid).value;
+                    accValue = document.getElementById(inputid+'_lkold').value;
+                    console.log('Input: '+ inputValue);
+                    console.log('accValue: '+ accValue);
+
+                    if(originalAccValue!=inputValue) {
+                        var requiredPaymentMethodName = vfId('givingMethodName');
+                        var requiredPaymentMethodId = vfId('givingMethodId');
+                        document.getElementById(requiredPaymentMethodName).value = '';
+                        document.getElementById(requiredPaymentMethodId).value = '';
+                    }
+                    var errorMsg = document.getElementsByClassName('errorMsg');
+                    for (i = 0; i < errorMsg.length; i++) {
+                        errorMsg[i].style.display = 'none';
+                    }
+
+                }
+                function validateRequiredFields(){
+                    var requiredField = vfId('reason');
+                    var requiredNoteField = vfId('reasonNote');
+                    var requiredPaymentMethod = vfId('givingMethodName');
+                    if(document.getElementById(requiredPaymentMethod).value == ''){
+                        document.getElementById(requiredPaymentMethod).focus();
+                    }
+                    else if(document.getElementById(requiredField).value == '' || document.getElementById(requiredNoteField).value == '') {
+                        document.getElementById(requiredField).focus();
+                    }
+                    else{
+                        ConfirmsaveAdjustmentOppty('{!activeOpportunity.hasSoftCredits}');
+                        return false;
+                    }
+
+                }
+                function vfElement(visualforceId) {
+                    return jQuery("[id $=':" + visualforceId + "']")
+                }
+
+                function vfId(visualforceId) {
+                    return vfElement(visualforceId).attr('id')
+                }
+
+                function hideDefaultLookup(){
+                    nameField = vfId('givingMethodName')+'_lkwgt';
+                    console.log('hideDefautLookup');
+                    document.getElementById(nameField).style.display = 'none';
+                }
+
+                function openCustomLookup(nameField){
+
+                    var errorMsg = document.getElementsByClassName('errorMsg');
+                    for (i = 0; i < errorMsg.length; i++) {
+                        errorMsg[i].style.display = 'none';
+                    }
+
+                    nameField = vfId('givingMethodName');
+                    idNameField = vfId('givingMethodId');
+                    accountIdField = vfId('accountIdOutput')+'_lkid';
+                    lookupStd = nameField+'_lkwgt'
+                    paymentMethodField = vfId('paymentMethod');
+                    var account = getElementByIdCS(accountIdField).value;
+                    var previousPaymentMethod = getElementByIdCS(nameField).value;
+                    var url = "/apex/Payment_Method_Lookup_Page?accountId="+account+"&namefield="+nameField +"&idfield=" + idNameField+'&prevPayment='+previousPaymentMethod+'&paymentMethod='+paymentMethodField;
+
+                    newWin = window.open(url, "",'height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=yes,status=yes');
+                    if (window.focus) {
+                        newWin.focus();
+                    }
+                     return false;
+                }
+                
+                function warning(str, batchLogInvalid){
+                    if(batchLogInvalid == 'true'){
+                        console.log('Batch Invalid 111');
+                        preventDefault();
+                        return;
+                    }else {
+                    if(batchLogInvalid == 'false' && (str.length>0 )){
+                        var continueWithWarnings = confirm( str + 'Proceed?');
+                        if (continueWithWarnings == true) {
+                            confirmSaveBatchLog();
+                        }
+                    }else{
+                        if(batchLogInvalid == 'false'){
+                            confirmSaveBatchLog();
+                        }
+                    }
+                    }
+                }
+                
+            </script>
+        </apex:outputPanel>
+      </div>
+
+    <!-- Batch Log Entry Links -->
+      <apex:pageBlock title="Batch Log Items" rendered="{!!batchLog.TPA_Bypass__c}">
+        <apex:pageBlockButtons location="top">
+          <apex:outputPanel id="BatchListButtons">
+            <apex:commandButton title="Add Row" value="Add Row" onclick="_bge.addRow(); return false;" rendered="{! !isAdjustOrReleased && !newOrEditing}"/>
+            <apex:commandButton title="Refresh List" value="Refresh List" onClick="refreshList(false); return false;" />
+            <!--apex:commandlink action="{!redirectToReport}"  target="_blank" style="text-decoration: none;">
+              <apex:commandButton title="Report" value="Detail Report" /> 
+            </apex:commandlink> -->
+            <apex:commandbutton title="Report" value="Detail Report" onclick="openReport('{!reportURL}'); return false;"/>
+              <!--BGE-84 hiding-->
+           <apex:commandbutton title="Report" value="Adjustment Detail Report" onclick="openReport('{!reportAdjustURL}'); return false;"  rendered="{!isAdjustBatch}"/>
+          </apex:outputPanel>
+          <apex:commandButton value="New Account" onClick="OpenEnterKeyErrorPopup(); return false;" styleClass="defaultButton" />
+          <apex:commandButton value="Export Batch Items" onclick="_bge.exportItems(); return false;" rendered="{!!isAdjustBatch}"/>
+        </apex:pageBlockButtons> 
+        <!-- <apex:outputLink onclick="openBatchPrefPopup();return false;" styleClass="batchPrefText" rendered="{! !isAdjustBatch}">{!$Label.Batch_Preferences}</apex:outputLink> -->
+        <table id="bgeList">
+          <tr>
+            <td></td>
+          </tr>
+        </table>
+        <apex:pageBlockButtons location="bottom">
+          <apex:outputPanel id="BatchListButtons2">
+            <apex:commandButton title="Add Row" value="Add Row" onclick="_bge.addRow(); return false;" rendered="{! !isAdjustOrReleased && !newOrEditing}"/>
+          </apex:outputPanel>
+        </apex:pageBlockButtons> 
+      </apex:pageBlock>
+
+    <!-- New Gift Detail Section -->
+        <apex:actionFunction name="changeActiveOppt" action="{! changeActiveOppt}" reRender="OpptyWrapperList" oncomplete="_bge.showOpptDetail();" status="counterStatus">
+        <apex:param name="activeOpptyIndex" value="" />
+      </apex:actionFunction>
+      <div class="bldp-custom-oppt-container">
+        <div class="bldp-custom-oppt-block">
+          <div class="bldp-custom-oppt-loader">Loading...</div>
+          <div class="bldp-custom-oppt-detail">
+            <apex:outputPanel id="OpptyWrapperList">
+            <apex:pageBlock rendered="{! activeOpportunity != null }">
+              <apex:pageMessages id="pageMsgsBLE" />
+              <apex:pageBlockButtons location="both">
+                <apex:outputPanel rendered="{! !isAdjustBatch}">
+                  <apex:commandButton title="Save" styleClass="tooltip rowSave" style="margin-Right:5px" value="Save"
+                    disabled="{! !activeOpportunity.isNew }" rendered="{! !isReleased}"
+                    onclick="_bge.saveOppt(); return false;" />
+                </apex:outputPanel>
+                <apex:commandButton title="Cancel" styleClass="tooltip" style="margin-Right:5px" 
+                  value="Cancel" onclick="_bge.cancelChange(); return false;" />
+                <apex:outputPanel rendered="{! !isAdjustBatch}">
+                  <apex:commandButton id="splitImage"
+                    title="Add Split"
+                    style="margin-Right:5px"
+                    value="Add Split"
+                    onClick="_bge.addSplit('{!activeOpportunity.recCount}');return false;"
+                    rendered="{! AND(
+                      !activeOpportunity.isNew,
+                      !activeOpportunity.isSplit,
+                      !isReleased,
+                      OR(
+                        activeOpportunity.objOppty.RecordTypeId == OPP_RT_PLEDGE_ID,
+                        activeOpportunity.objOppty.RecordTypeId == OPP_RT_DONATION_ID))}" />
+                  <apex:commandButton title="Delete Row" styleClass="tooltip" style="margin-Right:5px" value="Delete Row"
+                    rendered="{!
+                        AND(
+                          !activeOpportunity.isNew,
+                      OR(
+                        batchLog.Batch_Log_Status__c == 'Open',
+                            batchLog.Batch_Log_Status__c == 'Pending'
+                          )
+                      )}"
+                    disabled="{! activeOpportunity.objOppty.Split_Sequence__c = 1}"
+                    onClick="deleteRow('{!activeOpportunity.recCount}', '{!activeOpportunity.objOppty.Posted_to_GL_Checkbox__c}');return false;" />
+
+                  <apex:commandButton id="openPledges"
+                    title="Attach Giving" disabled="{! isAdjustmentRcType}"
+                    style="margin-Right:5px; background: rgb(253, 245, 151);
+                      display:{!if(
+                        AND(!isReleased, !isAdjustBatch, activeOpportunity.objOppty['accountId'] !=null, activeOpportunity.showOpenPledgeIcon == true, activeOpportunity.selectedRT != null, activeOpportunity.selectedRT != 'Pledge Payment'),
+                        ' inline ', ' none ')};"
+                    value="Attach Giving"
+                    onclick="openGrants('{!activeOpportunity.recCount}', '{!activeOpportunity.objOppty['AccountId']}', '{!activeOpportunity.objOppty.rC_Giving__Giving_Amount__c}','{!activeOpportunity.objOppty.Batch_Log__c}', '{!activeOpportunity.ObjOppty.rC_Giving__Payment_Method__c}', '{!activeOpportunity.selectedRT}', false); return false;" />
+                  <apex:commandButton id="Matching_Gift" title="Match Gift" styleClass="tooltip" rendered="{! AND(!activeOpportunity.isNew, OR(activeOpportunity.accountType  == 'Matching Company', activeOpportunity.accountType == WORKPLACE_GIVING),OR(activeOpportunity.objOppty.RecordTypeId == OPP_RT_DONATION_ID, activeOpportunity.objOppty.RecordTypeId == OPP_RT_PLEDGE_PAYMENT_ID))}" value="Match Gift" onclick="matchOpportunity('{!activeOpportunity.recCount}'); return false;" />
+                </apex:outputPanel>
+                <apex:commandButton id="adjustGivingImage" title="Adjust Giving" style="margin-Right:5px" value="Adjust Giving" rendered="{! AND(!activeOpportunity.isNew, isAdjustBatch, OR(activeOpportunity.objOppty.RecordType.Name == 'Donation', activeOpportunity.objOppty.RecordType.Name == 'Pledge',
+                activeOpportunity.objOppty.RecordType.Name == 'Pledge Payment'
+                ))}" onclick="adjustGivingProperties('{!activeOpportunity.recCount}');  return false;" />
+                <apex:commandButton title="Manage Pledge Schedule" value="Manage Pledge Schedule" rendered="{! AND(!activeOpportunity.isNew, activeOpportunity.objOppty.RecordType.Name == 'Pledge')}" onClick="managePledgeUrl('{!activeOpportunity.objOppty.Id}'); return false;"/>
+                <!-- START GH-75-- have to manage the pledge when the activeOpportunity is Pledge Payment; need to override managePledgeUrl -->
+                <apex:commandButton title="Manage Pledge Schedule" value="Manage Pledge Schedule" rendered="{! AND(!activeOpportunity.isNew, activeOpportunity.objOppty.RecordType.Name == 'Pledge Payment')}" onClick="managePledgeUrl('{!activeOpportunity.objOppty.rC_Giving__Parent__c}'); return false;"/>
+                <!-- END GH-75 -->
+                <apex:commandButton title="Gift Membership" value="Gift Membership"  style="margin-Right:5px" 
+                  onClick="_bge.openSoftCredit('{!activeOpportunity.objOppty.Id}', '{!batchLogId}', '{!isReleased}'); return false;"
+                  rendered="{!
+                    AND(
+                      NOT(
+                        AND(
+                          isAdjustBatch,
+                          activeOpportunity.hasSoftCredits != true
+                        )
+                      ),
+                      OR(
+                        activeOpportunity.objOppty.RecordTypeId == OPP_RT_DONATION_ID,
+                        activeOpportunity.objOppty.RecordTypeId == OPP_RT_PLEDGE_PAYMENT_ID,
+                        AND(
+                          activeOpportunity.objOppty.RecordTypeId == OPP_RT_PLEDGE_ID,
+                          isAdjustBatch
+                        ), 
+                        AND (
+                          activeOpportunity.isNew,
+                          OR (
+                            activeOpportunity.selectedRT == null,
+                            activeOpportunity.selectedRT == 'Donation',
+                            activeOpportunity.selectedRT == 'Pledge Payment'
+                          )
+                        )
+                      ),
+                      NOT (isAdjustmentRcType)
+                    )}" />
+                <apex:commandButton value="Clear IHO/IMO" action="{!deleteIHOValues}" rendered="{! !isAdjustOrReleased}"
+                  rerender="apexVariables,batchLogDetails,OpptyWrapperList" status="counterStatus"/>
+              </apex:pageBlockButtons>
+              <apex:pageBlockSection id="topSection">
+                <apex:outputField value="{! activeOpportunity.objOppty.Batch_Sequence__c}" />
+                <apex:outputField value="{! activeOpportunity.objOppty.Split_Sequence__c}" />
+
+                <!-- Account Number -->
+                <apex:pageBlockSectionItem id="accountNumberItem">
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Account Number" for="accountNumber" />
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Account_Number}" rendered="{! !activeOpportunity.accountSelected }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel id="accountNumberPanel">                    
+                    <apex:inputText id="accountNumber"
+                      value="{! activeOpportunity.accountNumber }"
+                      disabled="{! isReleased }"
+                      rendered="{! !activeOpportunity.accountSelected }"
+                      onchange="accountNumberChanged('{!activeOpportunity.recCount-1}', '{!colOrderMap['Account ID']}','{!activeOpportunity.isNew}');" />
+                    <apex:outputText styleclass="Account_Number_BGE__c"
+                      value="{! activeOpportunity.accountNumber}"
+                      rendered="{!
+                        OR(
+                          isAdjustBatch,
+                          activeOpportunity.accountSelected,
+                          !activeOpportunity.isNew,
+                          activeOpportunity.isSplitParent,
+                          activeOpportunity.isSplit
+                        )}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Account Name -->
+                <apex:pageBlockSectionItem id="accountNameItem">
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Account Name" for="acctargetName" />
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Account_Name}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel id="accountNamePanel" >
+                    <!-- Custom Account Lookup -->
+                    <apex:outputPanel styleclass="AccountId" style="white-space: nowrap;" rendered="{! !activeOpportunity.accountSelected }">
+                      <apex:inputHidden value="{! activeOpportunity.objOppty.accountId}" id="acctargetId" />
+                      <apex:outputPanel styleClass="requiredInput" layout="block">
+                        <apex:outputPanel styleClass="requiredBlock" layout="block" ></apex:outputPanel>
+                        <apex:inputHidden value="{! activeOpportunity.accountType}" id="acctType" />
+                        <apex:inputText value="{! activeOpportunity.accountName}" id="acctargetName" onFocus="this.blur()" disabled="false" />
+                        <!-- TODO: passaccComponentIds needs to be updated to the new model -->
+                        <a href="Javascript:passaccComponentIds('{!colOrderMap['Account ID']}','{!activeOpportunity.selectedRT}','{!!isAdjustBatch}')"><img src="/img/s.gif" class="lookupIcon"></img>
+                        </a>
+                      </apex:outputPanel>
+                    </apex:outputPanel>
+                    <!-- Clickable Acocunt Link -->
+                    <apex:actionRegion >
+                      <apex:outputText styleclass="AccountId" rendered="{! activeOpportunity.accountSelected }">
+                        <a href="/{! activeOpportunity.objOppty.accountId }" target="_blank">{! activeOpportunity.accountName }</a>
+                      </apex:outputText>
+                    </apex:actionRegion>
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Source Code -->
+                <apex:pageBlockSectionItem id="sourceCodeItem">
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Source Code" for="sourceCode" />
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Source_Code}" rendered="{! !isCompleted }" />
+                  </apex:outputPanel>
+                  <apex:outputPanel id="sourceCodePanel">
+                    <!--  DS - 2018-10-08 Source_Code_Override__c added per GH-34 -->                            
+                    <apex:inputHidden id="sourceCodeOverride"
+                      value="{! activeOpportunity.sourceCodeOverride}">
+                     </apex:inputHidden>  
+                    <apex:inputText id="sourceCode"
+                      value="{! activeOpportunity.SourceCode}"
+                      rendered="{! !isCompleted && activeOpportunity.selectedRT != 'Pledge Payment'}"
+                      onchange="document.getElementById('{!$Component.sourceCodeOverride}').value = true
+;sourceCodeChanged('{!activeOpportunity.recCount-1}', '{!colOrderMap['Campaign ID']}');" />
+                    <apex:outputText id="sourceCodeOp"
+                      value="{! activeOpportunity.hiddenSourceCode}"
+                      rendered="{! isCompleted || activeOpportunity.selectedRT == 'Pledge Payment'}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Campaign Name - Custom Lookup -->
+                <apex:pageBlockSectionItem id="campaignNameItem" >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Campaign Name" for="campaignNamePanel" />
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Campaign_Name}"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel style="white-space: nowrap;" id="campaignNamePanel">
+                    <apex:outputPanel styleClass="requiredInput" layout="block" rendered="{! !isReleased && !isAdjustBatch && !activeOpportunity.isPledgePaymentRecord}">
+                      <apex:outputPanel styleClass="requiredBlock" layout="block" rendered="{! activeOpportunity.selectedRT != 'Pledge Payment' && ! isAdjustmentRcType}" />
+                      <apex:inputHidden value="{! activeOpportunity.objOppty.CampaignId}" id="camptargetId" />
+                      <apex:inputHidden value="{! activeOpportunity.hiddenSourceCode}" id="cmpSourceCode" />
+                      <apex:inputHidden value="{! activeOpportunity.programType}" id="programType" />
+                      <apex:inputText value="{! activeOpportunity.campaignName}" id="targetName" disabled="false" /> 
+                      <!-- TODO: update passComponentIds() for new model -->
+                      <a href="Javascript:passComponentIds('{!activeOpportunity.recCount - 1}','{!colOrderMap['Campaign ID']}', '{!colOrderMap['Account ID']}', '{!activeOpportunity.objOppty['Id']}', '{!activeOpportunity.isNew}', '{!activeOpportunity.objOppty.AccountId }' )"><img src="/img/s.gif" class="lookupIcon"></img>
+                      </a>
+                    </apex:outputPanel>
+                    <apex:outputPanel styleClass="requiredInput" layout="block"
+                      rendered="{! isReleased || isAdjustBatch || activeOpportunity.isPledgePaymentRecord}">
+                      <apex:outputText value="{! activeOpportunity.campaignName}" />
+                    </apex:outputPanel>
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Record Type Selection -->
+                <apex:pageBlockSectionItem id="recordType" rendered="{! !isAdjustBatch }">
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Giving Record Type" for="recordType"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Record_Type}" 
+                      rendered="{!
+                        AND(
+                          activeOpportunity.isNew,
+                          activeOpportunity.selectedRT != 'Pledge Payment'
+                        )}"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:selectList id="recordType"
+                      value="{! activeOpportunity.selectedRT}"
+                      size="1"
+                      onchange="populateRecordTypeField('{!activeOpportunity.recCount}','{!colOrderMap['Giving Record Type']}')"
+                      rendered="{!
+                        AND(
+                          activeOpportunity.isNew,
+                          activeOpportunity.selectedRT != 'Pledge Payment'
+                        )}">
+                      <apex:selectOptions value="{! recTypeValues}" />
+                    </apex:selectList>
+                    <apex:outputText styleclass="selectedRT"
+                      value="{! activeOpportunity.selectedRT }"
+                      rendered="{!
+                        OR(
+                          !activeOpportunity.isNew,
+                          activeOpportunity.selectedRT == 'Pledge Payment'
+                        )
+                      }" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Giving Amount -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <apex:outputLabel value="Giving Amount" for="GivingAmountField"/>
+                        <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Record_Type}" 
+                           rendered="{! !isAdjustOrReleased }" />
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                      <apex:outputPanel styleClass="requiredInput"
+                        layout="block"
+                        rendered="{! !activeOpportunity.isPledgePaymentRecord && ! isAdjustmentRcType}">
+                        <apex:outputPanel styleClass="requiredBlock"
+                          layout="block"
+                          rendered="{! !isAdjustOrReleased && ! isAdjustmentRcType}" />
+                        
+                        <apex:inputField id="GivingAmountField"
+                          styleclass="rC_Giving__Giving_Amount__c"
+                          value="{! activeOpportunity.objOppty.rC_Giving__Giving_Amount__c}"
+                          rendered="{! !isAdjustOrReleased }" />
+                        <apex:outputText value="{! activeOpportunity.objOppty.rC_Giving__Giving_Amount__c }"
+                          rendered="{! isAdjustOrReleased }" />
+                      </apex:outputPanel>
+                      <apex:outputText value="{! activeOpportunity.objOppty.Amount }"
+                        rendered="{! activeOpportunity.isPledgePaymentRecord || isAdjustmentRcType}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                  <apex:outputLabel value="Program Type" for="programType" />
+                  <apex:outputText id="programType" value="{! activeOpportunity.programType }" />
+                </apex:pageBlockSectionItem>
+              </apex:pageBlockSection>
+
+              <apex:pageBlockSection id="section1" title="Payment Method & Related Giving">
+                <!--  Payment Method -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Payment Method" for="paymentM"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Payment_Method}" rendered="{! !iscompleted }" />
+                  </apex:outputPanel>
+                  <apex:outputPanel styleClass="requiredInput" layout="block">
+                    <apex:outputPanel styleClass="requiredBlock" layout="block" rendered="{! ! isAdjustmentRcType}"/>
+                    <apex:inputField styleclass="rC_Giving__Payment_Method__c"
+                      id="paymentM"
+                      onchange="showHidePaymentMethod(this,'{!activeOpportunity.recCount-1}','{!colOrderMap['Account ID']}','{!activeOpportunity.isNew}','{!activeOpportunity.objOppty['AccountId']}')"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Payment_Method__c}"
+                      rendered="{! !iscompleted }" />
+                    <!-- TODO: make showHidePaymentMethod work with the new design -->
+                    <apex:outputField styleclass="rC_Giving__Payment_Method__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Payment_Method__c}"
+                      rendered="{! iscompleted }" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Payment Subtype -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Payment Subtype" for="Payment_Subtype__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_PaymentSubType}" rendered="{! !iscompleted }" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                        <apex:outputPanel id="psReqBlock" styleClass="requiredBlock" layout="block"
+                        style="visibility:{!IF(psrequired==true,'visible','hidden')}"></apex:outputPanel>
+                        
+                        <apex:inputField id="Payment_Subtype__c" styleclass="Payment_Subtype__c"
+                          value="{! activeOpportunity.objOppty.Payment_Subtype__c}"
+                          rendered="{! !iscompleted}" />
+                    </apex:outputPanel>
+
+                    <apex:outputField styleclass="Payment_Subtype__c"
+                      value="{! activeOpportunity.objOppty.Payment_Subtype__c}"
+                      rendered="{! iscompleted }" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Parent Opportunity: Name -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Parent Opportunity: Name" for="rC_Giving__Parent_Name__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_ParentOpp_Name}" rendered="{! !isAdjustOrSplit}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    
+                    <apex:inputField id="rC_Giving__Parent_Name__c" styleclass="rC_Giving__Parent_Name__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Parent_Name__c}"
+                      rendered="{! !isAdjustOrSplit}" />
+
+                    <apex:outputField styleclass="rC_Giving__Parent_Name__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Parent_Name__c}"
+                      rendered="{! isAdjustOrSplit}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Check # -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                      <apex:outputLabel value="Check #" for="rC_Giving__Check_Number__c"/>
+                      <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Check}" rendered="{! !isAdjustOrSplit}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="rC_Giving__Check_Number__c"
+                      styleclass="rC_Giving__Check_Number__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Check_Number__c}"
+                      rendered="{! !isAdjustOrSplit}" />
+
+                    <apex:outputField styleclass="rC_Giving__Check_Number__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Check_Number__c}"
+                      rendered="{! isAdjustOrSplit}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Check Date -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Check Date" for="rC_Giving__Check_Date__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_checkDate}" rendered="{! !isAdjustOrSplit}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="rC_Giving__Check_Date__c" styleclass="rC_Giving__Check_Date__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Check_Date__c}"
+                      rendered="{! !isAdjustOrSplit}" />
+
+                    <apex:outputField styleclass="rC_Giving__Check_Date__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Check_Date__c}"
+                      rendered="{! isAdjustOrSplit}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--Description-->
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <apex:outputLabel value="Description" for="Description"/>
+                        <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Description}" rendered="{! !isAdjustOrSplit}" />
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                        <apex:inputField id="Description" styleclass="Description"
+                            value="{! activeOpportunity.objOppty.Description}"
+                            rendered="{! !isAdjustOrSplit}" />
+
+                        <apex:outputField styleclass="Description"
+                            value="{! activeOpportunity.objOppty.Description}"
+                            rendered="{! isAdjustOrSplit}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+              </apex:pageBlockSection>
+
+              <apex:pageBlockSection id="section2" title="Finance Details">
+                <!--  Restriction -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Restriction" for="Restriction__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Restriction}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >                    
+                    <apex:inputField id="Restriction__c" styleclass="Restriction__c" style="width:95%"
+                      value="{! activeOpportunity.objOppty.Restriction__c}"
+                      rendered="{! !isAdjustOrReleased }" />
+
+                    <apex:outputField styleclass="Restriction__c"
+                      value="{! activeOpportunity.objOppty.Restriction__c}"
+                      rendered="{! isAdjustOrReleased }" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Account Code -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Account Code" for="Account_Code__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_AccountCode}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Account_Code__c" styleclass="Account_Code__c" style="width:95%"
+                      value="{! activeOpportunity.objOppty.Account_Code__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Account_Code__c"
+                      value="{! activeOpportunity.objOppty.Account_Code__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Fund -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Fund" for="Fund__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Fund}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Fund__c" styleclass="Fund__c" style="width:95%"
+                      value="{! activeOpportunity.objOppty.Fund__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Fund__c"
+                      value="{! activeOpportunity.objOppty.Fund__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Account Note -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Out-Of-Affiliate Account Update" for="Account_Note__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_AccountNote}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Account_Note__c" styleclass="Account_Note__c" 
+                      value="{! activeOpportunity.objOppty.Account_Note__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Account_Note__c"
+                      value="{! activeOpportunity.objOppty.Account_Note__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+              </apex:pageBlockSection>
+
+              
+                <!-- Traction(Mounica) BGE-41 -->
+                <!-- Traction(Ana Ferreira, Feb 26) Hide BGE-41 -->
+              <apex:pageBlockSection id="section3" title="Recognition Credit" html-data-collapse="false" columns="2" rendered="{! !isAdjustBatch}">
+                  <apex:pageBlockSectionItem rendered="{! !isAdjustBatch }">
+                        <apex:outputPanel > 
+                            <apex:outputLabel value="Recognition Credit Type" />
+                            <c:BatchLogDetailPageTooltip helpText="Please select a Recognition Credit Type"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{!newCredit.Soft_Credit_Type__c}" rendered="{! !isReleased}"/>
+                            <apex:outputField value="{!newCredit.Soft_Credit_Type__c}" rendered="{! isReleased}"/>
+
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>    
+                  
+                  <apex:pageBlockSectionItem rendered="{! !isAdjustBatch}">
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Recognition Credit Account" />
+                            <c:BatchLogDetailPageTooltip helpText="Please select a Recognition Credit Account"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{!newCredit.rC_Giving__Account__c}" rendered="{! !isReleased}"/>
+                            <apex:outputField value="{!newCredit.rC_Giving__Account__c}" rendered="{! isReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem> 
+                  
+                  <apex:pageBlockSectionItem rendered="{! !isAdjustBatch}">
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Type" />
+                            <c:BatchLogDetailPageTooltip helpText="Please select a Type"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{!newCredit.rC_Giving__Type__c}" rendered="{! !isReleased}"/>
+                            <apex:outputField value="{!newCredit.rC_Giving__Type__c}" rendered="{! isReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <div></div>
+                       <apex:pageBlockSectionItem rendered="{! !isAdjustBatch}">
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Distribution %" />
+                            <c:BatchLogDetailPageTooltip helpText="Please select a Distribution %"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{!newCredit.rC_Giving__Distribution__c}" required="false" rendered="{! !isReleased}"/>
+                            <apex:outputField value="{!newCredit.rC_Giving__Distribution__c}" rendered="{!isReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                       <apex:pageBlockSectionItem rendered="{! !isAdjustBatch}">
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Comments" />
+                            <c:BatchLogDetailPageTooltip helpText="Please enter Comments"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{!newCredit.Comments__c}" required="false" rendered="{! !isReleased}"/>
+                            <apex:outputField value="{!newCredit.Comments__c}" rendered="{! isReleased}"/>
+                        </apex:outputPanel>
+
+                      </apex:pageBlockSectionItem>
+                       
+                    <!--BGE-75 Should update the controller to get this value when BGE-41 moves on -->
+                    <!--BGE-75-->
+                    <apex:pageBlockSectionItem rendered="{! !isAdjustBatch}">
+                          <apex:outputPanel >
+                              <apex:outputLabel value="Payment Issuer " />
+                          </apex:outputPanel>
+                          <apex:outputPanel >
+                              <apex:inputField value="{!newCredit.Payment_Issuer__c}" required="false" rendered="{! !isReleased}" />
+                              <apex:outputField value="{!newCredit.Payment_Issuer__c}"  rendered="{! isReleased}" />
+                          </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                  <apex:pageBlockSectionItem rendered="{! !isAdjustBatch}" >
+                          <apex:outputPanel >
+                              <apex:outputLabel value="Ack Fund Name " />
+                          </apex:outputPanel>
+                            <apex:outputPanel >
+                              <apex:inputField value="{!newCredit.Ack_Fund_Name__c}" required="false" rendered="{! !isReleased}"/>
+                              <apex:outputField value="{!newCredit.Ack_Fund_Name__c}"  rendered="{! isReleased}" />
+                          </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <!--BGE-75-->          
+
+                </apex:pageBlockSection>
+            
+                  <table align = "center"  width = "100%">
+                  <tr><td align = "right"><apex:commandLink action="{!ViewAllCredits}" value="View Account's Credits"  onComplete="window.open('{!reportCreditsURL}','popup','width=800,height=600');"/></td>
+                  <td width ="3%"></td>
+                  <td align = "left"><apex:commandLink action="{!ViewAllCredits}" value="View Giving Credits"  onComplete="window.open('{!reportOppURL}','popup','width=800,height=600');"/></td>
+                  <td width ="15%"></td>
+                  </tr>
+                  </table>
+                       
+              <!--BGE-41 END -->
+               <apex:pageBlockSection id="section4" title="Transfers & Securities" html-data-collapse="{! !activeOpportunity.hasStockValues}">
+                <!-- Ticker Symbol -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Ticker Symbol" for="rC_Giving__Ticker_Symbol__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_TickerSymbol}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel> 
+                  <apex:outputPanel >
+                    <apex:inputField id="rC_Giving__Ticker_Symbol__c"
+                      styleclass="rC_Giving__Ticker_Symbol__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Ticker_Symbol__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="rC_Giving__Ticker_Symbol__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Ticker_Symbol__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Types of Shares -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Types of Shares" for="Types_of_shares__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_typesOfShares}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel> 
+                  <apex:outputPanel >
+                    <apex:inputField id="Types_of_shares__c"
+                      styleclass="Types_of_shares__c"
+                      value="{! activeOpportunity.objOppty.Types_of_shares__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Types_of_shares__c"
+                      value="{! activeOpportunity.objOppty.Types_of_shares__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Number Of Shares -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Number Of Shares" for="rC_Giving__Number_Of_Shares__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_NumberOfShares}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel> 
+                  <apex:outputPanel >
+                    <apex:inputField id="rC_Giving__Number_Of_Shares__c"
+                      styleclass="rC_Giving__Number_Of_Shares__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Number_Of_Shares__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="rC_Giving__Number_Of_Shares__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Number_Of_Shares__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Tax Value -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Tax Value" for="Tax_Value__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Tax_Value}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Tax_Value__c"
+                      styleclass="Tax_Value__c"
+                      value="{! activeOpportunity.objOppty.Tax_Value__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Tax_Value__c"
+                      value="{! activeOpportunity.objOppty.Tax_Value__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+
+                <!-- High Amount -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="High Amount" for="High_Amount__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_HighAmount}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel> 
+                  <apex:outputPanel >
+                    <apex:inputField id="High_Amount__c"
+                      styleclass="High_Amount__c"
+                      value="{! activeOpportunity.objOppty.High_Amount__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="High_Amount__c"
+                      value="{! activeOpportunity.objOppty.High_Amount__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Net Amount -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Net Amount" for="Net_Amount__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_NetAmount}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel>  
+                  <apex:outputPanel >
+                    <apex:inputField id="Net_Amount__c"
+                      styleclass="Net_Amount__c"
+                      value="{! activeOpportunity.objOppty.Net_Amount__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Net_Amount__c"
+                      value="{! activeOpportunity.objOppty.Net_Amount__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Low Amount -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Low Amount" for="Low_Amount__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_LowAmount}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel> 
+                  <apex:outputPanel >
+                    <apex:inputField id="Low_Amount__c"
+                      styleclass="Low_Amount__c"
+                      value="{! activeOpportunity.objOppty.Low_Amount__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Low_Amount__c"
+                      value="{! activeOpportunity.objOppty.Low_Amount__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Fees -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Fees" for="Fees__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Fees}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel>  
+                  <apex:outputPanel >
+                    <apex:inputField id="Fees__c"
+                      styleclass="Fees__c"
+                      value="{! activeOpportunity.objOppty.Fees__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Fees__c"
+                      value="{! activeOpportunity.objOppty.Fees__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+              </apex:pageBlockSection>
+              
+                <apex:pageBlockSection id="section5" title="IHO/IMO" html-data-collapse="{! !activeOpportunity.hasImoValues}" columns="1">
+                <apex:pageBlock Id="ImoPb"> <!--Sai-7/6:Change-->
+                  <div class="imo-iho-div">
+                    <apex:pageBlockSection id="Honoree" title="Honoree" collapsible="false">
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                          <apex:outputLabel value="Tribute Type" />
+                          <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Tribute_Type}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.rC_Giving__Tribute_Type__c}" 
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.rC_Giving__Tribute_Type__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Honoree Title" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Honoree_Title}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Honoree_Title__c}"
+                              rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Honoree_Title__c}"
+                              rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Honoree First Name" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Honoree_FirstName}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Honoree_First_Name__c}"
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Honoree_First_Name__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Honoree Middle Name" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Honoree_MiddleName}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Honoree_Middle_Name__c}"
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Honoree_Middle_Name__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Honoree Last Name" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Honoree_LastName}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Honoree_Last_Name__c}"
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Honoree_Last_Name__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Honoree Suffix" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Honoree_Suffix}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Honoree_Suffix__c}"
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Honoree_Suffix__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Non-Person" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Non_Person}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Non_Person__c}"
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Non_Person__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+
+                    <apex:pageBlockSection id="tributeRec" title="Tribute Recipient" collapsible="false">
+                      <apex:pageBlockSectionItem id="tributeSecItem">
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Ack Recipient Account Number" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_ReciepientAccount}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>   
+                        <!-- Custom Account Lookup -->
+                        <apex:outputPanel >
+                            <apex:inputHidden value="{! activeOpportunity.objOppty.Ack_Recipient_Account__c}" id="ImoacctargetId" />
+                            <apex:inputHidden value="{! activeOpportunity.objOppty.Ack_Recipient_Account__r.Account_Type__c}" id="ImoacctargetType" />
+                            <apex:outputPanel rendered="{! !isAdjustOrReleased}">
+                                <apex:inputText value="{! ImoaccountName}" id="ImoacctargetName" disabled="false" />
+                                <a href="Javascript:imopassaccComponentIds()">
+                                    <img src="/img/s.gif" class="lookupIcon"></img>
+                                </a>
+                            </apex:outputPanel>
+                            <apex:outputText value="{! ImoaccountName}" rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem />
+                      <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Ack Recipient Full Name" />
+                        <apex:outputField value="{! activeOpportunity.objOppty.Ack_Recipient_Full_Name__c}" />
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Ack Recipient Street Line 1" />
+                        <apex:outputField value="{! activeOpportunity.objOppty.Ack_Recipient_Street_Line_1__c}" />
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Ack Recipient Street Line 2" />
+                        <apex:outputField value="{! activeOpportunity.objOppty.Ack_Recipient_Street_Line_2__c}" />
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Ack Recipient City" />
+                        <apex:outputField value="{! activeOpportunity.objOppty.Ack_Recipient_City__c}" />
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Ack Recipient State" />
+                        <apex:outputField value="{! activeOpportunity.objOppty.Ack_Recipient_State__c}" />
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Ack Recipient Country" />
+                        <apex:outputField value="{! activeOpportunity.objOppty.Ack_Recipient_Country__c}" />
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Ack Recipient Zip Code" />
+                        <apex:outputField value="{! activeOpportunity.objOppty.Ack_Recipient_Zip_Code__c}" />
+                      </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+
+                    <apex:pageBlockSection title="Acknowledgement" id="AckSection" columns="1" collapsible="false">
+                      <apex:pageBlockSectionItem id="AckSectionItem">
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Recipient Acknowledgement Code" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Recipient_Ack_Code}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>   
+                        <!-- Acknowledgement Code -->
+                        <apex:outputPanel >
+                              <apex:selectList value="{! activeOpportunity.ObjOppty.Recipient_Acknowledgment_Code__c}"
+                                  size="1"
+                                  id="recAckCode"
+                                  rendered="{! !isAdjustOrReleased}">
+                               <apex:selectOptions value="{! AcknowledgementCodePicklist}" />
+                              </apex:selectList>
+                              <apex:outputField value="{! activeOpportunity.objOppty.Recipient_Acknowledgment_Code__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Recipient Acknowledgement Status" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Recipient_Ack_Status}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Recipient_Acknowledgement_Status__c}"
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Recipient_Acknowledgement_Status__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                      <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputLabel value="Tribute Message Body" />
+                            <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Tribute_Message}" rendered="{! !isAdjustOrReleased }"/>
+                        </apex:outputPanel>   
+                        <apex:outputPanel >
+                            <apex:inputField value="{! activeOpportunity.objOppty.Tribute_Message_Body__c}"
+                                rendered="{! !isAdjustOrReleased}"/>
+                            <apex:outputField value="{! activeOpportunity.objOppty.Tribute_Message_Body__c}"
+                                rendered="{! isAdjustOrReleased}"/>
+                        </apex:outputPanel>
+                      </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                  </div>
+                </apex:pageBlock>
+              </apex:pageBlockSection>
+
+              <apex:pageBlockSection id="section6" title="Acknowledgement & Taxes">
+                <!-- Acknowledgement Code -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Acknowledgement Code" for="Acknowledgment_Code__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_AcknowledgementCode}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:selectList id="Acknowledgment_Code__c"
+                      value="{! activeOpportunity.ObjOppty.Acknowledgment_Code__c}"
+                      size="1"
+                      rendered="{! !isAdjustOrReleased}">
+                      <apex:selectOptions value="{! AcknowledgementCodePicklist}" />
+                    </apex:selectList>
+                    <apex:outputText value="{! activeOpportunity.ObjOppty.Acknowledgment_Code__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Anonymous? -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Anonymous?" for="rC_Giving__Is_Anonymous__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Anonymous}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="rC_Giving__Is_Anonymous__c" styleclass="rC_Giving__Is_Anonymous__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Is_Anonymous__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="rC_Giving__Is_Anonymous__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Is_Anonymous__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Tax Date -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Tax Date" for="Tax_Date__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_TaxDate}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Tax_Date__c" styleclass="Tax_Date__c"
+                      value="{! activeOpportunity.objOppty.Tax_Date__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Tax_Date__c"
+                      value="{! activeOpportunity.objOppty.Tax_Date__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Acknowledgement Status -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Acknowledgement Status" for="Acknowledgment_Status__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_AcknowledgementStatus}" rendered="{! !isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Acknowledgment_Status__c" styleclass="Acknowledgment_Status__c"
+                      value="{! activeOpportunity.objOppty.Acknowledgment_Status__c}"
+                      rendered="{! !isAdjustOrReleased }" />
+
+                    <apex:outputField styleclass="Acknowledgment_Status__c"
+                      value="{! activeOpportunity.objOppty.Acknowledgment_Status__c}"
+                      rendered="{! isAdjustOrReleased }" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+              </apex:pageBlockSection>
+
+              <!--<apex:pageBlockSection id="section4" title="Pledge Details" html-data-collapse="{! !activeOpportunity.hasPledgeDetails}" columns="2" rendered="{! !activeOpportunity.isPledgePaymentRecord }" >
+                <apex:pageBlockSectionItem >
+                  <apex:outputLabel value="Giving Frequency" for="rC_Giving__Giving_Frequency__c"/>
+                  <apex:outputPanel styleClass="givingFrequency">
+
+                    <apex:inputField id="rC_Giving__Giving_Frequency__c" styleclass="rC_Giving__Giving_Frequency__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Giving_Frequency__c}"
+                      rendered="{! !isAdjustOrReleased}"
+                      onchange="_bge.chooseGivingFrequency(this);"/>
+
+                    <apex:outputField styleclass="rC_Giving__Giving_Frequency__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Giving_Frequency__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Payment Frequency"
+                      styleclass="rC_Giving__Payment_Frequency__c"
+                      style="display:{! if(activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] == 'Total', ' inline ', ' none ') };"
+                      for="rC_Giving__Payment_Frequency__c"/>
+                    <apex:outputLabel value="Payment Count"
+                      styleclass="rC_Giving__Payment_Count__c"
+                      style="display:{! if(activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] == 'Irregular', ' inline ', ' none ') };"
+                      for="rC_Giving__Payment_Count__c"/>
+                    <apex:outputLabel value="Giving Years"
+                      styleclass="rC_Giving__Giving_Years__c"
+                      style="display:{! if(
+                        AND(
+                          activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != '',
+                          activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != 'One Payment',
+                          activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != 'Total',
+                          activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != 'Irregular'
+                        ), ' inline ', ' none ') };"
+                      for="rC_Giving__Giving_Years__c"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                   
+                      <apex:outputPanel id="paymentFrequency"
+                        styleClass="frequencyOptions rC_Giving__Payment_Frequency__c"
+                        style="display:{! if(activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] == 'Total', ' inline ', ' none ') };">
+                        <apex:inputField id="rC_Giving__Payment_Frequency__c"
+                          value="{! activeOpportunity.objOppty.rC_Giving__Payment_Frequency__c}"
+                          rendered="{! !isAdjustOrSplit}" />
+
+                        <apex:outputField value="{! activeOpportunity.objOppty.rC_Giving__Payment_Frequency__c}"
+                          rendered="{! isAdjustOrSplit}" />
+                      </apex:outputPanel>
+                    
+                      <apex:outputPanel id="paymentCount"
+                        styleClass="frequencyOptions rC_Giving__Payment_Count__c"
+                        style="display:{! if(activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] == 'Irregular', ' inline ', ' none ') };">
+                        <apex:outputPanel styleClass="requiredInput" layout="block" rendered="{! !activeOpportunity.isPledgePaymentRecord}">
+                          <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                          <apex:inputField id="rC_Giving__Payment_Count__c"
+                          value="{! activeOpportunity.objOppty.rC_Giving__Payment_Count__c}"
+                          rendered="{! !isAdjustOrSplit}" />
+                        </apex:outputPanel>
+                        <apex:outputField value="{! activeOpportunity.objOppty.rC_Giving__Payment_Count__c}"
+                          rendered="{! isAdjustOrSplit}" />
+                      </apex:outputPanel>
+                   
+                      <apex:outputPanel id="givingYears"
+                        styleClass="frequencyOptions rC_Giving__Giving_Years__c"
+                        style="display:{! if(
+                          AND(
+                            activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != '',
+                            activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != 'One Payment',
+                            activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != 'Total',
+                            activeOpportunity.objOppty['rC_Giving__Giving_Frequency__c'] != 'Irregular'
+                          ), ' inline ', ' none ') };">
+                        <apex:inputField id="rC_Giving__Giving_Years__c"
+                          value="{! activeOpportunity.objOppty.rC_Giving__Giving_Years__c}"
+                          rendered="{! !isAdjustOrSplit}" />
+
+                        <apex:outputField value="{! activeOpportunity.objOppty.rC_Giving__Giving_Years__c}"
+                          rendered="{! isAdjustOrSplit}" />
+                      </apex:outputPanel>
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+              </apex:pageBlockSection> -->
+
+              <apex:pageBlockSection id="section7" title="Sharing" html-data-collapse="{! !activeOpportunity.hasSharingValues}">
+                <!-- Sharing Code Override -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Sharing Code Override" for="Sharing_Code_Override__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Sharing_Code_Override}" rendered="{! !isAffiliateOrReleased }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Sharing_Code_Override__c" styleClass="Sharing_Code_Override__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Code_Override__c}"
+                      rendered="{! !isAffiliateOrReleased }"/>
+                    <apex:outputField styleClass="Sharing_Code_Override__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Code_Override__c}"
+                      rendered="{! isAffiliateOrReleased }"
+                      />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Sharing Code -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Sharing Code" for="Sharing_Code__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Sharing_Code}" rendered="{! AND( !isAdjustOrReleased,
+                        activeOpportunity.isDonationOrUnsplitPledge) }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Sharing_Code__c" styleClass="Sharing_Code__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Code__c}"
+                      rendered="{! AND( !isAdjustOrReleased,
+                        activeOpportunity.isDonationOrUnsplitPledge) }"/>
+                    <apex:outputField styleClass="Sharing_Code__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Code__c}"
+                      rendered="{! OR( isAdjustOrReleased,
+                        !activeOpportunity.isDonationOrUnsplitPledge)}"/>
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Sharing Entity Override -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Sharing Entity Override" for="Sharing_Entity_Override__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Sharing_Entity_Override}" rendered="{! !isAffiliateOrReleased }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Sharing_Entity_Override__c" styleClass="Sharing_Entity_Override__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Entity_Override__c}"
+                      rendered="{! !isAffiliateOrReleased }"/>
+                    <apex:outputField styleClass="Sharing_Entity_Override__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Entity_Override__c}"
+                      rendered="{! isAffiliateOrReleased }"
+                      />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!-- Sharing Entity -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Sharing Entity" for="Sharing_Entity__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_Sharing_Entity}" rendered="{! AND( !isAdjustOrReleased,
+                        activeOpportunity.isDonationOrUnsplitPledge)}"/>
+                  </apex:outputPanel> 
+                  <apex:outputPanel >
+                    <apex:inputField id="Sharing_Entity__c" styleClass="Sharing_Entity__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Entity__c}"
+                      rendered="{! AND( !isAdjustOrReleased,
+                        activeOpportunity.isDonationOrUnsplitPledge)}"/>
+                    <apex:outputField styleClass="Sharing_Entity__c"
+                      value="{! activeOpportunity.objOppty.Sharing_Entity__c}"
+                      rendered="{! OR( isAdjustOrReleased,
+                        !activeOpportunity.isDonationOrUnsplitPledge)}"/>
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Bypass Calculations -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Bypass Calculations" for="Bypass_Calculations__c" />
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_ByPassCalculation}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel> 
+                  <apex:outputPanel >
+                    <apex:inputField id="Bypass_Calculations__c"
+                      styleclass="Bypass_Calculations__c"
+                      value="{! activeOpportunity.objOppty.Bypass_Calculations__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+                    <apex:outputField value="{! activeOpportunity.objOppty.Bypass_Calculations__c}" 
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+              </apex:pageBlockSection>
+              
+                 <apex:pageBlockSection id="section8" title="Fundraising" html-data-collapse="{! !activeOpportunity.hasFundraisingValues}">
+                <!--  Fundraising Department -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Fundraising Department" for="Fundraising_Department__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_FundRaisingDepartment}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="Fundraising_Department__c"
+                      styleclass="StageName"
+                      value="{! activeOpportunity.objOppty.Fundraising_Department__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="Fundraising_Department__c"
+                      value="{! activeOpportunity.objOppty.Fundraising_Department__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <!--  Stage -->
+                <!-- TODO: Debug why the stageName is causing a "Stage: you must enter a value" error -->
+               <!--  <apex:pageBlockSectionItem >
+                  <apex:outputLabel value="Stage" for="stageName"/>
+                  <apex:outputPanel >
+                    <apex:inputField id="stageName"
+                      styleclass="StageName"
+                      value="{! activeOpportunity.objOppty.StageName}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="StageName"
+                      value="{! activeOpportunity.objOppty.StageName}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem> -->
+              </apex:pageBlockSection>
+
+              <apex:pageBlockSection id="section9" title="Matching" html-data-collapse="{! !activeOpportunity.hasMatchingValues}">
+                <!--  Matching Account -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Matching Account" for="rC_Giving__Matching_Account__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_MatchingAccount}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="rC_Giving__Matching_Account__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Matching_Account__c}"
+                      rendered="{! !isAdjustOrReleased }" />
+
+                    <apex:outputField value="{! activeOpportunity.objOppty.rC_Giving__Matching_Account__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+
+                </apex:pageBlockSectionItem>
+
+                <!--  Matching Status -->
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <apex:outputLabel value="Matching Status" for="rC_Giving__Matching_Status__c"/>
+                    <c:BatchLogDetailPageTooltip helpText="{!$Label.Batch_Log_Tooltip_MatchingStatus}" rendered="{! !isAdjustOrReleased }"/>
+                  </apex:outputPanel>
+                  <apex:outputPanel >
+                    <apex:inputField id="rC_Giving__Matching_Status__c" styleclass="rC_Giving__Matching_Status__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Matching_Status__c}"
+                      rendered="{! !isAdjustOrReleased}" />
+
+                    <apex:outputField styleclass="rC_Giving__Matching_Status__c"
+                      value="{! activeOpportunity.objOppty.rC_Giving__Matching_Status__c}"
+                      rendered="{! isAdjustOrReleased}" />
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+              </apex:pageBlockSection>
+              
+              <script type='text/javascript'>
+                console.log("Reloaded detail...");
+                console.log('_bge: '+ typeof _bge);
+                if (typeof _bge !== 'undefined' && _bge) {
+                    console.log('should not refresh')
+                  if (typeof _bge.collapseSections === "function") {
+                    _bge.collapseSections();
+                  }
+                  if (typeof _bge.setCustomInterval === "function") {
+                    <apex:outputPanel layout="none" rendered="{! AND( !activeOpportunity.isNew, !isReleased) }">
+                      _bge.clearCustomInterval();
+                      intervalHandle = _bge.setCustomInterval(_bge.toggleRowSaveButton, 1000);
+                    </apex:outputPanel>
+                  }
+                }
+              </script>
+            </apex:pageBlock>
+            </apex:outputPanel>
+          </div>
+        </div>
+      </div>
+  </apex:form>
+
+  <apex:outputPanel id="apexVariables">
+    <script type='text/javascript'>
+      // VisualForce merge variables
+      console.log("refreshing apexVariables");
+      
+      window._bgeApex = {
+        batchLogId: "{! batchLogId}",
+        depositSite: '{!batchLog.Deposit_Site__c}',
+        opportunityList: {!opportunityWrapperLstJSON},
+        errorInBatchRow: {!errorInBatchRow},
+        isError: {!isError},
+        isEdit: {!isEdit},
+        isReleased: {! isReleased},
+        isAdjustBatch: {! isAdjustBatch},
+        newSplitRowIndex: "{! newSplitRowIndex}",
+        columnOrder: {
+          accountId: '{!colOrderMap["Account ID"]}'
+        }
+      };
+    </script>
+  </apex:outputPanel>
+  <script type='text/javascript'>
+    // Define remote actions
+    window._bgeRemoteAction = {
+      populateCampaignLookup: '{!$RemoteAction.BatchLogDetailPageController.populateCampaignLookup}',
+      populateAccountLookup: '{!$RemoteAction.BatchLogDetailPageController.populateAccountLookup}'
+    }
+  </script>
+  <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" />
+  <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" />
+  <script type='text/javascript' src="{! URLFOR($Resource.BatchLogDetailPage, 'jqGrid/5.2.1/js/i18n/grid.locale-en.js')}" />
+  <script type='text/javascript' src="{! URLFOR($Resource.BatchLogDetailPage, 'jqGrid/5.2.1/js/jquery.jqGrid.min.js')}" />
+  <script type='text/javascript' src="{! URLFOR($Resource.BatchLogDetailPage, 'js/BatchLog.js')}" />
+</apex:page>

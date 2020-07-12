@@ -1,0 +1,12 @@
+<apex:page standardController="Account" extensions="GivingViews_AccountLayoutController" sidebar="false" showHeader="false" >
+  <div style="margin:4px 4px 8px 4px">
+      <apex:outputLink value="/006?rlid=RelatedOpportunityList&id={!$CurrentPage.parameters.Id}" id="OpportunityFullList" target="_blank">View All Giving</apex:outputLink>
+      <apex:outputLink value="{!URLFOR($Action.Opportunity.New,null,[retURL=accountId,accid=accountId])}" target="_parent" styleClass="btn" style="text-decoration:none;padding:4px;margin:6px">New Giving</apex:outputLink>
+      
+  </div>
+  <div style="overflow: scroll; width: 100%; height: 583px;">
+      <c:GivingViewsOnAccountLayout fieldSet="AccountLayout_DonationSection" accId="{!accountId}"/>
+      <c:GivingViewsOnAccountLayout fieldSet="AccountLayout_PledgeSection" accId="{!accountId}"/>
+      <c:GivingViewsOnAccountLayout fieldSet="AccountLayout_ProposalSection" accId="{!accountId}"/>
+  </div>
+</apex:page>

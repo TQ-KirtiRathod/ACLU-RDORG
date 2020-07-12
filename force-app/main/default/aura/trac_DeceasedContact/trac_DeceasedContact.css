@@ -1,0 +1,11 @@
+.THIS .rightPadding {
+    padding-right: .2rem;
+}
+
+.THIS .required {
+    color: red;
+}
+
+.THIS .wrap_Space {
+    white-space : pre-wrap;
+}

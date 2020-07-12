@@ -1,0 +1,33 @@
+<apex:component controller="FCMI_Report_Controller">
+ <body>  
+  <table style="width:40%;border-collapse:collapse;">
+  <tbody>
+   <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};" width="40%">
+      <th width="10%" style="text-align:center;"><span style="font-size: 8pt;">{!record.Account__r.Affiliation__c}</span></th>
+      <td width="10%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_AffiliateBRI__c}"/></apex:outputText></span></td>
+      <td width="10%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_AffiliateBRI_Count__c}"/></apex:outputText></span></td>
+      <td width="10%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!IF(record.FCMI_AffiliateBRI_Count__c == 0,0,record.FCMI_AffiliateBRI__c / record.FCMI_AffiliateBRI_Count__c)}"/></apex:outputText></span></td>
+   </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr width="40%">
+      <td width="10%"></td>
+      <td colspan="3" width="30%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+     <tr width="40%">
+      <td width="10%" style="text-align:center;"><span style="font-family: Arial Unicode MS; font-size: 8pt;text-align:center">Total</span></td>
+      <td width="10%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalAffBRI']}"/></apex:outputText></span></td>
+      <td width="10%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="{0, number, ###,###,###,##0}"><apex:param value="{!result['totalAFFBRICount']}"/></apex:outputText></span></td>
+      <td width="10%" style="text-align:right;"><span style="font-family: Arial Unicode MS; font-size: 8pt;"><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!totalAffBaseRenewableIncomeTotalColumn}"/></apex:outputText></span></td>
+    </tr>
+    <tr width="40%">
+      <td width="10%"></td>
+      <td colspan="3" width="30%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</apex:component>

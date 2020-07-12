@@ -1,0 +1,2201 @@
+<apex:page Controller="Reconcile_FoundationNonGMIRptController" renderAs="pdf" applyHtmlTag="false" applyBodyTag="false" showHeader="false" sidebar="false" readOnly="true">
+    <!-- apex/Reconcile_FoundationNonGMIReportPage -->
+    <html>
+
+    <head>
+        <title>Foundation Non GMI</title>
+        <style type="text/css">
+        .body {
+            width: 700px;
+            display: block;
+            font-size: 12px;
+            text-align: left;
+        }
+        .beforebreak {
+            page-break-before: always;
+        }
+        .title {
+            text-decoration: underline;
+            font: bold;
+            font-size: 20px;
+            padding: 0 0 5px 0;
+        }
+
+        .header {
+            width: 100%;
+            border: 0;
+        }
+
+        .header td {
+            border: 0;
+            vertical-align: bottom;
+        }
+
+        .header tr {
+            border: 0;
+        }
+
+        table,
+        tr,
+        th,
+        td {
+            border: 1px solid #C0C0C0;
+            border-collapse: collapse;
+            font-size: 12px;
+            padding: 2px;
+            border-spacing: 0;
+            table-collapse: collapse;
+        }
+        tr {
+            page-break-inside: avoid;
+        }
+        .rptTbl {
+            width: 100%;
+        }
+
+        .rptTbl th {
+            background-color: #C0C0C0;
+        }
+
+        .c5 {
+            width: 5%;
+        }
+
+        .c3 {
+            width: 3%;
+        }
+
+        .c55 {
+            width: 57%;
+        }
+
+        .c57 {
+            width: 57%;
+        }
+
+        .c37 {
+            width: 37%;
+        }
+
+        .c54 {
+            width: 54%;
+        }
+
+        .c10 {
+            width: 10%;
+        }
+
+        .c30 {
+            width: 30%;
+        }
+
+        .c17 {
+            width: 17%;
+        }
+
+        .c11 {
+            width: 11%;
+        }
+
+        .c40 {
+            width: 40%;
+        }
+
+        .c20 {
+            width: 20%;
+        }
+
+        .c50 {
+            width: 50%;
+        }
+
+        .ar {
+            text-align: right;
+        }
+
+        .ac {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .ul {
+            text-decoration: underline
+        }
+
+        .subHead {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .big {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class="body">
+            <apex:variable value="{!1<0 }" var="positive" />
+            <apex:variable value="{!1>0}" var="negative" />
+            <table class="header">
+                <tbody>
+                    <tr>
+                        <td class="c50 title">ACLU Foundation</td>
+                        <td class="c50 ar">Report Refresh: {!todayDate}</td>
+                    </tr>
+                    <tr>
+                        <td>v. Revenue Reconciliation Report</td>
+                        <td class="ar">Affiliate: {!affiliate}</td>
+                    </tr>
+                    <tr>
+                        <td>For Affiliate Foundations Without Guaranteed Minimum Incomes</td>
+                        <td class="ar">For Period:
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!startDate}" />
+                            </apex:outputText> to&nbsp;
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!endDate}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">1.</td>
+                        <td class="c55">FOUNDATION BASE RENEWABLE INCOME [Includes Direct Mail Gifts of less than $2,500]</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">a. Gross National Foundation-Banked [N111]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!one_a}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c40">b. Less Cost Factor</td>
+                        <td class="c17">{!foundationCostFactor}% of 1a =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!(one_a * foundationCostFactor * -1)/100 }" var="one_b" />
+                            <c:customCurrency curr="{!one_b}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">c. National-Banked Net Workplace Giving</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!one_c}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">d. Total Net National Foundation-Banked Base Renewable Income [1a+1b+1c]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!one_a + one_b + one_c}" var="one_d" />
+                            <c:customCurrency curr="{!one_d}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c40">e. Affiliate Foundation Share of Net National Foundation BRI</td>
+                        <td class="c17">{!briAffiliateShare}% of 1d =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!one_d * briAffiliateShare/100}" var="one_e" />
+                            <c:customCurrency curr="{!one_e}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c55">f. Total Net Affiliate Foundation-Banked Base Renewable Income</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!a_1a - a_1b}" var="one_f" />
+                            <c:customCurrency curr="{!one_f}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c40">g. National Foundation Share of Net Affiliate Foundation BRI</td>
+                        <td class="c17">{!100-briAffiliateShare}% of 1f =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!one_f * (1-briAffiliateShare/100) * -1}" var="one_g" />
+                            <c:customCurrency curr="{!one_g}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">h. Net BRI Due To/(From) Affiliate Foundation [1e+1g]]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!one_e + one_g}" var="one_h" />
+                            <c:customCurrency curr="{!one_h}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Section 2  -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">2.</td>
+                        <td class="c55">GENERAL INCENTIVE INCOME [Includes General, Direct Mail Gifts of $2,500+, Benefit Income; Excludes Campaign]</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">a. Total National Foundation-Banked</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_a}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c55">b. Total Affiliate Foundation-Banked</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!b_1 + b_2 + b_4}" var="two_b" />
+                            <c:customCurrency curr="{!two_b}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">c. Total Net Incentive Income [2a+2b]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_a + two_b}" var="two_c" />
+                            <c:customCurrency curr="{!two_c}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-top: 5px double black;">
+                        <td></td>
+                        <td>INDEMNIFICATION OF GENERAL INCENTIVE INCOME</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">d. National Foundation Indemnification</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_d}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c55">e. Affiliate Foundation Indemnification</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_e}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">f. Total Indemnification [2d+2e]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_d + two_e}" var="two_f" />
+                            <c:customCurrency curr="{!two_f}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                    </tr>
+                    <tr style="border-top: 5px double black;">
+                        <td></td>
+                        <td>GAIN OR (LOSS) OF GENERAL INCENTIVE INCOME</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">g. Total Net Incentive Income [2c]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_c}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c55">h. Less Total Indemnification [2f]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_f}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">i. Gain or (Loss) [2g-2h]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_c - two_f}" var="two_i" />
+                            <c:customCurrency curr="{!two_i}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                    </tr>
+                    <tr style="border-top: 5px double black;">
+                        <td></td>
+                        <td>DISTRIBUTION OF GENERAL INCENTIVE INCOME TO NATIONAL FOUNDATION</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">j. National Foundation Indemnification [2d]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_d}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c55">k. National Foundation Share of Gain or (Loss): 50.00% of 2i = </td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!(two_c - two_f)* 0.50 }" var="two_k" />
+                            <c:customCurrency curr="{!two_k}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">l. Net National Foundation Share of General Incentive Income [2j+2k]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_d + two_k}" var="two_l" />
+                            <c:customCurrency curr="{!two_l}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                    </tr>
+                    <tr style="border-top: 5px double black;">
+                        <td></td>
+                        <td>DISTRIBUTION OF GENERAL INCENTIVE INCOME TO AFFILIATE FOUNDATION</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">m. Affiliate Foundation Indemnification [2e]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_e}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c55">n. Affiliate Foundation Share of Gain or (Loss): 50.00% of 2i = </td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!two_k}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">o. Net Affiliate Foundation Share of General Incentive Income [2m+2n]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_e + two_k}" var="two_o" />
+                            <c:customCurrency curr="{!two_o}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">p. Less Net Affiliate Foundation-Banked General Incentive Income [2b]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_b * -1}" var="two_p" />
+                            <c:customCurrency curr="{!two_p}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">q. Net General Incentive Income Due To/(From) Affiliate Foundation [2o+2p]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_o + two_p}" var="two_q" />
+                            <c:customCurrency curr="{!two_q}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- Section 3 -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">3.</td>
+                        <td class="c55">SOLICITED EARMARKED INCENTIVE INCOME</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="" colspan="2">a. National Foundation-Banked -- Total =
+                            <c:customCurrency curr="{!three_a_total}" />
+                        </td>
+                        <td class="c10 ac">Share</td>
+                        <td class="c10 ac">Campaign</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <apex:repeat value="{!three_a_inc}" var="three_a" id="three_a">
+                        <tr>
+                            <td class="c3 nb"></td>
+                            <td class="c20 nb"></td>
+                            <td class="c17">{!three_a_inc[three_a].total} {!three_a_inc[three_a].donor} </td>
+                            <td class="c10 ar">{!three_a_inc[three_a].sharingCode}</td>
+                            <td class="c10">{!three_a_inc[three_a].lffCampaign}</td>
+                            <td class="c10 ar">
+                                <c:customCurrency curr="{!three_a_inc[three_a].amount}" />
+                            </td>
+                            <td class="c30">
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="" colspan="2">b. Affiliate Banked -- Total =
+                            <c:customCurrency curr="{!-three_b_total}" />
+                        </td>
+                        <td class="c10 "></td>
+                        <td class="c10"></td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <apex:repeat value="{!three_b_inc}" var="three_b" id="three_b">
+                        <tr>
+                            <td class="c3"></td>
+                            <td class="c20"></td>
+                            <td class="c17">{!three_b_inc[three_b].total} {!three_b_inc[three_b].donor}</td>
+                            <td class="c10 ar">{!three_b_inc[three_b].sharingCode}</td>
+                            <td class="c10">{!three_b_inc[three_b].lffCampaign}</td>
+                            <td class="c10 ar">
+                                <c:customCurrency curr="{!-three_b_inc[three_b].amount}" />
+                            </td>
+                            <td class="c30"></td>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">c. Net Solicited Earmarked Income Due To/(From) Affiliate Foundation</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!three_c}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- Section 4 -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">4.</td>
+                        <td class="c55">ACLU NATIONAL AND AFFILIATE FOUNDATION BEQUESTS/PLANNED GIFTS</td>
+                        <td class="c10"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55 ul">Affiliate-Banked</td>
+                        <td class="c10"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">a. Foundation Bequest 40/40/20% (SHARE CODE = Q001)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q001Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">b. Foundation Bequest 90/10% Jacobs Fund (SHARE CODE = Q002)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q002Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">c. Foundation Bequest 50/50% (SHARE CODE = Q003)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q003Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">d. Foundation Bequest 100% (SHARE CODE = Q004)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q004Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">e. Foundation Bequest Special Sharing (SHARE CODE = Q005)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q005Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55 ul">National-Banked or Out-of-Affiliate</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">g. Foundation Bequest 40/40/20% (SHARE CODE = Q001)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!xs4_q001Total_woGMI}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">h. Foundation Bequest 90/10% Jacobs Fund (SHARE CODE = Q002)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!xs4_q002Total_woGMI}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">i. Foundation Bequest 50/50% (SHARE CODE = Q003)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!xs4_q003Total_woGMI}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">j. Foundation Bequest 100% (SHARE CODE = Q004)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!xs4_q004Total_woGMI}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">k. Foundation Bequest Special Sharing (SHARE CODE = Q005)</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!xs4_q005Total_woGMI}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- Section 5  -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">5.</td>
+                        <td class="c55">ACLU FOUNDATION AND AFFILIATE FOUNDATION BEQUESTS/PLANNED GIFTS RECONCILIATION</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c40">a. Affiliate Share of National Foundation-Banked</td>
+                        <td class="c17">40.00% of 4g =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!xs4_q001Total_woGMI * 0.40}" var="five_a" />
+                            <c:customCurrency curr="{!five_a}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c40">b. National Share of Affiliate Foundation-Banked</td>
+                        <td class="c17">40.00% of 4a =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!s7_q001Total * 0.40 * -1}" var="five_b" />
+                            <c:customCurrency curr="{!five_b}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c40">c. Affiliate Share of National Foundation-Banked, Earmarked</td>
+                        <td class="c17">50.00% of 4i =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!xs4_q003Total_woGMI * 0.50}" var="five_c" />
+                            <c:customCurrency curr="{!five_c}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c40">d. National Share of Affiliate Foundation-Banked, Earmarked</td>
+                        <td class="c17">50.00% of 4c =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!s7_q003Total * 0.50 * -1}" var="five_d" />
+                            <c:customCurrency curr="{!five_d}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c40">e. Jacobs Fund</td>
+                        <td class="c17">20.00% of 4a =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!s7_q001Total * 0.20 * -1}" var="five_e" />
+                            <c:customCurrency curr="{!five_e}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c40">f. Jacobs Fund Unshared</td>
+                        <td class="c17">10.00% of 4b =</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!s7_q002Total * 0.10* -1}" var="five_f" />
+                            <c:customCurrency curr="{!five_f}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">i. ACLU Foundation Bequest Income Due To/(From) Affiliate Foundation [5a+5b+5c+5d+5e+5f]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!five_a + five_b + five_c + five_d + five_e + five_f}" var="five_i" />
+                            <c:customCurrency curr="{!five_i}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">j. Bequest Shares Previously Paid</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!five_j}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">k. Total Bequest Income Due To/(From) Affiliate Foundation [5i+5j]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!five_i + five_j}" var="five_k" />
+                            <c:customCurrency curr="{!five_k}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- Section 6  -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">6.</td>
+                        <td class="c55">OTHER AMOUNTS DUE TO/(FROM) AFFILIATE FOUNDATION (Numbers provided by ACLU National office)</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- repeating section -->
+                    <apex:variable var="six_count" value="{!1}" /><!--Zendesk: ##69055 - Updated value to 1 instead of 2 and removed All Affiliate Share row-->
+                    <apex:repeat value="{!six}" var="f" id="f">
+                        <tr>
+                            <td class="c3"></td>
+                            <td class="c55">{!six_count}. Other Amounts Due To/(From) - {!six[f].description} </td>
+                            <td class="c10 ar">
+                                <c:customCurrency curr="{!six[f].amount}" />
+                            </td>
+                            <td class="c30"></td>
+                        </tr>
+                        <apex:variable value="{!six_count+1}" var="six_count" />
+                    </apex:repeat>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">{!six_count}. Total Other Amounts Due To/(From) Affiliate</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!six_Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- Section 7 -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">7.</td>
+                        <td class="c55">ACLU FOUNDATION AND AFFILIATE FOUNDATION RECONCILIATION</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">a. Net BRI Due To/(From) Affiliate Foundation [1h]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!one_h}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">b. Net General Incentive Income Due To/(From) Affiliate Foundation [2q]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!two_q}" var="seven_b" />
+                            <c:customCurrency curr="{!seven_b}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c55">c. Net Solicited Earmarked Incentive income Due To/(From) Affiliate Foundation [3c]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!three_c}" var="seven_c" />
+                            <c:customCurrency curr="{!seven_c}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 5px double black;">
+                        <td class="c3"></td>
+                        <td class="c55">d. Subtotal [7a+7b+7c]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!one_h + seven_b + seven_c}" var="seven_d" />
+                            <c:customCurrency curr="{!seven_d}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 5px double black;">
+                        <td class="c3"></td>
+                        <td class="c55">e. ACLU Foundation/Affiliate Foundation Bequest Income Due To/(From) Affiliate [5k]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!five_k}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 5px double black;">
+                        <td class="c3"></td>
+                        <td class="c55">f. Other Amounts Due To/(From) Affiliate Foundation [6k]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!six_Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55">g. Total Net Due To/(From) Affiliate Foundation [7d+7e+7f]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!seven_d + five_k + six_Total}" var="seven_g" />
+                            <c:customCurrency curr="{!seven_g}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c55"></th>
+                        <th class="c10">&nbsp;</th>
+                        <th class="c30"></th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- /////////////////////////////////////////////////////////////         -->
+            <!-- tab w-->
+            <table class="header beforebreak">
+                <tbody>
+                    <tr>
+                        <td class="c50 title">ACLU Foundation</td>
+                        <td class="c50 ar">Report Refresh: {!todayDate}</td>
+                    </tr>
+                    <tr>
+                        <td>w. Affiliate Revenue Report</td>
+                        <td class="ar">Affiliate: {!affiliate}</td>
+                    </tr>
+                    <tr>
+                        <td>For Affiliate Foundations Without Guaranteed Minimum Incomes</td>
+                        <td class="ar">For Period:
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!startDate}" />
+                            </apex:outputText> to&nbsp;
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!endDate}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <table width="50%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>Summary Affiliate Revenue Report</b>
+                            <br/>
+                            <i>See Back Up Schedules I through VII</i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <!-- Summary affliate revenue report-->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c3"></th>
+                        <th class="c54"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">A.</td>
+                        <td class="" colspan="2">Foundation Base Renewable Income</td>
+                        <th class="c10"></th>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">1.</td>
+                        <td class="c54">Direct Mail [Share Code = R112]</td>
+                        <td class="c10 ar"></td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar"></td>
+                        <td class="c54">a. Gross Amount Raised by Foundation Affiliate</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!a_1a}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar"></td>
+                        <td class="c54">b. Total Expenses [The lesser of actual amount of expenses or approved cost factor percent]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!a_1b}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar"></td>
+                        <td class="c54">c. Net Foundation Base Renewable Income [A1a - A1b]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!a_1a - a_1b}" var="a_1c" />
+                            <c:customCurrency curr="{!a_1c}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- New Section B -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c3"></th>
+                        <th class="c54"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">B.</td>
+                        <td class="" colspan="2">Foundation Incentive Income</td>
+                        <th class="c10"></th>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">1.</td>
+                        <td class="c54">Unrestricted, Non-Membership Gifts to Affiliate Foundation less than $1 Million [Share Code = R113,R121,R131,K171]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!b_1}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">2.</td>
+                        <td class="c54">Net Benefit Income [Report each benefit using attached Schedule II]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!b_2}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">3.</td>
+                        <td class="c54">Solicited Earmarked Gifts [from sources other than recognized foundations/institutions. [List donor and earmarked purpose on Schedule III.] [Share Code = R151]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!b_3}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid black;">
+                        <td class="c3"></td>
+                        <td class="c3 ar">4.</td>
+                        <td class="c54">In-Kind Gifts [List gift and estimated value on Schedule IV] [Share Code = R181]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!b_4}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">5.</td>
+                        <td class="c54">Total Incentive Income [B1 + B2 + B3 + B4]</td>
+                        <td class="c10 ar">
+                            <apex:variable value="{!b_1 + b_2 + b_3 + b_4}" var="b_5" />
+                            <c:customCurrency curr="{!b_5}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- New Section C -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c3"></th>
+                        <th class="c54"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">C.</td>
+                        <td class="" colspan="2">Unshared Income</td>
+                        <th class="c10"></th>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">1.</td>
+                        <td class="c54">Recognized Foundation/Institutional Grants [List on Schedule V; upload documentation to donor account.] [Share Code = K165]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!c_1}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">2.</td>
+                        <td class="c54">Unsolicited Earmarked Gifts [List on Schedule VI; upload documentation to donor account.] [Share Code = K161]</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!c_2}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- New Section D -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c3"></th>
+                        <th class="c54"></th>
+                        <th class="c10"></th>
+                        <th class="c30">Notes / Additional Information</th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ar">D.</td>
+                        <td class="" colspan="2">Bequests and Planned Gifts [List on Schedule VII; upload documentation to donor account.] [Share Code = Q001,Q002,Q003,Q004,Q005] </td>
+                        <th class="c10"></th>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">1.</td>
+                        <td class="c54">Affiliate Foundation Banked - SHARED BEQUESTS</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q001Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">2.</td>
+                        <td class="c54">Affiliate Foundation Banked - DIRECTED BEQUESTS</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q002Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">3.</td>
+                        <td class="c54">Affiliate Foundation Banked - EARMARKED</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q003Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">4.</td>
+                        <td class="c54">Affiliate Foundation Banked - UNSHARED BEQUESTS</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q004Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c3 ar">5.</td>
+                        <td class="c54">Affiliate Foundation Banked - OTHER BEQUESTS</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s7_q005Total}" />
+                        </td>
+                        <td class="c30"></td>
+                    </tr>
+                    <!-- New Section Schedules -->
+                    <tr>
+                        <th class="c3"></th>
+                        <th class="c3"></th>
+                        <th class="c54"></th>
+                        <th class="c10"></th>
+                        <th class="c30"></th>
+                    </tr>
+                    <tr>
+                        <td class="c3 ac" colspan="5">
+                            <br/>I have reviewed this report on FY{!fiscalYear} revenue and confirm that the information presented is accurate and that income has been properly categorized
+                            <br/>in accordance with ACLU policy #505.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <!-- New Page -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="4">
+                            <div class="big">SCHEDULE I</div>
+                            Foundation Mega Gifts and Special Sharing
+                            <br/>
+                            <b>[from sources other than recognized foundations]</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">Affiliate (Program 5)</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55 bold">DONOR NAME AND GIFT AMOUNT</td>
+                        <td class="c20 bold">Campaign</td>
+                        <td class="c10"></td>
+                    </tr>
+                    <apex:repeat value="{!s1_megaSched}" var="opp" id="s1_megaSched">
+                        <tr>
+                            <td>&nbsp;</td>
+                            <!-- logic entered here -->
+                            <td>{!s1_megaSched[opp].donor}</td>
+                            <td class="ac">{!s1_megaSched[opp].lffCampaign}
+                            </td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s1_megaSched[opp].amount}" />
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s1_megaSchedTotal}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="" rowspan="4" colspan="2">
+                            <div class="big">SCHEDULE II [FOR LINE B2]</div>
+                            Affiliate Foundation Benefit Income - for events held in the Fiscal Year
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="c20">Total for R141 gifts</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!s2_totalR141}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Total income for manual fields</td>
+                        <td class="ar">
+                            <c:customCurrency curr="{!s2_totalManualFields}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Difference</td>
+                        <td class="ar">
+                            <apex:variable value="{!s2_totalR141 -s2_totalManualFields}" var="s2_diff" />
+                            <c:customCurrency curr="{!s2_diff}" />
+                        </td>
+                    </tr>
+                    <apex:repeat value="{!s2}" var="s2_" id="s2_">
+                        <tr>
+                            <td colspan="3"><b>{!s2_.Description__c}</b></td>
+                        </tr>
+                        <tr>
+                            <td class="bold" colspan="2">Purpose for which funds are earmarked (if applicable):</td>
+                            <td class="c30 bold ac"></td>
+                        </tr>
+                        <tr>
+                            <td class="c3 ar">1.</td>
+                            <td>Total Benefit/Event Expenses</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s2_.Expense__c}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="c3 ar">2.</td>
+                            <td>Total Benefit/Event Income</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s2_.Income__c}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="c3 ar">3.</td>
+                            <td>NET INCOME [2 LESS 1]; Formula calculates $0 if expenses are greater than income.</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s2_.Amount__c}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th colspan="3">&nbsp;</th>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="7">
+                            <div class="big">SCHEDULE III [FOR LINE B3]</div>
+                            Affiliate Foundation Solicited Earmarked Gifts
+                            <br/>
+                            <b>[from sources other than recognized foundations]</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c30 bold ac">DONOR NAME AND EARMARKED PURPOSE</td>
+                        <td class="c10 bold ac">Share Code</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c17 bold ac">Campaign</td>
+                        <td class="c20 bold ac">Restriction field (on donation)</td>
+                        <td class="c10 bold ac">Amount</td>
+                    </tr>
+                    <apex:variable var="s3_count" value="{!1}" />
+                    <apex:repeat value="{!s3_SolEarmarked}" var="s3" id="s3">
+                        <tr>
+                            <td class="ar">{!s3_count}.</td>
+                            <td>{!s3_SolEarmarked[s3].donor}</td>
+                            <td class="ac">{!s3_SolEarmarked[s3].sharingCode}</td>
+                            <td class="ac">{!s3_SolEarmarked[s3].depLoc}</td>
+                            <td class="ac">{!s3_SolEarmarked[s3].lffCampaign}</td>
+                            <td>{!s3_SolEarmarked[s3].restriction}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s3_SolEarmarked[s3].amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s3_count+1}" var="s3_count" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total:</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s3_Total}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="4">
+                            <div class="big">SCHEDULE IV [FOR LINE B4]</div>
+                            Affiliate Foundation In-Kind Gifts
+                            <br/>
+                            <b>[from sources other than recognized foundations]</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c57 bold ac">DONOR NAME AND GIFT ITEM</td>
+                        <td class="c30 bold ac">Item Description</td>
+                        <td class="c10 bold ac">Gift Amount</td>
+                    </tr>
+                    <apex:variable var="s4_count" value="{!1}" />
+                    <apex:repeat value="{!s4_InKindGifts}" var="s4" id="s4">
+                        <tr>
+                            <td class="ar">{!s4_count}.</td>
+                            <td>{!s4.account.name} ({!s4.account.Account_Number__c})</td>
+                            <td class="ac">{!s4.Description}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s4.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s4_count+1}" var="s4_count" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s4_Total}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="5">
+                            <div class="big">SCHEDULE V [FOR LINE C1]</div>
+                            Affiliate Foundation Gifts from Recognized Foundations / Institutional Grants
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Reminder: Gifts from Foundations / Institutions are to be Shared Unless Proper Documentation is Provided (See Policy #505)</td>
+                    </tr>
+                    <tr>
+                        <th colspan="5">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">FOUNDATION / INSTITUTION NAME AND EARMARKED PURPOSE</td>
+                        <td class="c10 bold ac">Campaign</td>
+                        <td class="c40 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="s5_count" value="{!1}" />
+                    <apex:repeat value="{!s5_FoundInstGifts}" var="s5" id="s5">
+                        <tr>
+                            <td class="ar">{!s5_count}.</td>
+                            <td>{!s5.account.name} ({!s5.account.Account_Number__c})</td>
+                            <td class="ac">{!IF(Right(Left(s5.RPT_Package_Code__c,4),2)== 'CP', "CP","")}</td>
+                            <td class="">{!s5.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s5.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s5_count+1}" var="s5_count" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total Gifts from Foundations / Institutions</td>
+                        <td></td>
+                        <td class="ar"></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s5_Total}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="5">
+                            <div class="big">SCHEDULE VI [FOR LINE C2]</div>
+                            Affiliate Foundation Unsolicited Earmarked Gifts
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Reminder: Unsolicited Earmarkd Gifts are to be Shared Unless Proper Documentation is Provided (See Policy #505)</td>
+                    </tr>
+                    <tr>
+                        <th colspan="5">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME</td>
+                        <td class="c10 bold ac">Campaign</td>
+                        <td class="c40 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="s6_count" value="{!1}" />
+                    <apex:repeat value="{!s6_UnsolGift}" var="s6" id="s6">
+                        <tr>
+                            <td class="ar">{!s6_count}.</td>
+                            <td>{!s6.account.name} ({!s6.account.Account_Number__c})</td>
+                            <td class="ac">{!IF(Right(Left(s6.RPT_Package_Code__c,4),2)== 'CP', "CP","")}</td>
+                            <td class="">{!s6.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s6.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s6_count+1}" var="s6_count" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total Unsolicited Earmarked Gifts from Individual Donors</td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s6_Total}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="6">
+                            <div class="big">SCHEDULE VII [FOR SECTION D]</div>
+                            Foundation Bequests and Planned Gifts
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Reminder: Bequests are to be Shared Unless Proper Documentation is Provided (See Policy #505)</td>
+                    </tr>
+                    <tr>
+                        <th colspan="6">Affiliate-Banked Bequests (Program = 5)</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest 40/40/20% (SHARE CODE = Q001)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - SHARED BEQUESTS (FOR LINE D1)</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c40 bold ac" colspan="2">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="s7_count" value="{!1}" />
+                    <apex:repeat value="{!s7_q001}" var="s7" id="s7">
+                        <tr>
+                            <td class="c3 ar">{!s7_count}.</td>
+                            <td class="c37">{!s7.account.name} ({!s7.account.Account_Number__c})</td>
+                            <td class="c10 ac">{!s7.Deposit_Site__c}</td>
+                            <td class="c10">{!s7.Sharing_Entity__c}</td>
+                            <td class="c40 ar" colspan="2">
+                                <c:customCurrency curr="{!s7.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s7_count+1}" var="s7_count" />
+                        <!--increment -->
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold" colspan="2">
+                            <c:customCurrency curr="{!s7_q001Total}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="6">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6" >Foundation Bequest 90/10% (SHARE CODE = Q002)</td>
+                    </tr>
+                    <tr >
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - AFFILIATE-DIRECTED BEQUESTS (FOR LINE D2)</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="s7_count2" value="{!1}" />
+                    <apex:repeat value="{!s7_q002}" var="s7_2" id="s7_2">
+                        <tr>
+                            <td class="ar">{!s7_count2}.</td>
+                            <td>{!s7_2.account.name} ({!s7_2.account.Account_Number__c})</td>
+                            <td class="ac">{!s7_2.Deposit_Site__c}</td>
+                            <td class="">{!s7_2.Sharing_Entity__c}</td>
+                            <td>{!s7_2.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s7_2.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s7_count2+1}" var="s7_count2" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s7_q002Total}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest 50/50% (SHARE CODE = Q003)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - SHARED BEQUESTS - EARMARKED (FOR LINE D3)</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="s7_count3" value="{!1}" />
+                    <apex:repeat value="{!s7_q003}" var="s7_3" id="s7_3">
+                        <tr>
+                            <td class="ar">{!s7_count3}.</td>
+                            <td>{!s7_3.account.name} ({!s7_3.account.Account_Number__c})</td>
+                            <td class="ac">{!s7_3.Deposit_Site__c}</td>
+                            <td class="">{!s7_3.Sharing_Entity__c}</td>
+                            <td>{!s7_3.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s7_3.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s7_count3+1}" var="s7_count3" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s7_q003Total}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest 100% (SHARE CODE = Q004)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - UNSHARED BEQUESTS (FOR LINE D4)</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="s7_count4" value="{!1}" />
+                    <apex:repeat value="{!s7_q004}" var="s7_4" id="s7_4">
+                        <tr>
+                            <td class="ar">{!s7_count4}.</td>
+                            <td>{!s7_4.account.name} ({!s7_4.account.Account_Number__c})</td>
+                            <td class="ac">{!s7_4.Deposit_Site__c}</td>
+                            <td class="">{!s7_4.Sharing_Entity__c}</td>
+                            <td>{!s7_4.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s7_4.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s7_count4+1}" var="s7_count4" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s7_q004Total}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest Special Sharing (SHARE CODE = Q005)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - OTHER BEQUESTS (FOR LINE D5)</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="s7_count5" value="{!1}" />
+                    <apex:repeat value="{!s7_q005}" var="s7_5" id="s7_5">
+                        <tr>
+                            <td class="ar">{!s7_count5}.</td>
+                            <td>{!s7_5.account.name} ({!s7_5.account.Account_Number__c})</td>
+                            <td class="ac">{!s7_5.Deposit_Site__c}</td>
+                            <td class="">{!s7_5.Sharing_Entity__c}</td>
+                            <td>{!s7_5.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!s7_5.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!s7_count5+1}" var="s7_count5" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!s7_q005Total}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- tab x -->
+            <table class="header beforebreak">
+                <tbody>
+                    <tr>
+                        <td class="c50 title">ACLU Foundation</td>
+                        <td class="c50 ar">Report Refresh: {!todayDate}</td>
+                    </tr>
+                    <tr>
+                        <td>x.National Revenue Report</td>
+                        <td class="ar">Affiliate: {!affiliate}</td>
+                    </tr>
+                    <tr>
+                        <td>For Affiliate Foundations Without Guaranteed Minimum Incomes</td>
+                        <td class="ar">For Period:
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!startDate}" />
+                            </apex:outputText> to&nbsp;
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!endDate}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <table width="50%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>Summary National Revenue Report</b>
+                            <br/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="4">
+                            <div class="big">SCHEDULE I</div>
+                            Foundation Mega Gifts and Special Sharing
+                            <br/>
+                            <b>[from sources other than recognized foundations/institutions]</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">National</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c55 bold">DONOR NAME AND GIFT AMOUNT</td>
+                        <td class="c20 bold">Campaign</td>
+                        <td class="c10"></td>
+                    </tr>
+                    <apex:repeat value="{!xs1_megaSched_woGMI}" var="opp" id="xs1_megaSched_woGMI">
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>{!xs1_megaSched_woGMI[opp].donor}</td>
+                            <td class="ac">{!xs1_megaSched_woGMI[opp].lffCampaign}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs1_megaSched_woGMI[opp].Amount}" />
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs1_megaSchedTotal_woGMI}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="" colspan="7">
+                            <div class="big">SCHEDULE II</div>
+                            National Foundation Solicited Earmarked Gifts
+                            <br/>
+                            <b>[from sources other than recognized foundations]</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c30 bold ac">DONOR NAME AND EARMARKED PURPOSE</td>
+                        <td class="c10 bold ac">Share Code</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c17 bold ac">Campaign</td>
+                        <td class="c20 bold ac">Restriction field (on donation)</td>
+                        <td class="c10">Amount</td>
+                    </tr>
+                    <apex:variable var="xs2_count_woGMI" value="{!1}" />
+                    <apex:repeat value="{!xs2_SolEarmarked_woGMI}" var="xs2" id="xs2">
+                        <tr>
+                            <td class="ar">{!xs2_count_woGMI}.</td>
+                            <td>{!xs2_SolEarmarked_woGMI[xs2].donor}</td>
+                            <td class="ac">{!xs2_SolEarmarked_woGMI[xs2].sharingCode}</td>
+                            <td class="ac">{!xs2_SolEarmarked_woGMI[xs2].depLoc}</td>
+                            <td class="ac">{!xs2_SolEarmarked_woGMI[xs2].lffCampaign}</td>
+                            <td>{!xs2_SolEarmarked_woGMI[xs2].restriction}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs2_SolEarmarked_woGMI[xs2].Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs2_count_woGMI+1}" var="xs2_count_woGMI" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs2_Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="7">
+                            <div class="big">SCHEDULE III</div>
+                            National Foundation Unsolicited Earmarked Gifts
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="7">Reminder: Unsolicited Earmarked Gifts are to be Shared Unless Proper Documentation is Provided (See Policy #505)</td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME AND UNSOLICITED EARMARKED PURPOSE</td>
+                        <td class="c10 bold ac">Campaign</td>
+                        <td class="c40 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold">Amount of Gift</td>
+                    </tr>
+                    <!--zenDesk : #68073 -->
+                    <apex:variable var="xs3_count_woGMI" value="{!1}" />
+                    <apex:repeat value="{!xs3_UnsolGift_woGMI}" var="xs3" id="xs3">
+                        <tr>
+                            <td class="ar">{!xs3_count_woGMI}.</td>
+                            <td>{!xs3_UnsolGift_woGMI[xs3].donor} </td>
+                            <td class="ac">{!IF(Right(Left(xs3_UnsolGift_woGMI[xs3].lffCampaign,4),2)== 'CP', "CP","")}</td>
+                            <td class="">{!xs3_UnsolGift_woGMI[xs3].restriction}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs3_UnsolGift_woGMI[xs3].amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs3_count_woGMI+1}" var="xs3_count_woGMI" />
+                         <!--zenDesk : #68073 -->
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">Total Unsolicited Earmarked Gifts from Individual Donors</td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs3_Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="6">
+                            <div class="big">SCHEDULE IV</div>
+                            Foundation Bequests and Planned Gifts
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Reminder: Bequests are to be Shared Unless Proper Documentation is Provided (See Policy #505) (See Policy #505)</td>
+                    </tr>
+                    <tr>
+                        <th colspan="6">National-Banked and Out-Of-Affiliate Bequests (Program = 4)</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest 40/40/20% (SHARE CODE = Q001)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - SHARED BEQUESTS</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class=" bold ac" colspan="2">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="xs4_count_woGMI" value="{!1}" />
+                    <apex:repeat value="{!xs4_q001_woGMI}" var="xs4" id="xs4">
+                        <tr>
+                            <td class="ar">{!xs4_count_woGMI}.</td>
+                            <td>{!xs4.account.name} ({!xs4.account.Account_Number__c})</td>
+                            <td class="ac">{!xs4.Deposit_Site__c}</td>
+                            <td class="">{!xs4.Sharing_Entity__c}</td>
+                            <td class="ar" colspan="2">
+                                <c:customCurrency curr="{!xs4.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs4_count_woGMI+1}" var="xs4_count_woGMI" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold" colspan="2">
+                            <c:customCurrency curr="{!xs4_q001Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest 90/10% (SHARE CODE = Q002)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - AFFILIATE-DIRECTED BEQUESTS</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="xs4_count2_woGMI" value="{!1}" />
+                    <apex:repeat value="{!xs4_q002_woGMI}" var="xs4_2" id="xs4_2">
+                        <tr>
+                            <td class="ar">{!xs4_count2_woGMI}.</td>
+                            <td>{!xs4_2.account.name} ({!xs4_2.account.Account_Number__c})</td>
+                            <td class="ac">{!xs4_2.Deposit_Site__c}</td>
+                            <td class="">{!xs4_2.Sharing_Entity__c}</td>
+                            <td>{!xs4_2.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs4_2.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs4_count2_woGMI+1}" var="xs4_count2_woGMI" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs4_q002Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest 50/50% (SHARE CODE = Q003)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - SHARED BEQUESTS - EARMARKED</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="xs4_count3_woGMI" value="{!1}" />
+                    <apex:repeat value="{!xs4_q003_woGMI}" var="xs4_3" id="xs4_3">
+                        <tr>
+                            <td class="ar">{!xs4_count3_woGMI}.</td>
+                            <td>{!xs4_3.account.name} ({!xs4_3.account.Account_Number__c})</td>
+                            <td class="ac">{!xs4_3.Deposit_Site__c}</td>
+                            <td class="">{!xs4_3.Sharing_Entity__c}</td>
+                            <td>{!xs4_3.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs4_3.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs4_count3_woGMI+1}" var="xs4_count3_woGMI" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs4_q003Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest 100% (SHARE CODE = Q004)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - UNSHARED BEQUESTS</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="xs4_count4_woGMI" value="{!1}" />
+                    <apex:repeat value="{!xs4_q004_woGMI}" var="xs4_4" id="xs4_4">
+                        <tr>
+                            <td class="ar">{!xs4_count4_woGMI}.</td>
+                            <td>{!xs4_4.account.name} ({!xs4_4.account.Account_Number__c})</td>
+                            <td class="ac">{!xs4_4.Deposit_Site__c}</td>
+                            <td class="">{!xs4_4.Sharing_Entity__c}</td>
+                            <td>{!xs4_4.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs4_4.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs4_count4_woGMI+1}" var="xs4_count4_woGMI" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs4_q004Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <!-- Next table -->
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Foundation Bequest Special Sharing (SHARE CODE = Q005)</td>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c37 bold ac">DONOR NAME - OTHER BEQUESTS</td>
+                        <td class="c10 bold ac">Dep Loc</td>
+                        <td class="c10 bold ac">Share Ent</td>
+                        <td class="c30 bold ac">Earmarked Purpose</td>
+                        <td class="c10 bold ac">Amount of Gift</td>
+                    </tr>
+                    <apex:variable var="xs4_count5_woGMI" value="{!1}" />
+                    <apex:repeat value="{!xs4_q005_woGMI}" var="xs4_5" id="xs4_5">
+                        <tr>
+                            <td class="ar">{!xs4_count5_woGMI}.</td>
+                            <td>{!xs4_5.account.name} ({!xs4_5.account.Account_Number__c})</td>
+                            <td class="ac">{!xs4_5.Deposit_Site__c}</td>
+                            <td class="">{!xs4_5.Sharing_Entity__c}</td>
+                            <td>{!xs4_5.Restriction__c}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs4_5.Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs4_count5_woGMI+1}" var="xs4_count5_woGMI" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs4_q005Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td colspan="4">
+                            <div class="big">SCHEDULE V</div>
+                            National Foundation In-Kind Gifts
+                            <br/>
+                            <b>[from sources other than recognized foundations]</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">National</th>
+                    </tr>
+                    <tr>
+                        <td class="c3"></td>
+                        <td class="c57 bold ac">DONOR NAME AND GIFT ITEM</td>
+                        <td class="c30 bold ac">Item Description</td>
+                        <td class="c10 bold ac">Gift Amount</td>
+                    </tr>
+                    <apex:variable var="xs5_count" value="{!1}" />
+                    <apex:repeat value="{!xs5d_woGMI}" var="xs5" id="xs5">
+                        <tr>
+                            <td class="ar">{!xs5_count}.</td>
+                            <td>{!xs5d_woGMI[xs5].donor}</td>
+                            <td class="ac">{!xs5d_woGMI[xs5].description}</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs5d_woGMI[xs5].Amount}" />
+                            </td>
+                        </tr>
+                        <apex:variable value="{!xs5_count+1}" var="xs5_count" />
+                    </apex:repeat>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td class="ar bold">Total</td>
+                        <td class="ar bold">
+                            <c:customCurrency curr="{!xs5_Total_woGMI}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="7">&nbsp;</th>
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <!-- New Section -->
+            <table class="rptTbl">
+                <tbody>
+                    <tr>
+                        <td class="" rowspan="4" colspan="2">
+                            <div class="big">SCHEDULE VI</div>
+                            National Foundation Benefit Income - for events held in the Fiscal Year
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="c20">Total for R141 gifts</td>
+                        <td class="c10 ar">
+                            <c:customCurrency curr="{!xs6_totalR141}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Total income for manual fields</td>
+                        <td class="ar">
+                            <c:customCurrency curr="{!xs6_totalManualFields}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Difference</td>
+                        <td class="ar">
+                            <apex:variable value="{!xs6_totalR141 -xs6_totalManualFields}" var="xs6_diff" />
+                            <c:customCurrency curr="{!xs6_diff}" />
+                        </td>
+                    </tr>
+                    <apex:repeat value="{!xs6}" var="xs6_" id="xs6">
+                        <tr>
+                            <td colspan="3"><b>{!xs6_.Description__c}</b></td>
+                        </tr>
+                        <tr>
+                            <td class="bold" colspan="2">Purpose for which funds are earmarked (if applicable):</td>
+                            <td class="c30 bold ac"></td>
+                        </tr>
+                        <tr>
+                            <td class="c3 ar">1.</td>
+                            <td>Total Benefit/Event Expenses</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs6_.Expense__c}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="c3 ar">2.</td>
+                            <td>Total Benefit/Event Income</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs6_.Income__c}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="c3 ar">3.</td>
+                            <td>NET INCOME [2 LESS 1]; Formula calculates $0 if expenses are greater than income.</td>
+                            <td class="ar">
+                                <c:customCurrency curr="{!xs6_.Amount__c}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th colspan="3">&nbsp;</th>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <a target="_blank" href="{!reportLink}"><b>Get Report Detail Records Set 1</b></a>
+            <br/><br/>
+            <apex:outputText rendered="{!reportLink2 != null}">  
+                <a target="_blank" href="{!reportLink2}"><b>Get Report Detail Records Set 2</b></a> 
+            </apex:outputText>
+            <br/>
+            <br/>
+            <!--Zendesk : #70191 - Added more links -->
+            <apex:outputText rendered="{!reportLink3 != null}">  
+                <a target="_blank" href="{!reportLink3}"><b>Get Report Detail Records Set 3</b></a> 
+            </apex:outputText>
+            <br/>
+            <br/>
+            <apex:outputText rendered="{!reportLink4 != null}">  
+                <a target="_blank" href="{!reportLink4}"><b>Get Report Detail Records Set 4</b></a> 
+            </apex:outputText>
+            <br/>
+            <br/>
+            <!--Zendesk : END- #70191 -->
+            <!-- <br/>{!reportLink}
+            <br/>{!reportLink2} -->
+        </div>
+    </body>
+
+    </html>
+</apex:page>

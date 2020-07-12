@@ -1,0 +1,101 @@
+<apex:page showHeader="true" sidebar="true" controller="ManageLimitsNotificationController">
+    <style type="text/css">
+        .insetModal {
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            width: 500px;
+            margin-left: -250px;
+            top:100px;
+        }
+        .insetBack{
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+    </style>
+
+	<apex:form >
+        <apex:pageBlock title="Manage Limits Notifications">
+            <div style="overflow-y:scroll; height:500px;" id="scrolldiv">
+                <apex:pageBlockTable value="{! limits }" var="lim" id="table">
+                    <apex:column >
+                        <apex:facet name="header">Limit Name</apex:facet>
+                        <apex:outputText value="{! lim.name }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Notifications</apex:facet>
+                        <apex:outputText value="{! lim.count }"/> notification<apex:outputText value="{! IF(lim.count == 1, '', 's') }" />&nbsp;
+                        <apex:commandButton action="{! add }" value="Add" rerender="details,insetModal">
+                            <apex:param name="sel" assignTo="{! selected }" value="{! lim.apiName }" />
+                            <apex:param name="selName" assignTo="{! selectedName }" value="{! lim.name }" />
+                        </apex:commandButton>
+                        <apex:commandButton action="{! manageNotifications }" value="Manage" rerender="details" rendered="{! lim.count > 0 }">
+                            <apex:param name="sel" assignTo="{! selected }" value="{! lim.apiName }" />
+                            <apex:param name="selName" assignTo="{! selectedName }" value="{! lim.name }" />
+                        </apex:commandButton>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </div>
+        </apex:pageBlock> 
+        <apex:outputPanel id="insetModal">
+            <apex:outputPanel styleClass="insetBack" layout="block" rendered="{! isAdding }"/>
+            <apex:outputPanel styleClass="insetModal" layout="block" rendered="{! isAdding }">
+                <apex:pageBlock title="Adding Notification">
+                <apex:pageBlockSection >
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel for="selNameAddField" value="Limit" />
+                        <apex:outputText value="{! selectedName }" id="selNameAddField"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem />
+                    <apex:inputField value="{! notificationToAdd.Threshold__c }"/>
+                    <apex:inputField value="{! notificationToAdd.Method__c }"/>
+                    <apex:inputField value="{! notificationToAdd.Send_To_Profile__c }" />
+                    <apex:commandButton value="Save" action="{! saveNewNotification }" rerender="insetModal,details,table"/>
+                </apex:pageBlockSection>
+                </apex:pageBlock>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:outputPanel id="details">
+            <apex:pageBlock title="{! 'Notifications for ' + selectedName }" rendered="{! NOT(ISBLANK(selected)) }">
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{! add }" value="Add" rerender="details,insetModal" />
+                    <apex:commandButton action="{! save }" value="Save All" />
+                </apex:pageBlockButtons>
+                <apex:pageBlockTable value="{! selectedNotifications }" var="n">
+                    <apex:column >
+                        <apex:commandButton action="{! del }" value="Del" rerender="details,table">
+                            <apex:param name="deletethis" assignTo="{! toDelete }" value="{! n.Id }" />
+                        </apex:commandButton>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Threshold</apex:facet>
+                        <apex:inputField value="{! n.Threshold__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Notification Method</apex:facet>
+                        <apex:inputField value="{! n.Method__c }"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Send to Profile?</apex:facet>
+                        <apex:inputField value="{! n.Send_To_Profile__c }"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlock>
+        </apex:outputPanel>
+        <apex:outputPanel id="addNew">
+            <apex:pageBlock title="{! 'Add New Notification for ' + selectedName }" rendered="{! isAdding }">
+            </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

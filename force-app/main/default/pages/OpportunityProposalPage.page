@@ -1,0 +1,45 @@
+<apex:page standardController="Opportunity" extensions="OpportunityProposalPageController" action="{!redirectToOtherPage}">
+    
+    <apex:form id="formBlock">
+        <apex:pageMessages id="errorMsg"/>
+        <apex:pageBlock title="Giving Detail"  tabStyle="Opportunity">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!saveOpportunityAndPortFolioRecord}" value="Save" />
+                <apex:commandButton action="{!returnToViewPage}" value="Cancel" immediate="true" html-formnovalidate="formnovalidate"/> 
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection title="{!$Label.Information}" columns="2">
+                <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Proposal_Edit_Information}" var="f">
+                    <apex:inputField value="{!Opportunity[f]}" required="{!OR(f.DBRequired, f.required)}" rendered="{!f.fieldPath != 'RecordTypeId' && f.fieldPath != 'OwnerId'}"/>
+                    <apex:OutputField value="{!Opportunity[f]}" rendered="{!f.fieldPath == 'RecordTypeId'}"/>
+                    <apex:OutputField value="{!Opportunity[f]}" rendered="{!f.fieldPath == 'OwnerId'}"/>
+                </apex:repeat>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="{!$Label.Proposal_Maintenance}" columns="2">
+                <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Proposal_Edit_Proposal_Maintenance}" var="f"> 
+                    <apex:inputField value="{!Opportunity[f]}" required="{!OR(f.DBRequired, f.required)}"/>
+                </apex:repeat>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="{!$Label.Projection_Information}" columns="2">
+                <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Proposal_Edit_Projection_Information}" var="f"> 
+                    <apex:inputField value="{!Opportunity[f]}" required="{!OR(f.DBRequired, f.required)}"/>
+                </apex:repeat>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="{!$Label.Proposal_Detail}" columns="2" >
+                <apex:repeat value="{!$ObjectType.Proposal_Detail__c.FieldSets.Proposal_Edit_Proposal_Detail}" var="f"> 
+                    <apex:inputField value="{!propDetail[f]}" required="{!OR(f.DBRequired, f.required)}"/>
+                </apex:repeat>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="{!$Label.Comment_Information}" columns="1">
+                <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Proposal_Edit_Comment_Information}" var="f"> 
+                    <apex:inputField value="{!Opportunity[f]}" required="{!OR(f.DBRequired, f.required)}"/>
+                </apex:repeat>
+            </apex:pageBlockSection>
+    </apex:pageBlock>
+    </apex:form>  
+    
+</apex:page>

@@ -1,0 +1,171 @@
+<apex:component >
+     <apex:attribute name="wrapper" description="wrapper map" type="map"/>
+    <apex:attribute name="rendered" description="to show this component conditionally" type="Boolean"/>
+   <apex:attribute name="lastRunDate" description="Flag to identify if map is empty or not" type="String"/>
+  <apex:attribute name="isRecordNotExist" description="Flag to identify if map is empty or not" type="Boolean"/>
+  <table>
+  <apex:pageBlock >
+      <table border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="pbTitle"><h2>Market Sources by Actions Taken</h2>
+                        </td>
+                     </tr>
+                      <tr>
+                        <td><h4>Last Batch Run Date: {!lastRunDate}</h4>
+                        </td>
+                     </tr>
+                </tbody>
+            </table>
+    <table class="list" border="0" cellspacing="0" cellpadding="0"> 
+    <tr class="headerRow">
+                <th scope="col">Market Source List</th>
+                <th scope="col" class="numericalColumn">Count</th>
+                <th scope="col" class="numericalColumn">% of Total</th>
+                </tr>
+               
+   <apex:repeat value="{!wrapper}" var="wrap">
+               
+                <apex:repeat value="{!wrapper[wrap]}" var="team">
+                      <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">Actions Taken Email</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.actionTakenMSByEmail}              
+                    </span>
+                    </td>
+                    <td class="numericalColumn">
+                    <span class="dashboardRowValue">
+                    <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.actionTakenMSByEmail>0,((team.actionTakenMSByEmail/(team.actionTakenMSByEmail+team.actionTakenMSByFB+
+                            team.actionTakenMSByTW+team.actionTakenMSByWeb+team.actionTakenMSByBanner+team.actionTakenMSByGAdd
+                            +team.actionTakenMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                        </span>
+                    </td>
+                       </tr>
+                        <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">Actions Taken By Facebook</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.actionTakenMSByFB}</span>
+                    </td>
+                    <td class="numericalColumn">
+                    <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.actionTakenMSByFB>0,((team.actionTakenMSByFB/(team.actionTakenMSByEmail+team.actionTakenMSByFB+
+                            team.actionTakenMSByTW+team.actionTakenMSByWeb+team.actionTakenMSByBanner+team.actionTakenMSByGAdd
+                            +team.actionTakenMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                    </td>
+                       </tr>
+                       <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">Actions Taken By Twitter</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.actionTakenMSByTW}</span>
+                    </td>
+                    <td class="numericalColumn">
+                      <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.actionTakenMSByTW>0,((team.actionTakenMSByTW/(team.actionTakenMSByEmail+team.actionTakenMSByFB+
+                            team.actionTakenMSByTW+team.actionTakenMSByWeb+team.actionTakenMSByBanner+team.actionTakenMSByGAdd
+                            +team.actionTakenMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                    </td>
+                       </tr>
+                       <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">Actions Taken By Web</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.actionTakenMSByWeb}</span>
+                    </td>
+                    <td class="numericalColumn">
+                     <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.actionTakenMSByWeb>0,((team.actionTakenMSByWeb/(team.actionTakenMSByEmail+team.actionTakenMSByFB+
+                            team.actionTakenMSByTW+team.actionTakenMSByWeb+team.actionTakenMSByBanner+team.actionTakenMSByGAdd
+                            +team.actionTakenMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                    </td>
+                       </tr>
+                       <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">Actions Taken By Banner</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.actionTakenMSByBanner}</span>
+                    </td>
+                    <td class="numericalColumn">
+                    <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.actionTakenMSByBanner>0,((team.actionTakenMSByBanner/(team.actionTakenMSByEmail+team.actionTakenMSByFB+
+                            team.actionTakenMSByTW+team.actionTakenMSByWeb+team.actionTakenMSByBanner+team.actionTakenMSByGAdd
+                            +team.actionTakenMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                    </td>
+                       </tr>
+                       <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">Actions Taken By Google Ads</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.actionTakenMSByGAdd}</span>
+                    </td>
+                    <td class="numericalColumn">
+                      <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.actionTakenMSByGAdd>0,((team.actionTakenMSByGAdd/(team.actionTakenMSByEmail+team.actionTakenMSByFB+
+                            team.actionTakenMSByTW+team.actionTakenMSByWeb+team.actionTakenMSByBanner+team.actionTakenMSByGAdd
+                            +team.actionTakenMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                    </td>
+                       </tr>
+                        <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">Actions Taken By Others</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.actionTakenMSByOth}</span>
+                    </td>
+                    <td class="numericalColumn">
+                     <span class="dashboardRowValue">
+                   <apex:outputText value="{0,Number,00.00}%">
+                    <apex:param value="{!IF(team.actionTakenMSByOth>0,((team.actionTakenMSByOth/(team.actionTakenMSByEmail+team.actionTakenMSByFB+
+                            team.actionTakenMSByTW+team.actionTakenMSByWeb+team.actionTakenMSByBanner+team.actionTakenMSByGAdd
+                            +team.actionTakenMSByOth))*100),0)}"/>
+                       </apex:outputText> 
+                       </span>
+                    </td>
+                       </tr> 
+                    </apex:repeat>
+             
+               </apex:repeat>
+               
+               <tr style="display: {!IF(isRecordNotExist, 'table-row','none')};" >
+               <td style="background-color: #ececec;" colspan='3'>
+                <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+               </td>
+               </tr>
+                 
+                 
+  </table>
+     </apex:pageBlock>
+        </table>
+</apex:component>

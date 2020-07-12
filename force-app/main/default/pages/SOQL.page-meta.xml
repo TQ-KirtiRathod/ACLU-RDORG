@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>41.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Admin tool to quickly run SOQL queries. By Glenn Weinstein, (c) Appirio. Uses SFDC API 36.0 (Spring &apos;16).</description>
+    <label>SOQL</label>
+</ApexPage>

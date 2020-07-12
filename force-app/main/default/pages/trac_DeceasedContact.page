@@ -1,0 +1,34 @@
+<!--
+- Created by amillereux on 6/18/2019.
+-->
+<apex:page standardController="Contact" id="DeceasedContact" sidebar="false" showHeader="false">
+    <apex:includeScript value="/lightning/lightning.out.js" />
+
+    <body class="slds-scope">
+        <script>
+        window.addEventListener("unload", refreshRecord, false);
+        var id = '{!Contact.Id}';
+        $Lightning.use("c:trac_DeceasedContactApp", function() {
+            $Lightning.createComponent(
+                "c:trac_DeceasedContact",
+                {"recordId" : id
+                },
+                "deceasedContactView",
+                function(cmp) {
+                    $A.eventService.addHandler({
+                        event: 'force:closeQuickAction',
+                        handler: function (event) {
+                            window.opener.location = '/' + id;
+                         },
+                     });
+                });
+        });
+        
+        function refreshRecord() {
+        	window.opener.location = '/' + id;
+        }
+        
+        </script>
+        <div id="deceasedContactView"></div>
+    </body>
+</apex:page>

@@ -1,0 +1,173 @@
+<apex:page controller="BatchItem_Pledges_Proposal_GrantsCont" sidebar="false" showHeader="false" id="page" tabStyle="Batch_Log__c">
+  <style>
+  .custPopup {
+    z-index: 9999;
+    left: 50%;
+    padding: 10px;
+    position: absolute;
+    /* These are the 3 css properties you will need to change so the popup
+            displays in the center of the screen. First set the width. Then set
+            margin-left to negative half of what the width is. You can add
+            the height property for a fixed size pop up if you want.*/
+    width: 1000px;
+    margin-left: -500px;
+    top: 100px;
+  }
+
+  .popupBackground {
+    background-color: black;
+    opacity: 0.20;
+    filter: alpha(opacity=20);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9998;
+  }
+  </style>
+  <script language="javascript">
+  window.onload = new function() {
+    // bring popup window to front
+    window.focus();
+    var ele = document.getElementById('{!$Component.form.block.section.pb}');
+    if (ele) {
+      ele.focus();
+    }
+  }
+
+  function fillIn(name, id, isPledge, amount, payment) {
+    var BatchLogItemPayment = '{!$CurrentPage.parameters.Payment}';
+    var paraAmount = parseFloat('{!JSENCODE($CurrentPage.parameters.bamount)}'.replace(/,/g, ''));
+    amount = parseFloat(amount.replace(/,/g, ''));
+    if (paraAmount != amount && isPledge == 'true') {
+      alert('Please populate amount on Donation/Pledge before selecting the Pledge Payment and ensure the Amount matches.');
+    } else if (BatchLogItemPayment == 'Charge Card' && payment == 'Cash/Check') {
+      alert('Before selecting, please click Manage to update the Payment Method on the selected Pledge Payment to the payment method added in this batch item');
+    } else {
+      var winMain = window.opener;
+      if (null == winMain) {
+        winMain = window.parent.opener;
+      }
+      winMain.updateParentOpp(id, '{!$CurrentPage.parameters.row}', isPledge, '{!$CurrentPage.parameters.isSC}');
+      CloseWindow();
+    }
+  }
+
+  function CloseWindow() {
+    var winMain = window.opener;
+    if (null == winMain) {
+      winMain = window.parent.opener;
+    }
+    winMain.closeAccLookupPopup('true');
+
+  }
+
+  function openManage(oppId, recTypeId) {
+    /*var url='https://rc-giving.cs13.visual.force.com/apex/opportunity_manage?id='+oppId+'&RecordType='+recTypeId+'&retTovalue=1';
+            var newWin=window.open(url, 'Popup1','width=800,height=350,top=200,left=300');
+            if (window.focus)
+            {
+                newWin.focus();
+            }
+          return false;*/
+
+    console.log('Entered Op');
+    manage(oppId, recTypeId);
+  }
+  </script>
+  <apex:form id="fm">
+    <apex:actionFunction name="manage" action="{!manageTransactions}" rerender="tstpopup">
+      <apex:param name="moppId" value="" />
+      <apex:param name="mrecTypeId" value="" />
+    </apex:actionFunction>
+    <apex:OutputPanel id="dummy"></apex:OutputPanel>
+    <apex:outputPanel id="pb">
+      <apex:pageBlock >
+        <!-- Proposals -->
+        <apex:pageBlockSection rendered="{!proposals.size >0 && accessToGrants_Proposals }" title="Proposals" columns="1">
+          <apex:pageBlockTable value="{!proposals}" var="opp" title="Proposals">
+            <apex:column value="{!opp.recordType.Name}" headerValue="Record Type" />
+            <apex:column headerValue="Action">
+              <apex:commandButton value="Select" onclick="fillIn('{!JSENCODE(opp.Name)}', '{!opp.id}', 'false', '{!opp.amount}')" />
+            </apex:column>
+            <apex:column headerValue="Name">
+              <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(opp.Name)}', '{!opp.id}', 'false', '{!opp.amount}')">{!opp.Name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!opp.rC_Giving__Requested_Amount__c}" headerValue="Requested Amount" />
+            <apex:column value="{!opp.closeDate}" headerValue="Close Date" />
+            <apex:column value="{!opp.campaign.Name}" headerValue="Campaign" />
+            <apex:column value="{!opp.campaign.rC_Giving__Source_Code__c}" headerValue="Source Code" />
+            <apex:column value="{!opp.stageName}" headerValue="Stage" />
+            <apex:column value="{!opp.Program_Type__c}" headerValue="Program Type" />
+          </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection rendered="{!proposals.size == 0 && accessToGrants_Proposals }" columns="1" title="Proposals">
+          <apex:outputPanel > No Proposals Found </apex:outputPanel>
+        </apex:pageBlockSection>
+        <!-- Grants -->
+        <apex:pageBlockSection rendered="{!grants.size >0 && accessToGrants_Proposals }" title="Grants" columns="1">
+          <apex:pageBlockTable value="{!grants}" var="opp" title="Grants">
+            <apex:column value="{!opp.recordType.Name}" headerValue="Record Type" />
+            <apex:column headerValue="Action">
+              <apex:commandButton value="Select" onclick="fillIn('{!JSENCODE(opp.Name)}', '{!opp.id}', 'false', '{!opp.amount}')" />
+            </apex:column>
+            <apex:column headerValue="Name">
+              <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(opp.Name)}', '{!opp.id}', 'false', '{!opp.amount}')">{!opp.Name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!opp.rC_Giving__Requested_Amount__c}" headerValue="Requested Amount" />
+            <apex:column value="{!opp.closeDate}" headerValue="Close Date" />
+            <apex:column value="{!opp.campaign.Name}" headerValue="Campaign" />
+            <apex:column value="{!opp.campaign.rC_Giving__Source_Code__c}" headerValue="Source Code" />
+            <apex:column value="{!opp.stageName}" headerValue="Stage" />
+            <apex:column value="{!opp.Program_Type__c}" headerValue="Program Type" />
+          </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection rendered="{!grants.size == 0 && accessToGrants_Proposals }" columns="1" title="Grants">
+          <apex:outputPanel >No Grants Found</apex:outputPanel>
+        </apex:pageBlockSection>
+        <!-- Pledges Payments-->
+        <apex:pageBlockSection rendered="{!pledgePayments.size >0 && (!accessToPledgePayments )}" title="Pledge Payments" columns="1">
+          <apex:pageBlockTable value="{!pledgePayments}" var="opp">
+            <apex:column headerValue="Manage">
+              <apex:commandButton rerender="dummy" value="Manage" onclick="openManage('{!opp.rC_Giving__Parent__c}', '{!opp.recordTypeId}')" />
+            </apex:column>
+            <apex:column value="{!opp.recordType.Name}" headerValue="Record Type" />
+            <apex:column headerValue="Action">
+              <apex:commandButton value="Select" onclick="fillIn('{!JSENCODE(opp.Name)}', '{!opp.id}', 'true', '{!opp.amount}', '{!opp.rC_Giving__Payment_Method__c}')" />
+            </apex:column>
+            <apex:column headerValue="Name">
+              <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(opp.Name)}', '{!opp.id}', 'true', '{!opp.amount}', '{!opp.rC_Giving__Payment_Method__c}')">{!opp.Name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!opp.amount}" headerValue="Amount" />
+            <apex:column value="{!opp.closeDate}" headerValue="Close Date" />
+            <apex:column value="{!opp.CampaignId}" headerValue="Pledge Payment Source" rendered="{!opp.CampaignId != ''}"/>
+            <apex:column value="{!opp.rC_Giving__Parent__r.campaignid}" headerValue="Pledge Payment Source" rendered="{!opp.CampaignId == ''}"/>
+            <apex:column value="{!opp.rC_Giving__Source_Code__c}" headerValue="Source Code" rendered="{!opp.rC_Giving__Source_Code__c != ''}"/>
+            <apex:column value="{!opp.rC_Giving__Parent__r.rC_Giving__Source_Code__c}" headerValue="Source Code" rendered="{!opp.rC_Giving__Source_Code__c == ''}"/>
+            <apex:column value="{!opp.Restriction__c}" headerValue="Restriction" />
+            <apex:column value="{!opp.Revenue_Fiscal_Year__c}" headerValue="FY" />
+            <apex:column value="{!opp.stageName}" headerValue="Stage" />
+            <apex:column value="{!opp.Program_Type__c}" headerValue="Program Type" />
+          </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection rendered="{!pledgePayments.size == 0 && (!accessToPledgePayments)}" columns="1" title="Pledge Payments">
+          <apex:outputPanel > No Pledges Found </apex:outputPanel>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection rendered="{!accessToPledgePayments && !isOpenedFromSoftCreditTable}" columns="1" title="Pledge Payments">
+          <apex:outputPanel > You can't Select the Pledge Payments for the Pledge Batch Item </apex:outputPanel>
+        </apex:pageBlockSection>
+      </apex:pageBlock>
+    </apex:outputPanel>
+    <apex:outputPanel id="tstpopup">
+      <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!manageWindow}" />
+      <apex:outputPanel rendered="{!manageWindow}" styleClass="custPopup" layout="block">
+        <apex:pageBlock >
+          <apex:pageBlockButtons location="top">
+            <apex:commandButton value="close" onClick="window.location.reload();" rerender="tstpopup,dummy" /></apex:pageBlockButtons>
+          <apex:iframe src="{!$Page.rC_Giving__Opportunity_Manage}?id={!mOppId}&RecordType={!mrecTypeId}&retTovalue=1" scrolling="true" id="theIframe" height="500px" width="100%" />
+        </apex:pageBlock>
+      </apex:outputPanel>
+    </apex:outputPanel>
+  </apex:form>
+</apex:page>

@@ -1,0 +1,43 @@
+<apex:page controller="MergeManagementController">
+    <apex:pageMessages id="errorPanel" />
+    <apex:form id="frm">
+        <!--<apex:actionFunction name="submit" action="{!submit}" rerender="errorPanel"/>-->
+        <apex:pageBlock title="Reset Merge Run for Task" id="pb1">
+                <apex:pageBlockSection columns="1">
+                    Description:  This process will make the following changes to the Task Records that match the Merge Job Number entered:<br/>
+                    <ul>
+                        <li>Set Merge Job Number to blank</li>
+                        <li>Set Fulfilled Date to blank</li>
+                        <li>Set Status to In Process</li>
+                    </ul>
+                    Resetting these values will enable the merge process can be rerun.
+                </apex:pageBlockSection>
+                <apex:pageBlockSection >
+                    <apex:outputText value="Please enter unique merge job number to be reset for Task:" />
+                </apex:pageBlockSection>
+                <apex:pageBlockSection >
+                    <apex:outputText value="Merge Job Number" />
+                    <apex:inputText value="{!mergeJobNumber}" />
+                </apex:pageBlockSection>
+            <apex:commandButton value="Submit" action="{!submit}" rerender="errorPanel,frm" id="theButton" />
+        </apex:pageBlock>
+        <apex:pageBlock title="Reset Merge Run for Giving Records" >
+                <apex:pageBlockSection columns="1">
+                    Description:  This process will make the following changes to the Giving Records that match the Merge Job Number entered:<br/>
+                    <ul>
+                        <li>Set Merge Job Number and Acknowledged Date to blank</li>
+                        <li>Acknowledgment Status to "N - Not Acknowledged" </li>
+                    </ul>
+                    Resetting these values will enable the merge process can be rerun.
+                </apex:pageBlockSection>
+                <apex:pageBlockSection >
+                    <apex:outputText value="Please enter unique merge job number to be reset for Giving:" />
+                </apex:pageBlockSection>
+                <apex:pageBlockSection >
+                    <apex:outputText value="Merge Job Number" />
+                    <apex:inputText value="{!mergeJobNumberOpp}" />
+                </apex:pageBlockSection>
+            <apex:commandButton value="Submit" action="{!submitOpp}" rerender="errorPanel,frm" />
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,175 @@
+<!--
+ - Created by Surya pratap on 6/18/2019.
+ -->
+<aura:component controller="trac_DeceasedContactCtlr"
+                description="Deceased Contact"
+                extends="c:trac_Util"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+                access="global">
+    
+    <aura:attribute name="recordId" 					type="String"/>
+    <aura:attribute name="obj" 				            type="String"/>
+    <aura:attribute name="deceasedDate" 	            type="Object" 	default="{}"/>
+    <aura:attribute name="isDeceasedContact" 			type="Boolean" 	default="false"/>
+    <aura:attribute name="isDeceasedContactHelpText" 	type="Boolean" 	default="false"/>
+    <aura:attribute name="isDeceasedFinalContact" 		type="Boolean" 	default="false"/>
+    <aura:attribute name="isContactAlreadyDeceased" 	type="Boolean" 	default="false"/>
+    <aura:attribute name="contactRecord" 				type="Contact"/>
+
+    <aura:handler   name="init" value="{!this}" action="{!c.init}"/>
+    
+    <div class="slds-modal__container">
+        <header class="modal-header slds-modal__header">
+            <lightning:buttonICon class="slds-modal__close"
+                                  iconName="utility:close"
+                                  alternativeText="close"
+                                  variant="bare-inverse"
+                                  size="large" onclick="{!c.closeModal}" />
+            <h2 class="slds-text-heading_medium slds-hyphenate">
+                {!$Label.c.Deceased_Contact_Update_Title}
+            </h2>
+        </header>
+        
+        <aura:if isTrue="{!v.isContactAlreadyDeceased}">
+            <div class="slds-p-around_medium" id="modal-content-id-1">
+                <h2 class="slds-text-heading_small  confirmation_heading">
+                    {!$Label.c.Deceased_Contact_Already_Deceased}
+                </h2>
+            </div>
+            
+            <footer class="modal-footer slds-modal__footer" id="footer">
+                <lightning:button aura:id="close"
+                                  label="Close"
+                                  onclick="{!c.closeModal}"/>
+            </footer>
+            
+            <aura:set attribute="else">
+                <aura:if isTrue="{!!v.isDeceasedContact}">
+                    <div class="slds-p-around_medium" id="modal-content-id-1">
+                        
+                        <h2 class="slds-text-heading_small confirmation_heading wrap_Space">
+                            {!$Label.c.Deceased_Contact_Confirmation}<br/>
+                            {!$Label.c.Deceased_Contact_Confirmation_2}
+                        </h2>
+                    </div>
+                    <footer class="modal-footer slds-modal__footer" id="footer">
+                        <lightning:button aura:id="yes"
+                                          label="Yes"
+                                          variant="brand"
+                                          onclick="{!c.deceasedContact}"/>
+                        
+                        <lightning:button aura:id="no"
+                                          label="No"
+                                          onclick="{!c.closeModal}"/>
+                    </footer>
+                    
+                    <aura:set attribute="else">
+                        
+                        <aura:if isTrue="{!v.isDeceasedFinalContact}">    
+                            <div class="slds-p-around_medium" id="modal-content-id-1">
+                                <div class="slds-notify slds-notify--alert slds-theme_warning" role="alert">
+                                    <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex /*slds-align-top*/">
+                                        <lightning:icon iconName="utility:warning" size="medium" variant="inverse"/>
+                                    </span>
+                                    <div class="slds-notify__content">
+                                        
+                                        <h2 class="slds-text-heading_small wrap_Space" >
+                                            {!$Label.c.Deceased_Contact_Update_Confirmation}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <footer class="modal-footer slds-modal__footer" id="footer">
+                                <lightning:button aura:id="ok"
+                                                  label="OK"
+                                                  variant="brand"
+                                                  onclick="{!c.updateAndDeceasedContact}"/>
+                                
+                                <lightning:button aura:id="cancel"
+                                                  label="Cancel"
+                                                  onclick="{!c.closeModal}"/>
+                            </footer>
+                            
+                            <aura:set attribute="else">
+                                <div class="slds-p-around_medium" id="modal-content-id-1">
+                                    <lightning:layout horizontalAlign="center" multipleRows="true">
+                                        <lightning:layoutItem flexibility="auto" size="8">
+                                            
+                                            <div class="slds-p-around_medium" id="modal-content-id-1">
+                                                <h2 class="slds-text-heading_small  confirmation_heading wrap_Space">
+                                                    {!$Label.c.Deceased_Contact_Deceased_Date_Confirmation}
+                                                </h2>
+                                            </div>
+
+                                            <lightning:layoutItem flexibility="auto" size="" padding="around-small">
+                                                <label class="slds-form-element__label">Deceased Month</label>
+                                                <lightning:helptext content="{!v.isDeceasedContactHelpText.rc_bios__deceased_month__c}" iconName="utility:info"/>
+                                                
+                                                <lightning:select name="deceasedMonth" label="Deceased Month:" variant="label-hidden"
+                                                                  aura:id="deceasedMonth" value="{!v.contactRecord.rC_Bios__Deceased_Month__c}">
+                                                    
+                                                    <aura:iteration items="{!v.deceasedDate.DeceasedMonth}" var="deceasedMonth" indexVar="index">
+                                                        <option text="{!deceasedMonth}" value="{!deceasedMonth}" 
+                                                                selected="{! abs(index) == abs(v.contactRecord.rC_Bios__Deceased_Month__c)}"/>
+                                                    </aura:iteration>
+                                                    
+                                                </lightning:select>
+                                            </lightning:layoutItem>
+                                            
+                                            <lightning:layoutItem flexibility="auto" size="" padding="around-small">
+                                                <label class="slds-form-element__label">Deceased Day</label>
+                                                <lightning:helptext content="{!v.isDeceasedContactHelpText.rc_bios__deceased_day__c}" iconName="utility:info"/>
+                                                
+                                                <lightning:select name="deceasedDay" label="Deceased Day:" variant="label-hidden"
+                                                                  aura:id="deceasedDay" value="{!v.contactRecord.rC_Bios__Deceased_Day__c}">
+                                                    
+                                                    <aura:iteration items="{!v.deceasedDate.DeceasedDay}" var="deceasedDay" indexVar="index">
+                                                        <option text="{!deceasedDay}" value="{!deceasedDay}" 
+                                                                selected="{! abs(index) == abs(v.contactRecord.rC_Bios__Deceased_Day__c)}" />
+                                                    </aura:iteration>
+                                                    
+                                                </lightning:select>
+                                            </lightning:layoutItem>
+                                            
+                                            <lightning:layoutItem flexibility="auto" size="" padding="around-small">
+                                                <label class="slds-form-element__label rightPadding">Deceased Year</label>
+                                                <label class="slds-form-element__label required">*</label>
+                                                <lightning:helptext content="{!v.isDeceasedContactHelpText.rc_bios__deceased_year__c}" iconName="utility:info"/>
+                                                
+                                                <lightning:select name="deceasedYear" label="Deceased Year:" variant="label-hidden"
+                                                                  aura:id="deceasedYear" value="{!v.contactRecord.rC_Bios__Deceased_Year__c}">
+                                                    
+                                                    <aura:iteration items="{!v.deceasedDate.DeceasedYear}" var="deceasedYear">
+                                                        <option text="{!deceasedYear}" value="{!deceasedYear}"/>
+                                                    </aura:iteration>
+                                                    
+                                                </lightning:select>
+                                            </lightning:layoutItem>
+                                            
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                                <footer class="modal-footer slds-modal__footer" id="footer">
+                                    <lightning:button aura:id="save"
+                                                      label="Save"
+                                                      variant="brand"
+                                                      onclick="{!c.deceasedContactFinal}"/>
+                                    
+                                    <lightning:button aura:id="cancel"
+                                                      label="Cancel"
+                                                      onclick="{!c.closeModal}"/>
+                                    
+                                </footer>
+                            </aura:set>
+                            
+                        </aura:if>
+                        
+                        
+                    </aura:set>
+                </aura:if> 		           
+            </aura:set>
+        </aura:if>
+        
+    </div>
+</aura:component>

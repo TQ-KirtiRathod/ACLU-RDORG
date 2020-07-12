@@ -1,0 +1,23 @@
+<!--
+ - Created by Surya pratap on 6/18/2019.
+ -->
+<aura:component extensible="true">
+	<aura:attribute name="message" 				type="String" 	default="" 		access="global"/>
+    <aura:attribute name="messageType" 			type="String" 	default="" 		access="global"/>
+    <aura:attribute name="closable" 			type="Boolean" 	default="true"/>
+    <aura:attribute name="autoHide" 			type="Boolean" 	default="false"/>
+    <aura:attribute name="showSpinner" 			type="boolean" 	default="false" />
+    <aura:attribute name="closeParentWindow" 	type="Boolean" 	default="false"/>
+    
+    <c:trac_Toast messageType="{!v.messageType}" message="{!v.message}" closeParentWindow="{!v.closeParentWindow}"
+                         closable="{!v.closable}" autoHide="{!v.autoHide}"/>
+    
+    <!-- show Toast -->
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading" />
+    </aura:if>
+    
+    
+    {!v.body}
+</aura:component>

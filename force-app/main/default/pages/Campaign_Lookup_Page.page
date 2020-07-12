@@ -1,0 +1,135 @@
+<apex:page controller="CampaignLookupPageController" showHeader="false" sidebar="false" tabstyle="Batch_Log__c" id="pg">
+  <apex:pageMessages Id="pgmPop" />
+  <apex:actionstatus id="counterStatus">
+    <apex:facet name="start">
+      <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb; height:100%;opacity:0.65;width:100%;">
+        <div class="waitingHolder" style="top: 100px; width: 91px;">
+          <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+          <span class="waitingDescription">Loading...</span>
+        </div>
+      </div>
+    </apex:facet>
+  </apex:actionstatus>
+  <apex:form id="form">
+    <apex:outputPanel id="getcmpPrdIds">
+      <script>
+      var str = '{!selCmpProds}';
+
+      function getcmpIds() {
+
+        console.log('str', str);
+        CloseWindow(str);
+      }
+      </script>
+    </apex:outputPanel>
+    <apex:actionFunction name="retreiveProducts" action="{!retrieveCampaignProducts}" rerender="form" oncomplete=" scrollToProducts(); ">
+      <apex:param name="campaignId" value="" />
+    </apex:actionFunction>
+    <apex:actionFunction name="createOppProducts" action="{!createOpptyProducts}" rerender="getcmpPrdIds" status="counterStatus" />
+    <div style="width:100%">
+      <apex:pageBlock id="block1">
+        <apex:inputText value="{!query}" id="query" /> &nbsp;&nbsp;
+        <apex:commandButton value="Go" action="{!runQuery}" />
+      </apex:pageBlock>
+      <apex:outputPanel id="dummy"></apex:outputPanel>
+      <br/>
+      <br/>
+      <apex:pageBlock title="Lookup" id="block">
+        <apex:pageBlockTable value="{!campaigns}" var="cmp" style="width:100%">
+          <apex:column headerValue="Action">
+            <apex:commandButton value="Select" onclick="fillIn('{!JSENCODE(cmp.Name)}', '{!cmp.id}', '{!cmp.rC_Giving__Source_Code__c}', '{!cmp.rC_Giving__Sub_Affiliation__c}')" oncomplete="getcmpIds();"></apex:commandButton>
+          </apex:column>
+          <apex:column headerValue="Name">
+            <apex:outputLink value="#" onclick="showProducts('{!cmp.id}')" rendered="{!cmp.rC_Connect__Campaign_Products__r.size>0}">{!cmp.Name}</apex:outputLink>
+            <apex:outputPanel rendered="{!cmp.rC_Connect__Campaign_Products__r.size==0}">{!cmp.Name}</apex:outputPanel>
+          </apex:column>
+          <apex:column value="{!cmp.rC_Giving__Source_Code__c }" />
+          <apex:column value="{!cmp.rC_Giving__Sub_Affiliation__c}" />
+        </apex:pageBlockTable>
+      </apex:pageBlock>
+      <br/>
+      <br/>
+      <apex:outputPanel id="products" rendered="{!showProducts}">
+        <apex:pageBlock title="Campaign Products" rendered="{!campaignProductsWrapper.size>0}">
+          <apex:pageBlockTable value="{!campaignProductsWrapper}" var="cmp">
+            <apex:column headerValue="Action">
+              <apex:inputCheckbox value="{!cmp.isSelect}"></apex:inputCheckbox>
+            </apex:column>
+            <apex:column headerValue="Product Name">
+              <apex:outputField value="{!Cmp.campaignProduct.rC_Connect__Product__r.Name}"></apex:outputField>
+            </apex:column>
+          </apex:pageBlockTable>
+        </apex:pageBlock>
+        <apex:pageBlock title="Campaign Products" rendered="{!campaignProductsWrapper.size==0}">
+          <apex:outputPanel > No Products under this campaign with Standard PriceBook</apex:outputPanel>
+        </apex:pageBlock>
+      </apex:outputPanel>
+    </div>
+  </apex:form>
+  <script language="javascript">
+    window.onload = new function() {
+      // bring popup window to front
+      window.focus();
+      var ele = document.getElementById('{!$Component.form.block1.query}');
+      if (ele) {
+        ele.focus();
+      }
+    }
+
+    function fillIn(name, id, sourcCode, progType) {
+      console.log('FillINEnter' + name);
+      var winMain = window.opener;
+      if (null == winMain) {
+        winMain = window.parent.opener;
+      }
+      var ele = winMain.document.getElementById('{!JSENCODE($CurrentPage.parameters.namefield)}');
+      ele.value = name;
+      ele = winMain.document.getElementById('{!$CurrentPage.parameters.idfield}');
+      ele.value = id;
+      ele = winMain.document.getElementById('{!$CurrentPage.parameters.cmpSouc}');
+      ele.value = sourcCode;
+      ele = winMain.document.getElementById('{!$CurrentPage.parameters.progTyp}');
+      ele.value = progType;
+      createOppProducts();
+      //window.opener.batchItemTableRefresh();
+      winMain.batchItemTableRefresh();
+      //setTimeout(function() {CloseWindow();}, 5000);
+      //CloseWindow();
+    }
+
+    function CloseWindow(str) {
+      var winMain = window.opener;
+
+      //alert(str);
+      console.log('Ele::::');
+      //newWin.close();
+      if (null == winMain) {
+        winMain = window.parent.opener;
+      }
+      console.log('Ids', str);
+      winMain.cmProdIds(str);
+      winMain.closeLookupPopup();
+
+    }
+
+    function showProducts(campId) {
+      console.log('campId:', campId);
+      var oppId = '{!$CurrentPage.parameters.oppId}';
+      console.log('oppId', oppId);
+      if (oppId != null || oppId != '') {
+        retreiveProducts(campId);
+      }
+
+    }
+
+    function test() {
+      console.log('camehere');
+    }
+
+    function scrollToProducts() {
+      debugger;
+      var products = document.getElementById('pg:form:products').getBoundingClientRect();
+      window.scrollTo(0, products.top);
+    }
+  </script>
+</apex:page>

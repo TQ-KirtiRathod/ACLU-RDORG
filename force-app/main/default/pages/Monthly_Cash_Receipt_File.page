@@ -1,0 +1,37 @@
+<apex:page controller="Monthly_Cash_Receipt_File_Controller">
+    <apex:form >
+        <apex:PageBlock title="Generate Monthly Cash Report File" rendered="{!!isConfirm}">
+        <apex:pageMessages rendered="{!isShowError}"></apex:pageMessages>
+            <apex:PageBlockSection >
+                <apex:pageBlockSectionItem >
+                    <label> Report Type</label>
+                    <apex:selectList value="{!selectedReportType}" multiselect="false" size="1">
+                        <apex:selectOption itemValue="batch_Credit_Card_summary" itemLabel=" Batch Summary/Credit Card"/>
+                        <apex:selectOption itemValue="50k" itemLabel="50k+ detail"/>                        
+                        <apex:selectOption itemValue="Pledge_Payment" itemLabel="Pledge Payment detail"/>
+                        <apex:selectOption itemValue="Stock_Gift" itemLabel="Stock Gift detail"/>
+                        <apex:selectOption itemValue="Bequest" itemLabel="Bequest detail"/>
+                        <apex:selectOption itemValue="Errors" itemLabel="Errors For Review"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputPanel ></apex:outputPanel>            
+                <apex:inputField value="{!batchLog.Bank_Date__c}"  label="Start Date"/>
+                <apex:inputField value="{!batchLog.Batch_Date__c}"  label="End Date"/>
+            </apex:PageBlockSection>
+             <apex:pageBlockButtons location="bottom">
+                 <apex:commandlink action="{!save}" target="_blank" style="text-decoration: none;">
+                    <apex:commandButton value="Submit" title="Submit" />
+                </apex:commandLink>                
+            </apex:pageBlockButtons>            
+        </apex:PageBlock>
+        
+         
+      <apex:pageBlock rendered="{!isConfirm}">
+           <apex:pageBlockSection >
+                <apex:outputText > Your report request is being processed. you'll receive an email when it is ready to view. </apex:outputText>
+            </apex:pageBlockSection>
+      </apex:pageBlock>
+      
+    </apex:form>
+    
+</apex:page>

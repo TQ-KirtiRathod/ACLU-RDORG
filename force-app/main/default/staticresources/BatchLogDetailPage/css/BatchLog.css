@@ -1,0 +1,249 @@
+.header-wrap {
+  background: #eeeeff;
+  width: 100%;
+  height: 50px;
+  top: 0;
+  z-index: 1;
+}
+
+#table-scroll3 {
+  overflow: auto;
+  margin-top: 20px;
+  overflow-y: scroll;
+  width: 1275px;
+}
+
+.defaultButton {
+  display: none !important;
+}
+
+#table-scroll4 {
+  overflow: auto;
+  margin-top: 20px;
+  overflow-y: scroll;
+  width: 700px;
+  height: 500px;
+}
+
+.disable{
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/*fixed column table*/
+
+.ui-state-highlight {
+  border: 1px solid #28B228;
+  background: #e3f3ff;
+  font-weight: bold;
+  color: #A6D118;
+}
+
+.hidePanel {
+  visibility: hidden;
+}
+
+.showPanel {
+  visibility: visible;
+}
+
+.popupBackground {
+  background-color: #fbfbfb;
+  opacity: 0.70;
+  filter: alpha(opacity=20);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 9998;
+}
+
+.custPopup {
+  z-index: 9999;
+  padding: 10px;
+  position: fixed;
+  left: 50vw;
+  top: 50vh;
+}
+
+.waitingDescription {
+  color: black;
+}
+
+div.popupBackground .loadingPopup {
+  width: 300px;
+  margin-left: -150px;
+  margin-top: -10px;
+}
+
+.paymentMethodPopup {
+  width: 700px;
+  margin-left: -250px;
+  margin-top: -110px;
+  background: rgb(192, 161, 192);
+}
+
+.restrictEnterKeyPopup {
+  width: 300px;
+  margin-left: -150px;
+  margin-top: -100px;
+}
+
+.adjustGivingPopup {
+  width: 1000px;
+  margin-left: -500px;
+  margin-top: -160px;
+}
+
+#pg:frm:tableScrollTest {
+  height: 250px;
+  overflow: auto;
+  margin-top: 20px;
+  overflow-y: scroll;
+  width: 1275px;
+}
+
+.lookupIcon {
+  background-image: url(/img/func_icons/util/lookup20.gif);
+  background-position: 0 0;
+  width: 20px;
+  height: 20px;
+  background-position: top left;
+}
+
+.required {
+  border-left-color: #c00;
+  border-right-width: 2px;
+}
+
+body {
+  overflow-x: scroll !important;
+}
+
+.Custom12Tab .imo-iho-div .tertiaryPalette, .individualPalette .Custom12Block .imo-iho-div .tertiaryPalette, .layoutEdit .individualPalette .Custom12Block .imo-iho-div .tertiaryPalette {
+  background-color: #a3dabc;
+  border-color: #a3dabc;
+}
+
+td.subgrid-cell,
+.bldp-custom-oppt-container {
+  display: none
+}
+
+.bldp-custom-oppt-loader {
+  padding: 20px
+}
+
+div .bldp-custom-oppt-detail .bPageBlock {
+  margin-bottom: 0
+}
+
+#gbox_bgeList .ui-jqgrid .ui-jqgrid-bdiv {
+  overflow-x: hidden;
+}
+
+.rC_Giving__Payment_Frequency__c,
+.rC_Giving__Payment_Count__c,
+.rC_Giving__Giving_Years__c {
+  display: none;
+}
+.givingFrequency .frequencyOptions {
+  /* Hide these initially but ensure they fall back to block styling*/
+  display: block;
+  display: none;
+}
+
+.givingFrequency .frequencyOptions label {
+  font-weight: bold;
+  font-size: 91%;
+  color: rgb(74, 74, 86);
+}
+
+.givingFrequency .frequencyOptions input,
+.givingFrequency .frequencyOptions select {
+  margin: 10px;
+}
+
+select {
+  max-width: 100%;
+}
+
+/* Match the appearance of standard Salesforce list views */
+#gbox_bgeList th.ui-th-column {
+  border-right: 1px solid #e0e3e5;
+  vertical-align: top;
+  height: initial;
+}
+#gbox_bgeList div.ui-th-div {
+  font-weight: bold;
+  font-family: 'Arial','Helvetica',sans-serif;
+  color: black;
+  text-align: left;
+  padding: 0 2px;
+  text-overflow: ellipsis;
+}
+#gbox_bgeList tr.ui-widget-content td,
+#gbox_bgeList tr.ui-widget-content th {
+  text-overflow: ellipsis;
+}
+
+#gbox_bgeList .bge-split-row {
+  background: #F5F5DC;
+}
+
+#gbox_bgeList .bge-adjusted-row{
+  background: rgba(255,0,0,0.2);
+}
+
+#gbox_bgeList .ui-state-hover,
+#gbox_bgeList .ui-widget-content .ui-state-hover,
+#gbox_bgeList .ui-widget-header .ui-state-hover,
+#gbox_bgeList .ui-state-focus,
+#gbox_bgeList .ui-widget-content .ui-state-focus,
+#gbox_bgeList .ui-widget-header .ui-state-focus {
+  background: #E1F6FF;
+  font-weight: bold;
+  color: #222222;
+}
+#gbox_bgeList .ui-state-highlight,
+#gbox_bgeList .ui-widget-content .ui-state-highlight,
+#gbox_bgeList .ui-widget-header .ui-state-highlight {
+  background: none repeat scroll 0 0 #B0E1FA !important;
+  border: 1px dotted #EDEDED;
+  color: #222222;
+}
+#gbox_bgeList .ui-state-default .ui-th-column .ui-th-ltr .ui-state-hover{
+  background-color: #E0E3E6;
+}
+#gbox_bgeList .ui-state-default,
+#gbox_bgeList .ui-widget-content .ui-state-default,
+#gbox_bgeList .ui-widget-header .ui-state-default{
+  background: #F2F3F3 !important;
+  color: #555555;
+  font-weight: normal;
+}
+#gbox_bgeList .ui-widget-content {
+  border: 1px solid #E0E3E5;
+  color: #222222;
+}
+#gbox_bgeList .ui-state-hover a,
+#gbox_bgeList .ui-state-hover a:hover,
+#gbox_bgeList .ui-state-hover a:link,
+#gbox_bgeList .ui-state-hover a:visited {
+  color: #222222;
+  text-decoration: underline;
+}
+
+/* Fixed top section on Soft Credit page */
+#pg\:frm\:hardCreditSection {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #FAFAFA;
+}
+#pg\:frm\:softCreditPopUp {
+  display: block;
+  padding-top: 123px;
+}

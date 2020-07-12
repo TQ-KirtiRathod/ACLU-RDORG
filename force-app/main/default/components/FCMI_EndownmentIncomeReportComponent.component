@@ -1,0 +1,39 @@
+<apex:component controller="FCMI_Report_Controller">
+ <head>
+ </head>
+ <body>  
+  <table style="width:45%;border-collapse:collapse;">
+  <tbody>
+  <apex:variable value="{!1}" var="i"/>
+   <apex:repeat value="{!listOfRecords}" var="record">
+   <apex:variable value="{!IF(i == 7, 1, i)}" var="i" />
+   <tr width="45%" style="background-color:{!IF(i<4, '#ffffff','#e0e0d1')};">
+      <th style="text-align:center;" width="10%"><span style="font-size: 8pt; ">{!record.Account__r.Affiliation__c}</span></th>
+      <td style="text-align:right;" width="15%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_Endowment__c}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="5%"></td>
+      <td style="text-align:right;" width="15%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!record.FCMI_NatEndowment__c}"/></apex:outputText></span></td>
+   </tr>
+    <apex:variable value="{!i+1}" var="i" />
+    </apex:repeat>
+    <tr width="45%">
+      <th width="10%"></th>
+      <td width="15%" style="border-bottom:1pt solid #808080;"></td>
+      <td style="background-color:#ffffff;" width="5%"></td>
+      <td width="15%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+    <tr width="45%">
+      <td style="text-align:center;" width="10%"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">Total</span></td>
+      <td style="text-align:right;" width="15%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMIEndownment']}"/></apex:outputText></span></td>
+      <td style="background-color:#ffffff;" width="5%"></td>
+      <td style="text-align:right;" width="15%"><span style="font-family: Arial Unicode MS; font-size: 8pt; "><apex:outputText value="${0, number, ###,###,###,##0}"><apex:param value="{!result['totalFCMINatEndownment']}"/></apex:outputText></span></td>
+   </tr>
+    <tr width="45%">
+      <th width="10%"></th>
+      <td width="15%" style="border-bottom:1pt solid #808080;"></td>
+      <td style="background-color:#ffffff;" width="5%"></td>
+      <td width="15%" style="border-bottom:1pt solid #808080;"></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</apex:component>

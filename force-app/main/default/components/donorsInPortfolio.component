@@ -1,0 +1,67 @@
+<apex:component >
+    <apex:attribute name="donorsInPortfolio" description="map to show account name, stage and requested amount" type="map"/>
+    <apex:attribute name="donorsFlag" description="Flag to identify if map is empty or not" type="Boolean"/>
+     <apex:attribute name="rendered" description="to show this component conditionally" type="Boolean"/>
+     <apex:attribute name="totalClosedAmount" description="to show total Closed Amount" type="Double"/>
+     <apex:attribute name="totalRequestedAmount" description="to show total Requested Amount" type="Double"/>
+    <apex:pageBlock title="Donors In Portfolio" rendered="{!rendered}">
+        
+    <table class="list" border="0" cellspacing="0" cellpadding="0"> 
+    <tr class="headerRow">
+                <th scope="col">Account Name</th>
+                <th scope="col" class="numericalColumn">Stage</th>
+                <!--th scope="col" class="numericalColumn">Sum of Open Pledged Amount</th-->
+                <th scope="col" class="numericalColumn">Sum of Requested Amount</th>
+                <th scope="col" class="numericalColumn">Sum of Closed Amount</th>
+                </tr>
+               
+   <apex:repeat value="{!donorsInPortfolio}" var="wrap">
+                    
+                
+                    <apex:repeat value="{!donorsInPortfolio[wrap]}" var="team">
+                      <tr class="first even last">
+               
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.AccountName}</span>
+                    </td>
+                         <td class="numericalColumn">
+                    <span class="dashboardRowValue">{!team.stageName}</span>
+                    </td>
+                      <td class="numericalColumn">
+                    <span class="dashboardRowValue">
+                     <apex:outputText value="${0,number,###,###,##0}">
+                            <apex:param value="{!team.requestedAmount}" />
+                        </apex:outputText>
+                    </span>
+                    </td>
+                    <td class="numericalColumn">
+                    <span class="dashboardRowValue">
+                     <apex:outputText value="${0,number,###,###,##0}">
+                            <apex:param value="{!team.closedAmount}" />
+                        </apex:outputText>
+                    </span>
+                    </td>
+                       </tr>
+                    </apex:repeat>
+             
+               </apex:repeat>
+               
+               <tr style="display: {!IF(donorsFlag, 'table-row','none')};" >
+               <td style="background-color: #ececec;" colspan='4'>
+                 <i><apex:outputLabel value="{!$Label.No_Data_Found}"/></i>
+               </td>
+               </tr>
+			     <tr >
+			         <td></td><td style="text-align:right;"><b>Total</b></td>
+               <td style="text-align:right;">
+                 <b>${!totalRequestedAmount}</b>
+               </td>
+               <td style="text-align:right;">
+                 <b>${!totalClosedAmount}</b>
+               </td>
+               </tr>
+			     
+  </table>
+     </apex:pageBlock>
+        
+</apex:component>

@@ -1,0 +1,26 @@
+<!-- 
+// (c) 2012 Appirio, Inc.
+//
+// Used to custom format currency values in reconcilation reports
+// displays negative amounts as ($ 123,456) in red
+//
+// 11 Nov 2017     James Wasilewsk       Original
+//
+//
+ -->
+<apex:component >
+  <apex:attribute name="curr" description="to show this component conditionally" type="Decimal" />
+
+  <apex:outputText value="$ {0, number, ###,###,###}" rendered="{!curr>=0}">
+      <apex:param value="{!curr}"/>
+  </apex:outputText>
+  
+  <apex:outputText style="color:Red" value="($ {0, number, ###,###,###})" rendered="{!curr<0}">  
+      <apex:param value="{!curr*-1}"/>  
+  </apex:outputText>
+
+  <!-- <apex:outputText value="${0, number, ###,###,##0}">
+      <apex:param value="{!two_d}" />
+  </apex:outputText> -->
+
+</apex:component>
