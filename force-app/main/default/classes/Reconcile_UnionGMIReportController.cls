@@ -7,6 +7,7 @@
             This class queries opp data and rolls up the amounts in various categories to support the reconciliation output and format"
 * Modified by :: Salesforce.org :: 08-July-2019 :: Zendesk: #68792
 * Modified by :: Salesforce.org :: 18-June-2019 :: Zendesk: #68203,#63855
+* Modified by :: Salesforce.org :: 14-July-2020 :: ACLU: #78235
 * Description :: the reports contain gifts within the 2 old KM Deposit Sites only (KM_Kansas and KMW_Kansas_web) - it is missing KS and KSW
 */
 public with sharing class Reconcile_UnionGMIReportController {
