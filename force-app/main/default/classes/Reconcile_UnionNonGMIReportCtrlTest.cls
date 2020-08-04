@@ -1,6 +1,8 @@
 /**
  * Test Class for Reconcile_UnionNonGMIReportController
- * Modified By : zenDesk : #68023*/
+ * Modified By : zenDesk : #68023
+ * Modified By : SFDO (Kirti Rathod)::#77087
+ * Purpose : Changed the deposit site value because the picklist value was inactivated */
 @isTest
 private class Reconcile_UnionNonGMIReportCtrlTest {
     private static testMethod void testReconcile_UnionNonGMIReportCtrl(){
@@ -104,7 +106,7 @@ private class Reconcile_UnionNonGMIReportCtrlTest {
         tempOpp9.CloseDate = Date.newInstance( 2017, 05, 01);
         tempOpp9.Exclude_from_Revenue_Sharing__c = False;
         tempOpp9.Amount = 2;
-        tempOpp9.Deposit_Site__c = 'NA_CN_NoCal_NNBanked';   //for Line 252
+        tempOpp9.Deposit_Site__c = 'NAE_NatF_Endowment'; //SFDO ::  #77087
         oppList.add(tempOpp9);
         
         Opportunity tempOpp10 = TestUtils.createOpportunity(testAcc1.Id,'testOpp1',false);
@@ -185,7 +187,7 @@ private class Reconcile_UnionNonGMIReportCtrlTest {
         tempOpp3.CloseDate = Date.newInstance( 2017, 05, 01);
         tempOpp3.Exclude_from_Revenue_Sharing__c = False;
         tempOpp3.Amount = 2;
-        tempOpp3.Deposit_Site__c = 'NA_CN_NoCal_NNBanked';   //for Line 252
+        tempOpp3.Deposit_Site__c = 'NAE_NatF_Endowment';   //for Line 252
         oppList.add(tempOpp3);
          
         Opportunity tempOpp4 = TestUtils.createOpportunity(testAcc1.Id,'testOpp1',false);
@@ -196,7 +198,7 @@ private class Reconcile_UnionNonGMIReportCtrlTest {
         tempOpp4.CloseDate = Date.newInstance( 2017, 05, 01);
         tempOpp4.Exclude_from_Revenue_Sharing__c = False;
         tempOpp4.Amount = 2;
-        tempOpp4.Deposit_Site__c = 'NA_CN_NoCal_NNBanked';   //for Line 252
+        tempOpp4.Deposit_Site__c = 'NAE_NatF_Endowment';   //SFDO ::  #77087
         tempOpp4.RPT_Package_Code__c = 'ABCP';
         oppList.add(tempOpp4);
         
@@ -218,7 +220,7 @@ private class Reconcile_UnionNonGMIReportCtrlTest {
         tempOpp6.CloseDate = Date.newInstance( 2017, 05, 01);
         tempOpp6.Exclude_from_Revenue_Sharing__c = False;
         tempOpp6.Amount = 2;
-        tempOpp6.Deposit_Site__c = 'NA_CN_NoCal_NNBanked';   //for Line 252
+        tempOpp6.Deposit_Site__c = 'NAE_NatF_Endowment';   //SFDO ::  #77087
         oppList.add(tempOpp6);
         
         Opportunity tempOpp7 = TestUtils.createOpportunity(testAcc1.Id,'testOpp1',false);
@@ -229,7 +231,7 @@ private class Reconcile_UnionNonGMIReportCtrlTest {
         tempOpp7.CloseDate = Date.newInstance( 2017, 05, 01);
         tempOpp7.Exclude_from_Revenue_Sharing__c = False;
         tempOpp7.Amount = 2;
-        tempOpp7.Deposit_Site__c = 'NA_CN_NoCal_NNBanked';   //for Line 252
+        tempOpp7.Deposit_Site__c = 'NAE_NatF_Endowment';  //SFDO ::  #77087
         
         Opportunity tempOpp8 = TestUtils.createOpportunity(testAcc1.Id,'testOpp1',false);
         tempOpp8.RecordTypeId = OPPORTUNITY_RT_TRANSACTION_Id;
@@ -239,7 +241,7 @@ private class Reconcile_UnionNonGMIReportCtrlTest {
         tempOpp8.CloseDate = Date.newInstance( 2017, 05, 01);
         tempOpp8.Exclude_from_Revenue_Sharing__c = False;
         tempOpp8.Amount = 2;
-        tempOpp8.Deposit_Site__c = 'NA_CN_NoCal_NNBanked';   //for Line 252
+        tempOpp8.Deposit_Site__c = 'NAE_NatF_Endowment';   //for Line 252
         oppList.add(tempOpp8);
         
         

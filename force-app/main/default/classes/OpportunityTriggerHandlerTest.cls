@@ -786,9 +786,14 @@ private class OpportunityTriggerHandlerTest {
         Opportunity oppOld = opp1;
         Map<Id,Opportunity> oldMap = new Map<id, Opportunity>();
         oldMap.put(oppOld.id,oppOld);
+        Map<Id, Opportunity> updateMap = new Map<Id, Opportunity>();
+        
+        oppList.clear();
         //creating child records:
+        opp1.Batch_Log__c = bl2.id;  
+        Update opp1;
+        Test.StartTest();
         Opportunity opp4 = TestUtils.createOpportunity(acc.id, 'closedDonation', false);//Transaction
-        opp4.Batch_Log__c = bl.id;
         opp4.Deposit_Site__c = 'AK_Alaska';
         opp4.recordTypeId = OPPORTUNITY_RT_TRANSACTION_Id;
         opp4.rC_Giving__Parent__c = opp1.id;
@@ -800,15 +805,14 @@ private class OpportunityTriggerHandlerTest {
         opp4.rC_Giving__Payment_Method__c = 'Cash/Check';
         opp4.StageName = 'Completed';//#77940:Added a Completed to get map on transaction.
         insert opp4;
-        Map<Id, Opportunity> updateMap = new Map<Id, Opportunity>();
-        Test.StartTest();
-            oppList.clear();
-            opp1.Batch_Log__c = bl2.id;
-            updateMap = OpportunityManager.updateChildOpportunityFromBatchLog( new List<Opportunity>{opp1}, oldMap, new List<Opportunity>{opp4},updateMap);
-            System.assertEquals(true, updateMap.size()>0);
-            System.assertEquals(Date.today(), updateMap.get(opp4.id).Bank_Date__c);
-            System.assertEquals(bl.id, updateMap.get(opp4.id).Batch_Log__c);//#77940 :Maps to the Parent's batch log
         Test.stopTest();
+        List<opportunity> oppoList = [SELECT Id,Batch_Log__c,rC_Giving__Parent__c
+                                        FROM Opportunity
+                                        WHERE id = :opp4.id];
+        if(oppoList != null && oppoList.size() >0) {
+            System.assertEquals(oppoList[0].Batch_Log__c, opp1.Batch_Log__c);//#77940 :Maps to the Parent's batch log
+        }    
+        
     }
     
     

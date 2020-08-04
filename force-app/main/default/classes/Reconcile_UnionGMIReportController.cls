@@ -289,7 +289,6 @@ public with sharing class Reconcile_UnionGMIReportController {
               && o.RPT_Package_Code__c.subString(2, 4) == 'CP'){
             packageCode = o.RPT_Package_Code__c.subString(2, 4);
           }
-
             //Zendesk: #68203
           
             Boolean isDepositSiteSameAsAffiliate = false;
@@ -309,8 +308,9 @@ public with sharing class Reconcile_UnionGMIReportController {
             two_a += o.Amount;
           }
           if( (o.Sharing_Code__c == 'E121' || o.Sharing_Code__c == 'E181' 
-               || (o.Sharing_Code__c == 'E131' && packageCode =='CP') )
-              && isDepositSiteSameAsAffiliate  && !donorsOver10KAccountIds.contains(o.AccountId)){
+               || (o.Sharing_Code__c == 'E131') )//ACLU: #78235:: Removed package code from the condition
+              && isDepositSiteSameAsAffiliate  
+              && !donorsOver10KAccountIds.contains(o.AccountId)){
             two_b += o.Amount;
           }
           if( (o.Sharing_Code__c == 'E151' || (o.Sharing_Code__c == 'E131' && packageCode =='CP'))

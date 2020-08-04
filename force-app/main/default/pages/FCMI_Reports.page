@@ -32,7 +32,7 @@
   <table style="width:100%">
    <thead>
     <tr>
-      <th colspan="2" width="8%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th colspan="4" width="8%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone -->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
       <th colspan="10" width="82%" align="center"><span style="font-size:16pt">ACLU FOUNDATION NATIONAL BASE RENEWABLE INCOME </span>
@@ -50,8 +50,8 @@
       <th colspan="7" style="width:56%;"></th>
     </tr>
     <tr>
-      <th style="font-size: 9pt ; text-align:center; width:8%;">AFF</th>
-      <th style="font-size: 9pt ; text-align:right; width:8%; ">$</th>
+      <th style="font-size: 9pt ; text-align:center; width:8%;">ID</th>
+      <th style="font-size: 9pt ; text-align:right; width:8%; ">Revenue</th>
       <th style="font-size: 9pt ; text-align:right; width:8%;">#</th>
       <th style="font-size: 9pt ; text-align:right; width:8%; ">AVG GIFT</th>
       <th style="font-size: 9pt ; text-align:right; width:9%;">NETAMOUNT<br/>(CF = {!foundationCostFactor}%)</th>
@@ -95,7 +95,7 @@
   <table style="width:100%">
    <thead>
     <tr>
-      <th colspan="2" width="8%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th colspan="2" width="8%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone -->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
       <th colspan="9" width="82%" align="center"><span style="font-size:16pt">ACLU FOUNDATION NATIONAL BANKED INCENTIVE INCOME</span>
@@ -145,10 +145,10 @@
   <table style="width:100%">
    <thead>
     <tr>
-      <th width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th width="12%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone and changed the width-->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
-      <th colspan="8" width="80%" align="center"><span style="font-size:16pt">ACLU FOUNDATION AFFILIATE BASE RENEWABLE INCOME</span>
+      <th colspan="8" width="78%" align="center"><span style="font-size:16pt">ACLU FOUNDATION AFFILIATE BASE RENEWABLE INCOME</span>
                                                   <br/>{!startDate} - {!endDate}
       </th>
       <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
@@ -192,7 +192,7 @@
   <table style="width:100%">
    <thead>
     <tr>
-      <th colspan="2" width="8%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th colspan="2" width="8%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone -->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
       <th colspan="7" width="82%" align="center"><span style="font-size:16pt">ACLU FOUNDATION AFFILIATE BANKED INCENTIVE INCOME</span>
@@ -242,7 +242,7 @@
        <table style="width:100%">
        <thead>
     <tr>
-      <th colspan="2" width="12%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th colspan="2" width="12%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone -->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
       <th colspan="9" width="78%" align="center"><span style="font-size:15pt">ACLU FOUNDATION UNSHARED INCOME</span><br/>{!startDate} - {!endDate}</th>
@@ -307,7 +307,7 @@
   <table style="width:100%">
    <thead>
     <tr>
-      <th colspan="2" width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th colspan="2" width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone -->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
       <th colspan="9" width="80%" align="center"><span style="font-size:16pt">ACLU FOUNDATION SPECIAL SHARING INCENTIVE INCOME</span>
@@ -369,10 +369,10 @@
        <table style="width:100%">
        <thead>
     <tr>
-      <th width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th width="12%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone and changed the width-->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
-      <th colspan="7" width="80%" align="center"><span style="font-size:15pt">ACLU FOUNDATION ENDOWMENT INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th colspan="7" width="78%" align="center"><span style="font-size:15pt">ACLU FOUNDATION ENDOWMENT INCOME</span><br/>{!startDate} - {!endDate}</th>
       <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
                                     <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
                                     <br/>&nbsp;</th>

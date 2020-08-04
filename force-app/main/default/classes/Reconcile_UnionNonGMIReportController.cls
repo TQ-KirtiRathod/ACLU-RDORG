@@ -6,6 +6,7 @@
 *Purpose :  Controller class for Reconcile_UnionNonGMIReport Page
             This class queries opp data and rolls up the amounts in various categories to support the reconciliation output and format
 * Modified By: SFDO :: 12-Jun-19 zenDesk : #68073
+* Modified By: SFDO :: 04-Aug-20 zenDesk : #79325
 */
 public with sharing class Reconcile_UnionNonGMIReportController {
  
@@ -361,8 +362,8 @@ public with sharing class Reconcile_UnionNonGMIReportController {
             s2_totalE141 += o.Amount;
           }
           //schedule III Affiliate Solicited Earmarked Gifts
-          if(o.Sharing_Code__c == 'E151' || (o.Sharing_Code__c == 'E131' && packageCode == 'CP') 
-            && (isDepositSiteSameAsAffiliate ) ){ //Zendesk: #68203 - Added isDepositSiteSameAsAffiliate 
+          if((o.Sharing_Code__c == 'E151' || (o.Sharing_Code__c == 'E131' && packageCode == 'CP')) 
+            && isDepositSiteSameAsAffiliate ){ //Zendesk: #68203, #77087 - Added isDepositSiteSameAsAffiliate and added extra round bracket
             key = '';
             // Zendesk:  #68073 - Added extra restriction key
             key = o.accountId + ' - '+ o.Restriction__c + ' - '+packageCode;
@@ -580,8 +581,8 @@ public with sharing class Reconcile_UnionNonGMIReportController {
           s2_totalManualFields += it.Income__c;
           s2.add(it);
         }
-        //schedule VI National Foundation Benefit Income w/o GMI
-        if(it.Income_Type__c =='Event/Benefit' && it.Fund_Type__c=='Foundation' && it.Event_Hosted_By__c=='National'){
+        //schedule VI National Union Benefit Income w/o GMI
+        if(it.Income_Type__c =='Event/Benefit' && it.Fund_Type__c=='Union' && it.Event_Hosted_By__c=='National'){//zenDesk :#79325 : Changed the Fund Type to Union instead of Foundation
           xs6.add(it);
           xs6_totalManualFields += it.Income__c;
           xs6_totalAmount += it.Amount__c;

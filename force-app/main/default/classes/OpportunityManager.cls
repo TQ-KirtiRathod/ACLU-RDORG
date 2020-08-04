@@ -14,7 +14,7 @@
             - Populate Pledge Source Codes
             - Resets Sharing Records
             - Creates Tasks
-* Ticket#    Modified Date       Modified By	 Description
+* Ticket#    Modified Date       Modified By     Description
 *  #77940    24-June-2020          SFDO            Added a method that can map the batchlog details from child list to parent list           
 */
 public class OpportunityManager {
@@ -203,43 +203,43 @@ public class OpportunityManager {
     }
     
      /*
-	*
-	*Method pushSourceFieldsToFirstChild
-	*@param : parentOpp
+    *
+    *Method pushSourceFieldsToFirstChild
+    *@param : parentOpp
     *@param : childOpp
-	*Author:  ACLU (Dave Seidman)
-	*Date  :  August 31, 2018
-	*Purpose : AI-8: Market source fields needs to sync from parent Giving record to
-	*       		the first and only the first child pledge payment record. This had
-	*				previously been implemented for SB_Donation_Id, but the first-child-payment
-	*				criteria was not used
-	*Modifications :
+    *Author:  ACLU (Dave Seidman)
+    *Date  :  August 31, 2018
+    *Purpose : AI-8: Market source fields needs to sync from parent Giving record to
+    *               the first and only the first child pledge payment record. This had
+    *               previously been implemented for SB_Donation_Id, but the first-child-payment
+    *               criteria was not used
+    *Modifications :
     *          GH-66: Add Market_Source_Other__c, Payment_Subtype__c, SB_Gateway_Transaction_Id__c
-	*Future TODO: Store these field mappings in a custom setting for easy reconfiguration
-	*
-	*/
-	public static void pushParentSourceFieldsToFirstPayment(Opportunity childOpp) {
-    	childOpp.rC_Giving__Source_Code__c = childOpp.rC_Giving__Parent__r.rC_Giving__Source_Code__c;
-    	childOpp.sb_donation_id__c = childOpp.rC_Giving__Parent__r.sb_donation_id__c;
-    	childOpp.Market_Source_Date__c = childOpp.rC_Giving__Parent__r.Market_Source_Date__c;
-    	childOpp.Form_Internal_Name__c = childOpp.rC_Giving__Parent__r.Form_Internal_Name__c;
+    *Future TODO: Store these field mappings in a custom setting for easy reconfiguration
+    *
+    */
+    public static void pushParentSourceFieldsToFirstPayment(Opportunity childOpp) {
+        childOpp.rC_Giving__Source_Code__c = childOpp.rC_Giving__Parent__r.rC_Giving__Source_Code__c;
+        childOpp.sb_donation_id__c = childOpp.rC_Giving__Parent__r.sb_donation_id__c;
+        childOpp.Market_Source_Date__c = childOpp.rC_Giving__Parent__r.Market_Source_Date__c;
+        childOpp.Form_Internal_Name__c = childOpp.rC_Giving__Parent__r.Form_Internal_Name__c;
         childOpp.SB_Gateway_Transaction_ID__c = childOpp.rc_Giving__Parent__r.SB_Gateway_Transaction_ID__c;
-    	childOpp.SB_Originating_Form_ID__c = childOpp.rC_Giving__Parent__r.SB_Originating_Form_ID__c;
-    	childOpp.Initial_Market_Source_Affiliation__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_Affiliation__c;
-    	childOpp.Initial_Market_Source_Channel__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_Channel__c;
-    	childOpp.Initial_Market_Source_External__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_External__c;
-    	childOpp.Initial_Market_Source_Other__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_Other__c;
-    	childOpp.Market_Source_External__c = childOpp.rC_Giving__Parent__r.Market_Source_External__c;
-    	childOpp.Market_Source_Affiliation__c = childOpp.rC_Giving__Parent__r.Market_Source_Affiliation__c;
-    	childOpp.Market_Source_Channel__c = childOpp.rC_Giving__Parent__r.Market_Source_Channel__c;
+        childOpp.SB_Originating_Form_ID__c = childOpp.rC_Giving__Parent__r.SB_Originating_Form_ID__c;
+        childOpp.Initial_Market_Source_Affiliation__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_Affiliation__c;
+        childOpp.Initial_Market_Source_Channel__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_Channel__c;
+        childOpp.Initial_Market_Source_External__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_External__c;
+        childOpp.Initial_Market_Source_Other__c = childOpp.rC_Giving__Parent__r.Initial_Market_Source_Other__c;
+        childOpp.Market_Source_External__c = childOpp.rC_Giving__Parent__r.Market_Source_External__c;
+        childOpp.Market_Source_Affiliation__c = childOpp.rC_Giving__Parent__r.Market_Source_Affiliation__c;
+        childOpp.Market_Source_Channel__c = childOpp.rC_Giving__Parent__r.Market_Source_Channel__c;
         childOpp.Market_Source_Other__c = childOpp.rC_Giving__Parent__r.Market_Source_Other__c;
-    	childOpp.Payment_Subtype__c = childOpp.rc_Giving__Parent__r.Payment_Subtype__c;
+        childOpp.Payment_Subtype__c = childOpp.rc_Giving__Parent__r.Payment_Subtype__c;
         childOpp.SB_Originating_Form_Name__c = childOpp.rC_Giving__Parent__r.SB_Originating_Form_Name__c;
-    	childOpp.SB_Originating_Form_ID__c = childOpp.rC_Giving__Parent__r.SB_Originating_Form_ID__c;
-    	childOpp.Referral_URL__c = childOpp.rC_Giving__Parent__r.Referral_URL__c;
-    	childOpp.Initial_Referral_URL__c = childOpp.rC_Giving__Parent__r.Initial_Referral_URL__c;
-    	childOpp.Search_Engine__c = childOpp.rC_Giving__Parent__r.Search_Engine__c;
-    	childOpp.Search_String__c = childOpp.rC_Giving__Parent__r.Search_String__c;
+        childOpp.SB_Originating_Form_ID__c = childOpp.rC_Giving__Parent__r.SB_Originating_Form_ID__c;
+        childOpp.Referral_URL__c = childOpp.rC_Giving__Parent__r.Referral_URL__c;
+        childOpp.Initial_Referral_URL__c = childOpp.rC_Giving__Parent__r.Initial_Referral_URL__c;
+        childOpp.Search_Engine__c = childOpp.rC_Giving__Parent__r.Search_Engine__c;
+        childOpp.Search_String__c = childOpp.rC_Giving__Parent__r.Search_String__c;
     } 
        
      /*
@@ -814,7 +814,7 @@ public class OpportunityManager {
             if(parentToChildOpportunities.containsKey(objOppty.Id)) {
                 tempOppList = parentToChildOpportunities.get(objOppty.Id);
                 for(Opportunity opp : tempOppList) {
-                    if(objOppty.Batch_Log__c != null && objOppty.stageName.equalsIgnoreCase('Completed')) {//ACLU:77940 :: Added a condition to check stagename = completed
+                    if(objOppty.Batch_Log__c != null) {
                         opp.Batch_Log__c = objOppty.Batch_Log__c;
                     }
                     if(objOppty.Deposit_Site__c != null) {
@@ -847,22 +847,6 @@ public class OpportunityManager {
             }
         }*/
         return mapUpdateOpportunities;
-    }
-
-    public static void getTransactionMappedFromParent(Opportunity child,Opportunity parentOpp) {
-            if(parentOpp.Batch_Log__c != null) {//ACLU:77940 :: Added a condition to check stagename = completed
-                child.Batch_Log__c = parentOpp.Batch_Log__c;
-            }if(parentOpp.Batch_Sequence__c != null) {
-                child.Batch_Sequence__c = parentOpp.Batch_Sequence__c;
-            }if(parentOpp.Batch_Date__c != null) {
-                child.Batch_Date__c = parentOpp.Batch_Date__c;
-            }if(parentOpp.Deposit_Site__c != null) {
-                child.Deposit_Site__c =parentOpp.Deposit_Site__c;
-            }if(parentOpp.Bank_Date__c != null) {
-                child.Bank_Date__c = parentOpp.Bank_Date__c;
-            }if(parentOpp.Payment_Subtype__c != null) {
-                child.Payment_Subtype__c = parentOpp.Payment_Subtype__c;
-            }
     }
     
      /*
@@ -951,15 +935,15 @@ public class OpportunityManager {
                 campaignIdsToByPass.add(camp.Id);
             }
         }
-		
-	    if (!campaignIdsToByPass.isEmpty()) {
+        
+        if (!campaignIdsToByPass.isEmpty()) {
             for (Opportunity opp : opps) {
                 if (opp.campaignId != null && campaignIdsToByPass.contains(opp.campaignId) || 
                     opp.CampaignIdText__c != null && campaignIdsToByPass.contains(opp.CampaignIdText__c)) {
                         opp.Bypass_Calculations__c = TRUE;
                 }
             }
-	    }
+        }
     }
     //ACLU:77940 :: Update batchlog details of child list from a parent list
     public static void setTransactionBatchFieldsFromParent(Set<Opportunity> childOppList,Map<id,Opportunity> parentOppMap) {

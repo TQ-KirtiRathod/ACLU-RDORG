@@ -5,7 +5,8 @@
 *Date  :  Jan 30, 2017
 *Purpose : Controller Class for CMI_Reports page
 * Ticket 		Modified Date		Modified by				Purpose
-* #75941        03/04/2020		 SFDO (Kirti Rathod)    Added BRI Affiliate Share field check*/
+* #75941        03/04/2020		 SFDO (Kirti Rathod)    Added BRI Affiliate Share field check*
+* #77016        11/06/2020       SFDO (Kirti Rathod)    Added a timezone on the report*/
 global with sharing class RevenueSharingReportsController {
   public transient List<Affiliate_Yearly__c> listOfRecords { get; set; }
   public AggregateResult result{get;set;}
@@ -15,6 +16,7 @@ global with sharing class RevenueSharingReportsController {
   public static String todayDate{get;set;}
   public static Double totalAffiliateBRI{get;set;}
   public static Double totalNationalBRI{get;set;}
+  public String dateTimezone{get;set;}//#77016
   static {
     Datetime myDatetime = Datetime.now();
     todayDate = myDatetime.format('EEE MMM d,  yyyy');
@@ -22,6 +24,7 @@ global with sharing class RevenueSharingReportsController {
   }
   public RevenueSharingReportsController() {
       listOfRecords = new List<Affiliate_Yearly__c>();
+      dateTimezone = System.now().format() +' ' + Utilities.getTimeZone();//#77016
       listOfRecords = [SELECT Id, Fiscal_Year__c, CMI_stage_DateStart__c, CMI_stage_DateEnd__c,Account__r.Affiliation__c, CMI_stage_Unshared_New__c,
                             CMI_stage_Unshared_New_Count__c, CMI_stage_Unshared_Recap__c, CMI_stage_Unshared_Recap_Count__c, CMI_stage_Unshared_FirstRenew__c,
                             CMI_stage_Unshared_FirstRenew_Count__c, Total_Unshared_Affiliate__c,

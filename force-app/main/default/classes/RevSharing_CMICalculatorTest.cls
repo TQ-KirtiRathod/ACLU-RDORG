@@ -1,5 +1,6 @@
 /**
  * Test Class for RevSharing_CMICalculator
+ * Modified by :: Salesforce.org :: 03-August-2020 :: Zendesk: #79232
  **/
 @isTest
 private class RevSharing_CMICalculatorTest {
@@ -111,7 +112,7 @@ private class RevSharing_CMICalculatorTest {
         createData();
         Test.startTest();
         for(Integer i=0;i<10;i++){
-           listOpportunity.get(i).Sharing_Code__c='R121'; 
+           listOpportunity.get(i).Sharing_Code__c='E121'; // #79232 :Changed the Sharing code instead of R121
         }
    
         insert listOpportunity;

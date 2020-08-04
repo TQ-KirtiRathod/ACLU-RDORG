@@ -4,7 +4,7 @@
 *Author:  Appirio India (Shikha Gupta)
 *Date  :  Feb 09, 2017
 *Purpose : Controller Class for FCMI_Reports Page. This will pull the data from Affiliates Yearly for the FCMI eports
-*
+*Modified By : Kirti Rathod(SFDO) : 11-June-2020 #77016
 */
 public with sharing class FCMI_Report_Controller {
   public transient List<Affiliate_Yearly__c> listOfRecords { get; set; }
@@ -16,6 +16,7 @@ public with sharing class FCMI_Report_Controller {
   public static Double totalAffBaseRenewableIncomeTotalColumn{get;set;}
   //public static Double totalNatAvgGift{get;set;}
   public static Double foundationCostFactor{get;set;}
+  public String dateTimezone{get;set;}//#77016
   static {
     Datetime myDatetime = Datetime.now();
     todayDate = myDatetime.format('EEE MMM d,  yyyy');
@@ -27,6 +28,7 @@ public with sharing class FCMI_Report_Controller {
   public FCMI_Report_Controller() {
       listOfRecords = new List<Affiliate_Yearly__c>();
       totalAffBaseRenewableIncomeTotalColumn = 0;
+      dateTimezone =  System.now().format() +' ' + Utilities.getTimeZone();
       listOfRecords =  [SELECT Id, Fiscal_Year__c, Account__r.Affiliation__c,FCMI_stage_DateStart__c,FCMI_stage_DateEnd__c,
                                             FCMI_NatDirectMailLess2500__c, FCMI_NatDirectMailLess2500_Count__c, FCMI_NatDirectMailLess2500_AvgGift__c,
                                             FCMI_NatDirectMailLess2500_NetAmount__c, FCMI_NatWorkplace__c, FCMI_TotalBRI__c, FCMI_NetBRI__c,

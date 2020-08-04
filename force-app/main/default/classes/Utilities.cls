@@ -337,7 +337,6 @@ public class Utilities{
 
         // Add FROM statement
         query += ' FROM ' + sobjectName;
-
         // may not need as long as middle names are enabled; but SOQL error popping up suddenly in dev org
        /* if (sobjectName == 'Contact' && !(query.contains('MiddleName') || query.contains('middlename'))) {
             query = query.replace('firstname,','firstname, middlename,');
@@ -371,6 +370,19 @@ public class Utilities{
     public static String stripNonNumeric(String stringToStrip) {
         return stringToStrip.replaceAll('[^0-9]', '');
     }
-
+    //Added by : Kirti Rathod(SFDO)#77016 - This method is used to find the timezone of user
+    public static String getTimeZone() {
+        TimeZone tz = UserInfo.getTimeZone();
+        String userDate = tz.getDisplayName();
+        if(userDate.contains(')')) {
+            userDate = userDate.substringBetween(')', '(');
+        }
+        List<String> lst = (userDate.trim()).split(' ');
+        userDate= '';
+        for(String s :lst) {
+            userDate = userDate+s.subString(0,1);
+        }
+        return userDate;
+    }
 
 }

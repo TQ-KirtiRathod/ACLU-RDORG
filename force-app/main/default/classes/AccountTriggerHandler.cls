@@ -433,6 +433,7 @@ public class AccountTriggerHandler {
       populateSortNameOnHouseholdAccounts(newList,oldMap);
 
       createOrUpdatePreferencesOnAccount(newList,oldMap);
+      
     }
 
     private static void updateEmailPreferencesForAffiliateChange(Map<Id, String> newAffiliationMap, Map<Id, String> oldAffiliationMap) {

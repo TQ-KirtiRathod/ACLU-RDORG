@@ -8,6 +8,7 @@
 *
 * Modified by :: Salesforce.org :: 29-May-2019 :: Zendesk: #67674
 * Modified by :: Salesforce.org :: 02-August-2019 :: Zendesk: #69266
+* Modified by :: Salesforce.org :: 03-August-2020 :: Zendesk: #79232:
 * Description :: Affiliate Banked Revenue with Unexpected Calculations
 */
 global class RevSharing_CMICalculator implements Database.Batchable<sObject>,Database.stateful {
@@ -238,7 +239,7 @@ global class RevSharing_CMICalculator implements Database.Batchable<sObject>,Dat
                 }
 
                 // Advertising
-                if(theOpp.Sharing_Code__c == 'R121' || theOpp.Sharing_Code__c == 'E121' ){
+                if(theOpp.Sharing_Code__c == 'E121' ){ // ACLU #79232 :: CMI Column 44 - Removed the sharing code R121 condition
                     //advertising = advertising + calculateAffiliateShare(theOpp, mapAccountIdToAmount, costFactor, false );
                     //advertisingNat = advertisingNat + calculateNationalShare(theOpp, mapAccountIdToAmount, costFactor, false );
                     //Zendesk: #67674: Calculated in Nationals only when deposit site contains "NA" or no value

@@ -11,9 +11,12 @@
 *Modified By: Amar Kulkarni (rC) :: 09-Jul-18
 *Desc: I-57114 - Operational Source Codes not applied to sustainer pledge payment charges
 **Chnage Log: Traction(Mounica V)  BGE-22, 12/2/2019 : Commented the call to flagMembershipShareCodeReset method
-* Ticket#  Modified Date    Modified By	  Description
-* #67314 	06-Feb-2020		 SFDO			- Added the batchlog type = Vendor in the if condition
-* #77940    24-June-2020     SFDO           - Added a if block to map batch log on transaction when it gets completed instead of open stage
+              Traction(Nchandwani), ACL-25, 28May2020 Added method to assocaite payment/transaction with BUP
+              Traction(Nchandwani), BGE-102/ACL-001: Removed existing logic to populate Market Source fields
+              Traction(Nchandwani), BGE-6/ACL-64: Added after update logic to update Sharing_Code_Description__c
+* Ticket#  Modified Date       Modified By      Description
+* #67314    06-Feb-2020         SFDO            - Added the batchlog type = Vendor in the if condition
+* #77940    24-June-2020        SFDO           - Added a if block to map batch log on transaction when it gets completed instead of open stage and Adjustment code != D
 */
 public class OpportunityTriggerHandler {
 
@@ -195,7 +198,18 @@ public class OpportunityTriggerHandler {
         list<Opportunity> listOfOpportunitiesForNameUpdate = new list<Opportunity>();
         Set<Opportunity> childOppList = new Set<Opportunity>();
         //Set<Id> parentOppIdSet = new Set<Id>();
+        
+        //Added as part of BGE-06/ACL-064 
+        Map<String,String> mapSharecodetoDescription = getSharingCodeMap();
         for(Opportunity objOppty: newlistOpp) {
+            
+            //Start: BGE-06/ACL-064: Nchandwani, Update sharing Description based on share code
+            if( objOppty.StageName == 'Completed' && String.isNotBlank( objOppty.Sharing_Code__c ) ){
+            
+                objOppty.Sharing_Code_Description__c =  mapSharecodetoDescription.get(objOppty.Sharing_Code__c);    
+                            
+            }//BGE-06/ACL-064: END
+        
             //Default Acknowledgement status I-315069
             if((objOppty.RecordTypeId == OPPORTUNITY_RT_DONATION_Id || objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_Id || 
                 objOppty.RecordTypeId == OPPORTUNITY_RT_TRANSACTION_Id || objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id || 
@@ -270,6 +284,7 @@ public class OpportunityTriggerHandler {
           //ACLU #77940 : Added the condition - Maps parent's batch log to transaction batch log id
           if((objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id
             || objOppty.RecordTypeId == OPPORTUNITY_RT_TRANSACTION_Id)
+            && objOppty.Adjustment_Code__c != 'D'
             && objOppty.StageName.equalsIgnoreCase('Completed')){
               childOppList.add(objOppty);
           }
@@ -284,7 +299,7 @@ public class OpportunityTriggerHandler {
                                     RPT_Package_Code__c, Restriction__c, Program_Type__c, Campaign_Type__c, Fund__c,
                                     Fundraising_Department__c, Account_Code__c, CampaignId, CampaignIdText__c,SB_Donation_Id__c,
                                     Acknowledgment_Code__c,Tax_Date__c,Tax_Value__c,rC_Giving__Giving_Amount__c,//T-647782-added tax value
-                                    Batch_Log__c,Batch_Sequence__c,Batch_Date__c,Bank_Date__c,Payment_Subtype__c //ACLU :#77940 - Added fields 
+                                    Batch_Log__c,Batch_Sequence__c,Batch_Date__c,Bank_Date__c,Payment_Subtype__c,Adjustment_Code__c //ACLU :#77940 - Added fields
                                  FROM Opportunity
                                  WHERE (Id IN : setOfParentOrRelatedTransactionIds)]) {
             mapOfParentOppIdVsParentOpportunity.put(opp.Id,opp);
@@ -321,6 +336,7 @@ public class OpportunityTriggerHandler {
                 && (objOppty.rC_Giving__Is_Sustainer__c)) {
               objOppty.CampaignId = objOppty.Upgrade_Source__c;
             }
+            
             //Populate Tax Date for Pledge Payments
             if(objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id && objOppty.Tax_Date__c == null 
                 && objOppty.CloseDate != null) {
@@ -591,9 +607,9 @@ public class OpportunityTriggerHandler {
                 objOppty.Tax_Value__c = objOppty.Amount;
             }
             //END T-647782
-                            
+                
         }
-
+           
         // Method to  copy Fields from Campaign and populate Sharing and Revenue Type fields
         if(!opportunities.IsEmpty()){
             OpportunityCampaignManager.copyCampaignFieldsAndPopulateSharingFields(opportunities, campaignIds,true, null);
@@ -811,7 +827,7 @@ public class OpportunityTriggerHandler {
                         objOppty.Batch_Log__r.Batch_Log_Type__c == 'Manual' 
                         || objOppty.Batch_Log__r.Batch_Log_Type__c == 'Vendor') {//Zendesk: #67314 - Added the batchlog type = Vendor in the if condition
                 parentOpportunityIds.add(objOppty.Id);
-                //parentOpportunities.add(objOppty); //ACLU:: #77940 :: This line is commented beacuse the 
+                 //parentOpportunities.add(objOppty); //ACLU:: #77940 :: This line is commented beacuse the 
                                                      //batchlog should populated when stagename = completed 
             }
             //populate Merchant Name
@@ -1064,7 +1080,6 @@ public class OpportunityTriggerHandler {
               OPPORTUNITY_RT_SOFT_CREDIT_Id+'\' OR RecordTypeId =\''+ OPPORTUNITY_RT_PLEDGE_PAYMENT_Id+
               '\' ) AND StageName = \'Completed\'');
         }
-
         
     }
 
@@ -1082,8 +1097,11 @@ public class OpportunityTriggerHandler {
         List<opportunity> newlistOpp = newMap.values();
         Set<String> campaignIds = new Set<String>();
         Set<Id> setOfPaymentMethodIds =  new Set<Id>();
+        Set<Id> setOfPledgePaymentIds =  new Set<Id>();
         List<opportunity> opportunities = new List<opportunity>();
         List<Opportunity> listOfCompletedChildOpps = new List<Opportunity>();
+        List<Opportunity> listOfCompletedPledgeChildOpps = new List<Opportunity>();
+        List<Opportunity> listOfCompletedTransactionChildOpps = new List<Opportunity>();
         Set<Id> setOfAccountIds = new Set<Id>();
         Set<Id> setOfRelatedTransactionIds = new Set<Id>();
         Map<Id,Account> mapOfAccountIdVsAccount = new Map<Id,Account>();
@@ -1095,18 +1113,17 @@ public class OpportunityTriggerHandler {
         List<Opportunity> opptyLstForShareCodeUpdate = new List<Opportunity>();
         rC_Giving__Opportunity_Setting__c oppSetting = rC_Giving__Opportunity_Setting__c.getInstance();
         list<Opportunity> listOfOpportunitiesForNameUpdate = new list<Opportunity>();
-        Set<Opportunity> childOppList = new Set<Opportunity>();
+        Set<Opportunity> childOppList = new Set<Opportunity>();//ACLU #77940: Added a variable
         System.debug('Before Update');
         /* Mounica V, Added as part of BGE-6 */
-        map<String, Share_Source_Revenue_Codes__c> mapShareCodeTable = Share_Source_Revenue_Codes__c.getAll();
-        Map<String,string> mapShareCodetoDescription = new map<String,string>();
-        for(String oShare : mapShareCodeTable.keyset()){
-        mapShareCodetoDescription.put(mapShareCodeTable.get(oshare).Share_Code__c,mapShareCodeTable.get(oshare).Share_Code_Description__c);
-        } //BGE-6 END
+        Map<String,string> mapShareCodetoDescription = getSharingCodeMap();
+        //BGE-6 END
         
         for(Opportunity objOppty: newlistOpp) {
             if( objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id){
               System.debug(LoggingLevel.Error, '=============before update=='+objOppty.stagename);
+                setOfPledgePaymentIds.add(objOppty.rC_Giving__Parent__c);
+                listOfCompletedPledgeChildOpps.add(objOppty);
             }
           if((oldMap.get(objOppty.Id).Isclosed != objOppty.Isclosed  || oldMap.get(objOppty.Id).accountId != objOppty.accountId)
               && objOppty.Isclosed == true && objOppty.accountId != null ) {
@@ -1126,6 +1143,7 @@ public class OpportunityTriggerHandler {
           // Modified By :: roundCorner Inc. 
           // #60194: Rolling down information from Donation to Transaction
           if(objOppty.rC_Giving__Parent__c != null && objOppty.RecordtypeId == OPPORTUNITY_RT_TRANSACTION_Id){
+            listOfCompletedTransactionChildOpps.add(objOppty);
             setOfRelatedTransactionIds.add(objOppty.rC_Giving__Parent__c);
           }
 
@@ -1197,10 +1215,10 @@ public class OpportunityTriggerHandler {
                  
                 objOppty.Sharing_Code_Description__c =  mapSharecodetoDescription.get(objOppty.Sharing_Code__c);
              } //BGE-6 END
-
              //ACLU #77940 : Added the condition - Maps parent's batch log to transaction batch log id
             if((objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id
               || objOppty.RecordTypeId == OPPORTUNITY_RT_TRANSACTION_Id)
+              && objOppty.Adjustment_Code__c != 'D'
               && objOppty.StageName.equalsIgnoreCase('Completed') 
               && objOppty.StageName!= oldMap.get(objOppty.id).StageName){
                 childOppList.add(objOppty);
@@ -1229,15 +1247,31 @@ public class OpportunityTriggerHandler {
           }
         }
 
-        if(setOfRelatedTransactionIds.size() > 0 ) {
-          for(Opportunity opp : [SELECT Id, rC_Giving__Source_Code__c,Deposit_Site__c,RPT_Package_Code__c,Restriction__c,rC_Giving__Ticker_Symbol__c,rC_Giving__Number_Of_Shares__c,High_Amount__c,Low_Amount__c,Types_of_shares__c,Tax_Value__c,
-                                        Program_Type__c,Campaign_Type__c,Fund__c,Fundraising_Department__c,Account_Code__c,
-                                        CampaignId,CampaignIdText__c,Acknowledgment_Code__c,
-                                        Batch_Log__c,Batch_Sequence__c,Batch_Date__c,Bank_Date__c,Payment_Subtype__c //ACLU :#77940 - Added fields 
+        if(setOfRelatedTransactionIds.size() > 0) {
+          for(Opportunity opp : [SELECT Id, rC_Giving__Source_Code__c,Deposit_Site__c,RPT_Package_Code__c,Restriction__c,rC_Giving__Ticker_Symbol__c,rC_Giving__Number_Of_Shares__c,High_Amount__c, Low_Amount__c,
+                                        Types_of_shares__c,Tax_Value__c,Program_Type__c,Campaign_Type__c,Fund__c,Fundraising_Department__c,Account_Code__c, CampaignId, CampaignIdText__c,
+                                        Acknowledgment_Code__c, batch_log__c, rC_Giving__Check_Date__c,rC_Giving__Check_Number__c, SB_Originating_Form_ID__c, SB_Form_Affiliation__c, SB_Donation_Id__c,
+                                        Form_Internal_Name__c, rC_Giving__Acknowledged_Date__c, Acknowledgment_Status__c, rC_Giving__Acknowledged__c, Source_File__c, Form_URL__c,
+                                        Batch_Sequence__c,Batch_Date__c,Bank_Date__c,Payment_Subtype__c,Adjustment_Code__c //ACLU :#77940 - Added fields 
                                  FROM Opportunity
-                                 WHERE Id IN : setOfRelatedTransactionIds]) {
+                                 WHERE Id IN : setOfRelatedTransactionIds ]) {
             mapOfParentOppIdVsParentOpportunity.put(opp.Id,opp);
           }
+        }
+
+        //populate map parent to pledge
+        if(setOfPledgePaymentIds.size() > 0 ) {
+            System.debug('>>> build parent');
+            for(Opportunity opp : [SELECT Id, rC_Giving__Source_Code__c,Deposit_Site__c,RPT_Package_Code__c,Restriction__c,rC_Giving__Ticker_Symbol__c,rC_Giving__Number_Of_Shares__c,High_Amount__c,Low_Amount__c,Types_of_shares__c,Tax_Value__c,
+                    Program_Type__c,Campaign_Type__c,Fund__c,Fundraising_Department__c,Account_Code__c,
+                    CampaignId,CampaignIdText__c,Acknowledgment_Code__c, batch_log__c, rC_Giving__Check_Date__c,rC_Giving__Check_Number__c,
+                    SB_Originating_Form_ID__c, SB_Form_Affiliation__c, SB_Donation_Id__c, Form_Internal_Name__c, rC_Giving__Acknowledged_Date__c, Acknowledgment_Status__c,
+                    rC_Giving__Acknowledged__c, Source_File__c, Form_URL__c, StageName, SB_Originating_Form_Name__c,
+                    Batch_Sequence__c,Batch_Date__c,Bank_Date__c,Payment_Subtype__c,Adjustment_Code__c //ACLU :#77940 - Added fields 
+            FROM Opportunity
+            WHERE Id IN : setOfPledgePaymentIds ]) {
+                mapOfParentOppIdVsParentOpportunity.put(opp.Id,opp);
+            }
         }
         //Populate map from Custom setting
         if(listOfOppsFromGivingWizard.size() > 0) {
@@ -1249,7 +1283,8 @@ public class OpportunityTriggerHandler {
                             System.debug('==before update start rec type =='+objOppty.RecordTypeId);
             
             //GH-75 START
-            //Prevent Adjustment recordtype from EVER being changed to Pledge Payment     
+            //Prevent Adjustment recordtype from EVER being changed to Pledge Payment
+
             if (objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id && oldMap.get(objOppty.Id).RecordTypeId == OPPORTUNITY_RT_ADJUSTMENT_Id
                 && objOppty.Adjustment_Code__c == 'N' && oldMap.get(objOppty.Id).Adjustment_Code__c == 'A') {
                 Boolean adjCancellationInProgress = BatchLogDetailPageController.adjustmentCancellationInProgress;  
@@ -1521,7 +1556,8 @@ public class OpportunityTriggerHandler {
             currentUser.Validation_Bypass__c = true;
             update currentUser; 
             }*/
-        }
+        } 
+         
         //Method to  copy Fields from Campaign and populate Sharing and Revenue Type fields
         if(!opportunities.IsEmpty()) {
             OpportunityCampaignManager.copyCampaignFieldsAndPopulateSharingFields(opportunities, campaignIds,false, oldMap);
@@ -1533,6 +1569,7 @@ public class OpportunityTriggerHandler {
                 if(!shareCodeLogicProcessedSet.contains(oppty.Id)) {
                     opptyLstForShareCodeUpdate.add(oppty);
                 }
+
             }
         } else {
             opptyLstForShareCodeUpdate = listOfCompletedChildOpps;
@@ -1714,11 +1751,11 @@ public class OpportunityTriggerHandler {
               rC_Giving__Parent__r.Market_Source_Affiliation__c,
               rC_Giving__Parent__r.Market_Source_Channel__c,
               rC_Giving__Parent__r.Market_Source_Other__c,
+              rC_Giving__Parent__r.Payment_Subtype__c,
               rC_Giving__Parent__r.Referral_URL__c,
               rC_Giving__Parent__r.Initial_Referral_URL__c,
               rC_Giving__Parent__r.Search_Engine__c,
-              rC_Giving__Parent__r.Search_String__c,
-              rc_Giving__Parent__r.Payment_Subtype__c,
+              rC_Giving__Parent__r.Search_String__c,                            
               LastModifiedDate, rC_Giving__Parent__r.CampaignId, 
               Source_Code_Override__c,
               rC_Giving__Planned_Giving__c,rC_Giving__Giving_Amount__c, Original_Amount__c, Prior_Amount__c, Sharing_Code__c, 
@@ -1764,8 +1801,8 @@ public class OpportunityTriggerHandler {
                    objOppty.Account_Code__c != oldMap.get(objOppty.Id).Account_Code__c ||
                    objOppty.Acknowledgment_Code__c != oldMap.get(objOppty.Id).Acknowledgment_Code__c ||
                    objOppty.CampaignIdText__c != oldMap.get(objOppty.Id).CampaignIdText__c)) {
-				   
-				   setOfRealtedTransactionIds.add(objOppty.Id);
+                   
+                   setOfRealtedTransactionIds.add(objOppty.Id);
             }
 
             // Method to update the Account code, Restriction, Fundraising Department And Fund Field on child oppties if updated on Parent
@@ -1891,7 +1928,7 @@ public class OpportunityTriggerHandler {
             if(objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id && objOppty.StageName != oldMap.get(objOppty.Id).StageName
                 && objOppty.StageName == 'Completed' &&
               objOppty.rC_Giving__Parent__r.rC_Giving__Is_Sustainer__c) {
-              	  /* Changes for :: I-57114 - Operational Source Codes not applied to sustainer pledge payment charges			      */
+                  /* Changes for :: I-57114 - Operational Source Codes not applied to sustainer pledge payment charges                */
                   if(objOppty.Sustainer_First_Payment__c && objOppty.Adjustment_Code__c != 'D') {
                       objOppty.rC_Giving__Source_Code__c = objOppty.rC_Giving__Parent__r.rC_Giving__Source_Code__c;
                       opptyMapToUpdate.put(objOppty.Id,objOppty);
@@ -1940,9 +1977,10 @@ public class OpportunityTriggerHandler {
                         objOppty.Batch_Log__r.Batch_Log_Type__c == 'Manual' 
                         || objOppty.Batch_Log__r.Batch_Log_Type__c == 'Vendor') {//Zendesk: #67314 - Added the batchlog type = Vendor in the if condition
                 parentOpportunities.add(objOppty);
-               // parentOpportunityIds.add(objOppty.id);//added by Bhavesh, this should be there to run updateChildOpportunityFromBatchLog fn in OpportunityManager class, this list size is checked in below code.
+                //parentOpportunityIds.add(objOppty.id);//added by Bhavesh, this should be there to run updateChildOpportunityFromBatchLog fn in OpportunityManager class, this list size is checked in below code.
                 parentOpptyOldMap.put(objOppty.Id, oldMap.get(objOppty.Id));
             }
+
             //populate Merchant Name
             //removed the checking with paymentMethod field change  (objOppty.rC_Giving__Payment_Method__c != oldMap.get(objOppty.Id).rC_Giving__Payment_Method__c || )
             if(objOppty.Deposit_Site__c != null && objOppty.rC_Giving__Payment_Method_Selected__c != null
@@ -2041,7 +2079,8 @@ public class OpportunityTriggerHandler {
             if( objOppty.Stagename == 'Completed' && objOppty.Stagename != oldMap.get(objOppty.id).Stagename 
                 && ((objOppty.RecordTypeId == OPPORTUNITY_RT_PLEDGE_PAYMENT_Id && objOppty.Related_Transaction__c == null && objOppty.sustainer_first_payment__c == TRUE)
                 || objOppty.RecordTypeId == OPPORTUNITY_RT_TRANSACTION_Id)) {
-                OpportunityManager.pushParentSourceFieldsToFirstPayment(objOppty);
+               //BGE-102: Nchandwani, Commented Source field population from parent
+                //OpportunityManager.pushParentSourceFieldsToFirstPayment(objOppty);
                 mapUpdateOpportunities.put(objOppty.Id,objOppty);
             }
             
@@ -2683,6 +2722,20 @@ public class OpportunityTriggerHandler {
         return opt;
     }
      
+
+    /**
+     * @name getSharingCodeMap
+     * @description Method to get Sharing code map with share_code and share_code_description
+     * @date 19 June 2020
+     */
+    private static Map<String,string> getSharingCodeMap(){
+        Map<String, Share_Source_Revenue_Codes__c> mapShareCodeTable = Share_Source_Revenue_Codes__c.getAll();
+        Map<String,string> mapShareCodetoDescription = new Map<String,string>();
+        for( String oShare : mapShareCodeTable.keyset() ){
+            mapShareCodetoDescription.put(mapShareCodeTable.get(oshare).Share_Code__c,mapShareCodeTable.get(oshare).Share_Code_Description__c);
+        }
+        return mapShareCodetoDescription;
+    }
      
      
     

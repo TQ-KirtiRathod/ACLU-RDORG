@@ -313,6 +313,7 @@
             <td colspan="4" class="nb"> -->
     </tbody></table>
     <table class="rptTbl" ><tbody>
+        <apex:variable value="{!0}" var="nationalTotalBanked"/><!--#78464 :: Added a variable to calculate the value-->
         <tr>
             <td class="c3"></td>
             <td class="c37" colspan="2" width="70%">a. National -Banked -- Total =
@@ -332,6 +333,7 @@
                 <td class="c10">{!three_a[v3_a].campaign}</td>
                 <td class="c10 ar">
                     <c:customCurrency curr="{!three_a[v3_a].amount}" />
+                    <apex:variable var="nationalTotalBanked" value="{!nationalTotalBanked + three_a[v3_a].amount}"/><!--#78464 :: Added a variable to calculate the value-->
                 </td>
                 <td class="c30"></td>
             </tr>
@@ -346,15 +348,17 @@
             <td class="c10 ar"></td>
             <td class="c30"></td>
         </tr>
+        <apex:variable value="{!0}" var="affiliateTotalBanked"/><!--#78464 :: Added a variable to calculate the value-->
         <apex:repeat value="{!three_b}" var="v3_b" id="three_b">
             <tr>
                 <td class="c3"></td>
                 <td class="c20"></td>
                 <td class="c17">{!three_b[v3_b].total}{!three_b[v3_b].donor}</td>
-                <td class="c10 ar">!three_b[v3_b].sharingCode}</td>
+                <td class="c10 ar">{!three_b[v3_b].sharingCode}</td>
                 <td class="c10">{!three_b[v3_b].campaign}</td>
                 <td class="c10 ar">
                     <c:customCurrency curr="{!three_b[v3_b].amount}" />
+                   <apex:variable var="affiliateTotalBanked" value="{!affiliateTotalBanked + three_b[v3_b].amount}"/><!--#78464 :: Added a variable to calculate the value-->
                 </td>
                 <td class="c30"></td>
             </tr>
@@ -365,7 +369,7 @@
             <td class="c3"></td>
             <td class="c55">c. Net Solicited Earmarked Income Due To/(From) Affiliate</td>
             <td class="c10 ar">
-                <apex:variable value="{!three_aTotal - three_bTotal}" var="three_c"/>
+                <apex:variable value="{!nationalTotalBanked - affiliateTotalBanked}" var="three_c"/><!--#78464 :: Added a variable to calculate the value-->
                 <c:customCurrency curr="{!three_c}" />
             </td>
             <td class="c30"></td>

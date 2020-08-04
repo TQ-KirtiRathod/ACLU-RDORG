@@ -32,10 +32,10 @@
   <table style="width:100%">
    <thead>
     <tr>
-      <th width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th width="12%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone -->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
-      <th colspan="14" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - UNSHARED INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th colspan="14" width="78%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - UNSHARED INCOME</span><br/>{!startDate} - {!endDate}</th>
       <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
                                     <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
                                     <br/>&nbsp;</th>
@@ -114,10 +114,10 @@
    <table style="width:100%">
    <thead>
     <tr>
-      <th cospan="2" width="9%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th cospan="2" width="12%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone and changed the width-->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
-      <th colspan="12" width="79%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - BASE RENEWABLE INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th colspan="12" width="78%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - BASE RENEWABLE INCOME</span><br/>{!startDate} - {!endDate}</th>
       <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
                                     <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
                                     <br/>&nbsp;</th>
@@ -182,10 +182,10 @@
    <table style="width:100%">
    <thead>
     <tr>
-      <th cospan="2" width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th cospan="2" width="12%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone and changed the width-->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
-      <th colspan="7" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - MEMBERSHIP INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th colspan="7" width="78%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - MEMBERSHIP INCOME</span><br/>{!startDate} - {!endDate}</th>
       <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
                                     <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
                                     <br/>&nbsp;</th>
@@ -239,7 +239,7 @@
        <table style="width:100%">
        <thead>
     <tr>
-      <th width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th width="10%" align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone -->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
       <th colspan="8" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - NON-MEMBERSHIP UNSHARED INCOME</span><br/>{!startDate} - {!endDate}</th>
@@ -296,10 +296,10 @@
    <table style="width:100%">
    <thead>
     <tr>
-      <th width="10%"  align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!todayDate}</span><br/>
+      <th width="12%"  align="left"><span style="font-family: Arial Unicode MS; font-size: 8pt; ">{!dateTimezone}</span><br/><!--ACLU :#77016 Added timezone and changed the width-->
                                                 <span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080; vertical-align: text-top;">Date Printed</span>
                                                 <br/>&nbsp;</th>
-      <th colspan="10" width="80%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - INCENTIVE INCOME</span><br/>{!startDate} - {!endDate}</th>
+      <th colspan="10" width="78%" align="center"><span style="font-size:15pt">AMERICAN CIVIL LIBERTIES UNION - INCENTIVE INCOME</span><br/>{!startDate} - {!endDate}</th>
       <th width="10%" align="right"><span style="font-family: Arial Unicode MS; font-size: 8pt; color:#808080">CMI&nbsp;Report</span><br/>
                                     <span style="font-family: Arial Unicode MS; font-size: 8pt; color:red; vertical-align: text-top;">OFFICIAL</span>
                                     <br/>&nbsp;</th>
