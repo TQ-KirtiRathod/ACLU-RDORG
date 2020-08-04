@@ -1,0 +1,8 @@
+<apex:page controller="ExampleController">
+    <apex:form >
+        
+         <apex:variable value="{!one - two}" var="three_c"/>
+    <apex:outputPanel title="{!three_c}"></apex:outputPanel>
+        <apex:outputText value="{!three_c}"></apex:outputText>
+        </apex:form>
+</apex:page>
